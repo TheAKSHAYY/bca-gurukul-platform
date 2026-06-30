@@ -12,8 +12,12 @@ import { Toaster } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { MaintenanceGate } from "@/components/maintenance-gate";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+
+const THEME_INIT_SCRIPT = `(function(){try{var k='bca-theme';var s=localStorage.getItem(k)||'system';var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;if(d)r.classList.add('dark');r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
+
 
 function NotFoundComponent() {
   return (
