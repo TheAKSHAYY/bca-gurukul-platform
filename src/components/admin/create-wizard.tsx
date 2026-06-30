@@ -259,8 +259,9 @@ function SubjectForm({ onBack, onDone }: { onBack: () => void; onDone: () => voi
     if (!semesterId || !title.trim()) return toast.error("Semester and title required");
     setBusy(true);
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const finalCode = (code || slug.toUpperCase().slice(0, 12)) || "SUBJ";
     const { error } = await supabase.from("subjects").insert({
-      semester_id: semesterId, title, code: code || null, slug, status,
+      semester_id: semesterId, title, code: finalCode, slug, status,
     });
     setBusy(false);
     if (error) return toast.error(error.message);
@@ -314,7 +315,10 @@ function UnitForm({ onBack, onDone }: { onBack: () => void; onDone: () => void }
   async function submit(status: "draft" | "published") {
     if (!subjectId || !title.trim()) return toast.error("Subject and title required");
     setBusy(true);
-    const { error } = await supabase.from("units").insert({ subject_id: subjectId, title, status });
+    const { data: existing } = await supabase
+      .from("units").select("number").eq("subject_id", subjectId).order("number", { ascending: false }).limit(1);
+    const nextNumber = (existing?.[0]?.number ?? 0) + 1;
+    const { error } = await supabase.from("units").insert({ subject_id: subjectId, title, number: nextNumber, status });
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Unit created");
