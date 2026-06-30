@@ -131,7 +131,7 @@ export type AuditLogRow = {
   action: string;
   entity_type: string | null;
   entity_id: string | null;
-  metadata: Record<string, unknown> | null;
+  metadata: unknown;
   ip: string | null;
   created_at: string;
 };
