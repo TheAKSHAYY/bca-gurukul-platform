@@ -15,6 +15,7 @@ import { PasswordStrengthMeter, scorePassword } from "@/components/auth/password
 import { PhoneAuthForm } from "@/components/auth/phone-auth-form";
 import { GoogleSignInButton } from "@/components/auth/google-signin-button";
 import { resolvePostAuthRoute } from "@/lib/post-auth";
+import { BrandMark } from "@/components/brand-mark";
 
 
 const searchSchema = z.object({
@@ -64,9 +65,7 @@ function AuthPage() {
         </div>
 
         <Link to="/" className="relative flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary-foreground text-primary shadow-sm">
-            <span className="font-display text-lg font-semibold">ब</span>
-          </div>
+          <BrandMark variant="inverse" className="h-10 w-10" />
           <div className="leading-tight">
             <div className="font-display text-lg font-semibold">BCA Gurukul</div>
             <div className="text-xs text-primary-foreground/70">
@@ -118,9 +117,7 @@ function AuthPage() {
             Back to home
           </Link>
           <Link to="/" className="flex items-center gap-2 lg:hidden">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
-              <span className="font-display text-sm font-semibold">ब</span>
-            </div>
+            <BrandMark className="h-8 w-8" />
             <span className="font-display text-sm font-semibold">BCA Gurukul</span>
           </Link>
         </div>
