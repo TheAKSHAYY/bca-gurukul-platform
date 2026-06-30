@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Users, GraduationCap, Library, Layers, FileText, FileStack, FlaskConical,
-  ImageIcon, Download, Activity, Eye, ListChecks, Rocket, Plus, UploadCloud,
+  ImageIcon, Download, Activity, Eye, ListChecks, Rocket, Plus, UploadCloud, BookOpen,
 } from "lucide-react";
 
 import { getDashboardStats, getRecentUploads, getRecentActivity } from "@/lib/admin.functions";
