@@ -22,7 +22,7 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("maintenance")
-        .select("enabled, message, scheduled_end_at")
+        .select("enabled, message, scheduled_end")
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -51,9 +51,9 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
         <p className="mt-2 text-sm text-muted-foreground">
           {data.message ?? "BCA Gurukul is undergoing scheduled maintenance. Please check back soon."}
         </p>
-        {data.scheduled_end_at && (
+        {data.scheduled_end && (
           <p className="mt-2 text-xs text-muted-foreground">
-            Estimated back online: {new Date(data.scheduled_end_at).toLocaleString()}
+            Estimated back online: {new Date(data.scheduled_end).toLocaleString()}
           </p>
         )}
         {!user && (
