@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, FlaskConical, LayoutDashboard, Shield } from "lucide-react";
+import { BookOpen, FlaskConical, ImageIcon, LayoutDashboard, Shield, Tag as TagIcon } from "lucide-react";
 
 import { useRoles } from "@/hooks/use-roles";
 
