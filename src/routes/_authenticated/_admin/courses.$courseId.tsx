@@ -111,7 +111,7 @@ function CourseTreePage() {
 
           <Accordion type="multiple" className="space-y-3">
             {semestersQuery.data?.map((sem) => (
-              <SemesterCard key={sem.id} sem={sem} onChange={invalidateAll} />
+              <SemesterCard key={sem.id} sem={{ ...sem, status: sem.status as Status }} onChange={invalidateAll} />
             ))}
           </Accordion>
         </section>
@@ -213,7 +213,7 @@ function SemesterCard({
           {subjectsQuery.data?.map((sub) => (
             <SubjectRow
               key={sub.id}
-              sub={sub}
+              sub={{ ...sub, status: sub.status as Status }}
               onChange={() => qc.invalidateQueries({ queryKey: ["admin", "subjects", sem.id] })}
             />
           ))}
