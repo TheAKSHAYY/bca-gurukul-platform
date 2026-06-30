@@ -83,9 +83,23 @@ function UnitDetail() {
               </h2>
               <div className="mt-4 space-y-3">
                 {dataQuery.data.notes.length === 0 && (
-                  <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-sm text-muted-foreground">
-                    No notes published for this unit yet.
-                  </p>
+                  <EmptyState
+                    icon={FileText}
+                    tone="accent"
+                    title="Notes are being prepared"
+                    description="A senior is curating structured, exam-ready notes for this unit. As soon as they're published, you'll see them right here."
+                    tip="Bookmark this unit and we'll keep your spot — pick up exactly where you left off."
+                    primaryAction={{
+                      label: "Bookmark this unit",
+                      to: "/dashboard",
+                      icon: Bookmark,
+                    }}
+                    secondaryAction={{
+                      label: "Explore other units",
+                      to: "/courses",
+                      icon: BookOpen,
+                    }}
+                  />
                 )}
                 {dataQuery.data.notes.map((n) => (
                   <Link
