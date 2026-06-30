@@ -197,7 +197,13 @@ export const updateFeatureFlag = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: Record<string, unknown> = { updated_by: context.userId, updated_at: new Date().toISOString() };
+    const patch: {
+      updated_by: string;
+      updated_at: string;
+      enabled?: boolean;
+      kill_switch?: boolean;
+      rollout_pct?: number;
+    } = { updated_by: context.userId, updated_at: new Date().toISOString() };
     if (typeof data.enabled === "boolean") patch.enabled = data.enabled;
     if (typeof data.kill_switch === "boolean") patch.kill_switch = data.kill_switch;
     if (typeof data.rollout_pct === "number") patch.rollout_pct = data.rollout_pct;
@@ -208,7 +214,7 @@ export const updateFeatureFlag = createServerFn({ method: "POST" })
       action: "flag.update",
       entity_type: "feature_flag",
       entity_id: data.key,
-      metadata: patch,
+      metadata: patch as unknown as Record<string, string | number | boolean>,
     });
     return { ok: true };
   });
