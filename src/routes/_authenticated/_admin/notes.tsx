@@ -30,8 +30,8 @@ export const Route = createFileRoute("/_authenticated/_admin/notes")({
   component: AdminNotesPage,
 });
 
-type Status = "draft" | "published" | "archived";
-type Visibility = "public" | "authenticated" | "admin";
+type Status = string;
+type Visibility = string;
 
 function slugify(input: string) {
   return input

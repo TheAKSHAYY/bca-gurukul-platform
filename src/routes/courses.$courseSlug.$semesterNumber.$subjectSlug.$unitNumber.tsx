@@ -28,7 +28,7 @@ function UnitDetail() {
         .eq("slug", subjectSlug).eq("status", "published").maybeSingle();
       if (!subject) throw notFound();
       const { data: unit } = await supabase
-        .from("units").select("id, number, title, summary, body").eq("subject_id", subject.id)
+        .from("units").select("id, number, title, summary").eq("subject_id", subject.id)
         .eq("number", Number(unitNumber)).eq("status", "published").maybeSingle();
       if (!unit) throw notFound();
 
@@ -75,11 +75,6 @@ function UnitDetail() {
               </div>
             </div>
 
-            {dataQuery.data.unit.body && (
-              <div className="prose prose-neutral mt-8 max-w-none whitespace-pre-wrap rounded-2xl border border-border bg-surface p-6">
-                {dataQuery.data.unit.body}
-              </div>
-            )}
 
             <section className="mt-10">
               <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-foreground">
