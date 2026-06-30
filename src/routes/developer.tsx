@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Github,
   Globe,
+  Home,
   Instagram,
   Linkedin,
   Mail,
