@@ -127,16 +127,17 @@ function EmptyLanding({ user, loading }: { user: unknown; loading: boolean }) {
           page from the admin panel — every section is editable, nothing is hardcoded.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          {!loading && !user && (
+          {!loading && !user ? (
             <Button asChild size="lg">
               <Link to="/auth">Sign in</Link>
             </Button>
-          )}
-          {!loading && user && (
+          ) : null}
+          {!loading && user ? (
             <Button asChild size="lg">
               <Link to="/admin">Open admin panel</Link>
             </Button>
-          )}
+          ) : null}
+
           <Button asChild variant="outline" size="lg">
             <Link to="/courses">Browse courses</Link>
           </Button>
