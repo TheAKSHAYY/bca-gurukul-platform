@@ -1,5 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { BookOpen, FileText, PlayCircle, ListChecks } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, BookOpen, FileText, ListChecks, PlayCircle } from "lucide-react";
+
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
