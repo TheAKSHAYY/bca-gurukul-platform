@@ -38,6 +38,7 @@ import { Route as AuthenticatedAdminQuizzesRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminPapersRouteImport } from './routes/_authenticated/admin/papers'
 import { Route as AuthenticatedAdminNotesRouteImport } from './routes/_authenticated/admin/notes'
 import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/admin/media'
+import { Route as AuthenticatedAdminInboxRouteImport } from './routes/_authenticated/admin/inbox'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminExplorerRouteImport } from './routes/_authenticated/admin/explorer'
 import { Route as AuthenticatedAdminDeveloperRouteImport } from './routes/_authenticated/admin/developer'
@@ -199,6 +200,11 @@ const AuthenticatedAdminMediaRoute = AuthenticatedAdminMediaRouteImport.update({
   path: '/media',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminInboxRoute = AuthenticatedAdminInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
 const AuthenticatedAdminHomepageRoute =
   AuthenticatedAdminHomepageRouteImport.update({
     id: '/homepage',
@@ -311,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/admin/developer': typeof AuthenticatedAdminDeveloperRoute
   '/admin/explorer': typeof AuthenticatedAdminExplorerRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/inbox': typeof AuthenticatedAdminInboxRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
   '/admin/notes': typeof AuthenticatedAdminNotesRoute
   '/admin/papers': typeof AuthenticatedAdminPapersRoute
@@ -353,6 +360,7 @@ export interface FileRoutesByTo {
   '/admin/developer': typeof AuthenticatedAdminDeveloperRoute
   '/admin/explorer': typeof AuthenticatedAdminExplorerRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/inbox': typeof AuthenticatedAdminInboxRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
   '/admin/notes': typeof AuthenticatedAdminNotesRoute
   '/admin/papers': typeof AuthenticatedAdminPapersRoute
@@ -398,6 +406,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/developer': typeof AuthenticatedAdminDeveloperRoute
   '/_authenticated/admin/explorer': typeof AuthenticatedAdminExplorerRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/_authenticated/admin/inbox': typeof AuthenticatedAdminInboxRoute
   '/_authenticated/admin/media': typeof AuthenticatedAdminMediaRoute
   '/_authenticated/admin/notes': typeof AuthenticatedAdminNotesRoute
   '/_authenticated/admin/papers': typeof AuthenticatedAdminPapersRoute
@@ -444,6 +453,7 @@ export interface FileRouteTypes {
     | '/admin/developer'
     | '/admin/explorer'
     | '/admin/homepage'
+    | '/admin/inbox'
     | '/admin/media'
     | '/admin/notes'
     | '/admin/papers'
@@ -486,6 +496,7 @@ export interface FileRouteTypes {
     | '/admin/developer'
     | '/admin/explorer'
     | '/admin/homepage'
+    | '/admin/inbox'
     | '/admin/media'
     | '/admin/notes'
     | '/admin/papers'
@@ -530,6 +541,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/developer'
     | '/_authenticated/admin/explorer'
     | '/_authenticated/admin/homepage'
+    | '/_authenticated/admin/inbox'
     | '/_authenticated/admin/media'
     | '/_authenticated/admin/notes'
     | '/_authenticated/admin/papers'
@@ -773,6 +785,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMediaRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/inbox': {
+      id: '/_authenticated/admin/inbox'
+      path: '/inbox'
+      fullPath: '/admin/inbox'
+      preLoaderRoute: typeof AuthenticatedAdminInboxRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/homepage': {
       id: '/_authenticated/admin/homepage'
       path: '/homepage'
@@ -929,6 +948,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminDeveloperRoute: typeof AuthenticatedAdminDeveloperRoute
   AuthenticatedAdminExplorerRoute: typeof AuthenticatedAdminExplorerRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
+  AuthenticatedAdminInboxRoute: typeof AuthenticatedAdminInboxRoute
   AuthenticatedAdminMediaRoute: typeof AuthenticatedAdminMediaRoute
   AuthenticatedAdminNotesRoute: typeof AuthenticatedAdminNotesRoute
   AuthenticatedAdminPapersRoute: typeof AuthenticatedAdminPapersRoute
@@ -945,6 +965,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminDeveloperRoute: AuthenticatedAdminDeveloperRoute,
     AuthenticatedAdminExplorerRoute: AuthenticatedAdminExplorerRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
+    AuthenticatedAdminInboxRoute: AuthenticatedAdminInboxRoute,
     AuthenticatedAdminMediaRoute: AuthenticatedAdminMediaRoute,
     AuthenticatedAdminNotesRoute: AuthenticatedAdminNotesRoute,
     AuthenticatedAdminPapersRoute: AuthenticatedAdminPapersRoute,
@@ -1025,3 +1046,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
