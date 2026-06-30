@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -9,11 +10,13 @@ import {
   ListChecks,
   LogOut,
   PlayCircle,
+  Search,
   Sparkles,
   TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -75,6 +78,81 @@ function DashboardPage() {
   const bookmarks = bookmarksQuery.data ?? [];
   const progress = progressQuery.data ?? [];
 
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQuery(searchInput.trim()), 250);
+    return () => clearTimeout(id);
+  }, [searchInput]);
+
+  const searchEnabled = debouncedQuery.length >= 2;
+  const searchQuery = useQuery({
+    queryKey: ["dashboard-search", debouncedQuery],
+    enabled: searchEnabled,
+    queryFn: async () => {
+      const pattern = `%${debouncedQuery.replace(/[%_]/g, (m) => `\\${m}`)}%`;
+
+      const [courses, units, notes, papers, quizzes] = await Promise.all([
+        supabase
+          .from("courses")
+          .select("id, title, slug")
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .ilike("title", pattern)
+          .limit(5),
+        supabase
+          .from("units")
+          .select("id, title")
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .ilike("title", pattern)
+          .limit(5),
+        supabase
+          .from("notes")
+          .select("id, title")
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .ilike("title", pattern)
+          .limit(5),
+        supabase
+          .from("papers")
+          .select("id, title")
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .ilike("title", pattern)
+          .limit(5),
+        supabase
+          .from("quizzes")
+          .select("id, title")
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .ilike("title", pattern)
+          .limit(5),
+      ]);
+
+      const errs = [courses.error, units.error, notes.error, papers.error, quizzes.error].filter(Boolean);
+      if (errs.length) throw errs[0];
+
+      return {
+        courses: (courses.data ?? []) as Array<{ id: string; title: string; slug: string }>,
+        units: (units.data ?? []) as Array<{ id: string; title: string }>,
+        notes: (notes.data ?? []) as Array<{ id: string; title: string }>,
+        papers: (papers.data ?? []) as Array<{ id: string; title: string }>,
+        quizzes: (quizzes.data ?? []) as Array<{ id: string; title: string }>,
+      };
+    },
+  });
+
+  const searchResults = searchQuery.data;
+  const totalResults = searchResults
+    ? searchResults.courses.length +
+      searchResults.units.length +
+      searchResults.notes.length +
+      searchResults.papers.length +
+      searchResults.quizzes.length
+    : 0;
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-md">
@@ -126,6 +204,128 @@ function DashboardPage() {
             </Button>
           </div>
         </section>
+
+        {/* Search */}
+        <section className="mt-8">
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+            <label htmlFor="dashboard-search" className="flex items-center gap-2.5">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                <Search className="h-4.5 w-4.5" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="font-display text-lg font-semibold text-foreground">
+                  Search the library
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  Find published courses, units, notes, papers and quizzes.
+                </p>
+              </div>
+            </label>
+
+            <div className="mt-4 relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="dashboard-search"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Try “data structures”, “DBMS 2023”, “OS quiz”…"
+                className="pl-9"
+                autoComplete="off"
+              />
+            </div>
+
+            {!searchEnabled ? (
+              <p className="mt-4 text-xs text-muted-foreground">
+                Type at least 2 characters to begin searching.
+              </p>
+            ) : searchQuery.isLoading ? (
+              <p className="mt-4 text-sm text-muted-foreground">Searching…</p>
+            ) : searchQuery.isError ? (
+              <p className="mt-4 text-sm text-destructive">
+                Something went wrong. Try again.
+              </p>
+            ) : totalResults === 0 ? (
+              <div className="mt-5 rounded-xl border border-dashed border-border bg-surface-muted/40 p-5 text-center">
+                <p className="text-sm font-medium text-foreground">
+                  No published matches for “{debouncedQuery}”
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  We only show content that has been published and is visible to you.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                {searchResults!.courses.length > 0 && (
+                  <ResultGroup label="Courses" icon={<Compass className="h-3.5 w-3.5" />}>
+                    {searchResults!.courses.map((c) => (
+                      <Link
+                        key={c.id}
+                        to="/courses/$courseSlug"
+                        params={{ courseSlug: c.slug }}
+                        className={resultLinkClass}
+                      >
+                        {c.title}
+                      </Link>
+                    ))}
+                  </ResultGroup>
+                )}
+                {searchResults!.units.length > 0 && (
+                  <ResultGroup label="Units" icon={<BookOpen className="h-3.5 w-3.5" />}>
+                    {searchResults!.units.map((u) => (
+                      <Link key={u.id} to="/courses" className={resultLinkClass}>
+                        {u.title}
+                      </Link>
+                    ))}
+                  </ResultGroup>
+                )}
+                {searchResults!.notes.length > 0 && (
+                  <ResultGroup label="Notes" icon={<FileText className="h-3.5 w-3.5" />}>
+                    {searchResults!.notes.map((n) => (
+                      <Link
+                        key={n.id}
+                        to="/notes/$noteId"
+                        params={{ noteId: n.id }}
+                        className={resultLinkClass}
+                      >
+                        {n.title}
+                      </Link>
+                    ))}
+                  </ResultGroup>
+                )}
+                {searchResults!.papers.length > 0 && (
+                  <ResultGroup label="Papers" icon={<FileText className="h-3.5 w-3.5" />}>
+                    {searchResults!.papers.map((p) => (
+                      <Link
+                        key={p.id}
+                        to="/papers/$paperId"
+                        params={{ paperId: p.id }}
+                        className={resultLinkClass}
+                      >
+                        {p.title}
+                      </Link>
+                    ))}
+                  </ResultGroup>
+                )}
+                {searchResults!.quizzes.length > 0 && (
+                  <ResultGroup label="Quizzes" icon={<ListChecks className="h-3.5 w-3.5" />}>
+                    {searchResults!.quizzes.map((q) => (
+                      <Link
+                        key={q.id}
+                        to="/quizzes/$quizId"
+                        params={{ quizId: q.id }}
+                        className={resultLinkClass}
+                      >
+                        {q.title}
+                      </Link>
+                    ))}
+                  </ResultGroup>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+
+
 
         {/* Quick actions */}
         <section className="mt-10">
@@ -340,5 +540,28 @@ function ActionCard({
         <ArrowRight className="h-3.5 w-3.5" />
       </div>
     </Link>
+  );
+}
+
+const resultLinkClass =
+  "block truncate rounded-md border border-border/60 bg-background px-3 py-2 text-sm text-foreground transition-colors hover:border-primary/40 hover:bg-surface hover:text-primary";
+
+function ResultGroup({
+  label,
+  icon,
+  children,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="mb-2 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {icon}
+        {label}
+      </div>
+      <div className="space-y-1.5">{children}</div>
+    </div>
   );
 }
