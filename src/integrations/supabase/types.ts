@@ -131,6 +131,66 @@ export type Database = {
         }
         Relationships: []
       }
+      categories: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_published: boolean
+          name: string
+          order_index: number
+          parent_id: string | null
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_published?: boolean
+          name: string
+          order_index?: number
+          parent_id?: string | null
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_published?: boolean
+          name?: string
+          order_index?: number
+          parent_id?: string | null
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           code: string
@@ -248,6 +308,66 @@ export type Database = {
           scheduled_start?: string | null
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      media_assets: {
+        Row: {
+          alt_text: string | null
+          bucket: string
+          byte_size: number | null
+          caption: string | null
+          checksum: string | null
+          created_at: string
+          duration_seconds: number | null
+          filename: string
+          height: number | null
+          id: string
+          kind: Database["public"]["Enums"]["media_kind"]
+          metadata: Json
+          mime_type: string | null
+          object_key: string
+          updated_at: string
+          uploaded_by: string | null
+          width: number | null
+        }
+        Insert: {
+          alt_text?: string | null
+          bucket: string
+          byte_size?: number | null
+          caption?: string | null
+          checksum?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          filename: string
+          height?: number | null
+          id?: string
+          kind?: Database["public"]["Enums"]["media_kind"]
+          metadata?: Json
+          mime_type?: string | null
+          object_key: string
+          updated_at?: string
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string | null
+          bucket?: string
+          byte_size?: number | null
+          caption?: string | null
+          checksum?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          filename?: string
+          height?: number | null
+          id?: string
+          kind?: Database["public"]["Enums"]["media_kind"]
+          metadata?: Json
+          mime_type?: string | null
+          object_key?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          width?: number | null
         }
         Relationships: []
       }
@@ -461,6 +581,71 @@ export type Database = {
           },
         ]
       }
+      taggables: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_kind: Database["public"]["Enums"]["taggable_kind"]
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_kind: Database["public"]["Enums"]["taggable_kind"]
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_kind?: Database["public"]["Enums"]["taggable_kind"]
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "taggables_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tags: {
+        Row: {
+          color: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       units: {
         Row: {
           created_at: string
@@ -599,6 +784,16 @@ export type Database = {
     }
     Enums: {
       app_role: "super_admin" | "admin" | "instructor" | "student"
+      media_kind: "image" | "pdf" | "video" | "audio" | "document" | "other"
+      taggable_kind:
+        | "note"
+        | "video"
+        | "paper"
+        | "quiz"
+        | "assignment"
+        | "unit"
+        | "subject"
+        | "announcement"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -727,6 +922,17 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "admin", "instructor", "student"],
+      media_kind: ["image", "pdf", "video", "audio", "document", "other"],
+      taggable_kind: [
+        "note",
+        "video",
+        "paper",
+        "quiz",
+        "assignment",
+        "unit",
+        "subject",
+        "announcement",
+      ],
     },
   },
 } as const
