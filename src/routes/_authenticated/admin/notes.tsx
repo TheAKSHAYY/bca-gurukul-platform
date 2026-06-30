@@ -191,9 +191,18 @@ function AdminNotesPage() {
 
             <div className="mt-4 space-y-3">
               {(notesQuery.data ?? []).length === 0 && (
-                <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-sm text-muted-foreground">
-                  No notes yet. Create the first one.
-                </p>
+                <EmptyState
+                  icon={FileText}
+                  tone="primary"
+                  title="No notes in this unit yet"
+                  description="Notes are the backbone students rely on most. Drop in a PDF or write a fresh one — students will see it on the public unit page the moment you publish."
+                  tip="Keep titles outcome-focused, e.g. “Normalization — 1NF to 3NF with examples.”"
+                  primaryAction={{
+                    label: "Create the first note",
+                    icon: FilePlus,
+                    onClick: openCreate,
+                  }}
+                />
               )}
               {(notesQuery.data ?? []).map((n) => (
                 <div key={n.id} className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-border bg-surface p-4">
