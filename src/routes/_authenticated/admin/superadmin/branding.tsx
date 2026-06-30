@@ -66,7 +66,7 @@ function BrandingPage() {
       ? {
           site_name: brandingQuery.data.site_name ?? "",
           tagline: brandingQuery.data.tagline ?? "",
-          logo_text: (brandingQuery.data as Record<string, string | null>).logo_text ?? "",
+          logo_text: brandingQuery.data.logo_text ?? "",
           logo_url: brandingQuery.data.logo_url ?? "",
           favicon_url: brandingQuery.data.favicon_url ?? "",
           support_email: brandingQuery.data.support_email ?? "",
@@ -75,11 +75,11 @@ function BrandingPage() {
           seo_description: brandingQuery.data.seo_description ?? "",
           og_image_url: brandingQuery.data.og_image_url ?? "",
           primary_color: brandingQuery.data.primary_color ?? "",
-          secondary_color: (brandingQuery.data as Record<string, string | null>).secondary_color ?? "",
+          secondary_color: brandingQuery.data.secondary_color ?? "",
           accent_color: brandingQuery.data.accent_color ?? "",
-          font_heading: (brandingQuery.data as Record<string, string | null>).font_heading ?? "Fraunces",
-          font_body: (brandingQuery.data as Record<string, string | null>).font_body ?? "Inter",
-          radius_rem: (brandingQuery.data as Record<string, number | null>).radius_rem ?? 0.75,
+          font_heading: brandingQuery.data.font_heading ?? "Fraunces",
+          font_body: brandingQuery.data.font_body ?? "Inter",
+          radius_rem: brandingQuery.data.radius_rem ?? 0.75,
         }
       : undefined,
   });
