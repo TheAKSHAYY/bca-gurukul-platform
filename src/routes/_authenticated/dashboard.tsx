@@ -276,7 +276,7 @@ function DashboardPage() {
         ) : totalResults === 0 ? (
           <div className="mt-5 rounded-xl border border-dashed border-border bg-surface-muted/40 p-5 text-center">
             <p className="text-sm font-medium text-foreground">
-              No published matches for “{debouncedQuery}”
+              No published matches for "{debouncedQuery}"
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               We only show content that has been published and is visible to you.
@@ -284,44 +284,44 @@ function DashboardPage() {
           </div>
         ) : (
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
-            {searchResults!.courses.length > 0 && (
+            {searchHits.filter((h) => h.kind === "course").length > 0 && (
               <ResultGroup label="Courses" icon={<Compass className="h-3.5 w-3.5" />}>
-                {searchResults!.courses.map((c) => (
-                  <Link key={c.id} to="/courses/$courseSlug" params={{ courseSlug: c.slug }} className={resultLinkClass}>
+                {searchHits.filter((h) => h.kind === "course").map((c) => (
+                  <Link key={c.id} to="/courses/$courseSlug" params={{ courseSlug: c.slug ?? c.id }} className={resultLinkClass}>
                     {c.title}
                   </Link>
                 ))}
               </ResultGroup>
             )}
-            {searchResults!.units.length > 0 && (
+            {searchHits.filter((h) => h.kind === "unit").length > 0 && (
               <ResultGroup label="Units" icon={<BookOpen className="h-3.5 w-3.5" />}>
-                {searchResults!.units.map((u) => (
+                {searchHits.filter((h) => h.kind === "unit").map((u) => (
                   <Link key={u.id} to="/courses" className={resultLinkClass}>{u.title}</Link>
                 ))}
               </ResultGroup>
             )}
-            {searchResults!.notes.length > 0 && (
+            {searchHits.filter((h) => h.kind === "note").length > 0 && (
               <ResultGroup label="Notes" icon={<FileText className="h-3.5 w-3.5" />}>
-                {searchResults!.notes.map((n) => (
-                  <Link key={n.id} to="/notes/$noteId" params={{ noteId: n.id }} className={resultLinkClass}>
+                {searchHits.filter((h) => h.kind === "note").map((n) => (
+                  <Link key={n.id} to="/notes/$noteSlug" params={{ noteSlug: n.slug ?? n.id }} className={resultLinkClass}>
                     {n.title}
                   </Link>
                 ))}
               </ResultGroup>
             )}
-            {searchResults!.papers.length > 0 && (
+            {searchHits.filter((h) => h.kind === "paper").length > 0 && (
               <ResultGroup label="Papers" icon={<FileText className="h-3.5 w-3.5" />}>
-                {searchResults!.papers.map((p) => (
+                {searchHits.filter((h) => h.kind === "paper").map((p) => (
                   <Link key={p.id} to="/papers/$paperId" params={{ paperId: p.id }} className={resultLinkClass}>
                     {p.title}
                   </Link>
                 ))}
               </ResultGroup>
             )}
-            {searchResults!.quizzes.length > 0 && (
+            {searchHits.filter((h) => h.kind === "quiz").length > 0 && (
               <ResultGroup label="Quizzes" icon={<ListChecks className="h-3.5 w-3.5" />}>
-                {searchResults!.quizzes.map((q) => (
-                  <Link key={q.id} to="/quizzes/$quizId" params={{ quizId: q.id }} className={resultLinkClass}>
+                {searchHits.filter((h) => h.kind === "quiz").map((q) => (
+                  <Link key={q.id} to="/quizzes/$quizSlug" params={{ quizSlug: q.slug ?? q.id }} className={resultLinkClass}>
                     {q.title}
                   </Link>
                 ))}
