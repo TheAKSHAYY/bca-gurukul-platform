@@ -23,7 +23,7 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from("maintenance")
         .select("enabled, message, scheduled_end")
-        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
         .limit(1)
         .maybeSingle();
       if (error) throw error;
