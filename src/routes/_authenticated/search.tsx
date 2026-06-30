@@ -17,7 +17,24 @@ export const Route = createFileRoute("/_authenticated/search")({
   component: SearchPage,
 });
 
-type Hit = { id: string; title: string; slug?: string | null };
+type SearchHit = {
+  id: string;
+  title: string;
+  description: string;
+  slug: string | null;
+  kind: "course" | "semester" | "subject" | "unit" | "note" | "paper" | "quiz";
+  rank: number;
+};
+
+type SearchResult = {
+  courses: SearchHit[];
+  semesters: SearchHit[];
+  subjects: SearchHit[];
+  units: SearchHit[];
+  notes: SearchHit[];
+  papers: SearchHit[];
+  quizzes: SearchHit[];
+};
 
 function SearchPage() {
   const { q } = Route.useSearch();
@@ -43,27 +60,25 @@ function SearchPage() {
     queryKey: ["global-search", debounced],
     enabled,
     queryFn: async () => {
-      const pattern = `%${debounced.replace(/[%_]/g, (m: string) => `\\${m}`)}%`;
-      const [courses, semesters, subjects, units, notes, papers, quizzes] = await Promise.all([
-        supabase.from("courses").select("id,title,slug").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(10),
-        supabase.from("semesters").select("id,title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(10),
-        supabase.from("subjects").select("id,title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(10),
-        supabase.from("units").select("id,title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(10),
-        supabase.from("notes").select("id,title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(10),
-        supabase.from("papers").select("id,title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(10),
-        supabase.from("quizzes").select("id,title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(10),
-      ]);
-      const errs = [courses, semesters, subjects, units, notes, papers, quizzes].map((r) => r.error).filter(Boolean);
-      if (errs.length) throw errs[0];
-      return {
-        courses: (courses.data ?? []) as Hit[],
-        semesters: (semesters.data ?? []) as Hit[],
-        subjects: (subjects.data ?? []) as Hit[],
-        units: (units.data ?? []) as Hit[],
-        notes: (notes.data ?? []) as Hit[],
-        papers: (papers.data ?? []) as Hit[],
-        quizzes: (quizzes.data ?? []) as Hit[],
-      };
+      const { data, error } = await supabase.rpc("student_search", {
+        _query: debounced,
+        _max_results: 50,
+      });
+      if (error) throw error;
+      const hits = ((data ?? []) as SearchHit[]).sort((a, b) => b.rank - a.rank);
+      return hits.reduce<SearchResult>(
+        (acc, hit) => {
+          if (hit.kind === "course") acc.courses.push(hit);
+          if (hit.kind === "semester") acc.semesters.push(hit);
+          if (hit.kind === "subject") acc.subjects.push(hit);
+          if (hit.kind === "unit") acc.units.push(hit);
+          if (hit.kind === "note") acc.notes.push(hit);
+          if (hit.kind === "paper") acc.papers.push(hit);
+          if (hit.kind === "quiz") acc.quizzes.push(hit);
+          return acc;
+        },
+        { courses: [], semesters: [], subjects: [], units: [], notes: [], papers: [], quizzes: [] }
+      );
     },
   });
 
