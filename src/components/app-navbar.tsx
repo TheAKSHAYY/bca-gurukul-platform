@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
   BookMarked,
+  Code2,
   HelpCircle,
   LayoutDashboard,
   LogOut,
