@@ -72,9 +72,17 @@ function BrandingPage() {
 
   const saveBranding = useMutation({
     mutationFn: async (values: FormValues) => {
-      const payload = Object.fromEntries(
-        Object.entries(values).map(([k, v]) => [k, v === "" ? null : v]),
-      );
+      const payload = {
+        site_name: values.site_name,
+        tagline: values.tagline || null,
+        logo_url: values.logo_url || null,
+        favicon_url: values.favicon_url || null,
+        support_email: values.support_email || null,
+        footer_text: values.footer_text || null,
+        seo_title: values.seo_title || null,
+        seo_description: values.seo_description || null,
+        og_image_url: values.og_image_url || null,
+      };
       const { error } = await supabase.from("branding").update(payload).eq("id", 1);
       if (error) throw error;
     },
