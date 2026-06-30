@@ -50,23 +50,9 @@ export const Route = createFileRoute("/")({
 
 type HomepageSection = { id: string; type: string; position: number; enabled: boolean };
 
-const DEFAULT_SECTIONS: HomepageSection[] = [
-  { id: "d-hero", type: "hero", position: 10, enabled: true },
-  { id: "d-trust", type: "trust_bar", position: 20, enabled: true },
-  { id: "d-features", type: "features", position: 30, enabled: true },
-  { id: "d-why", type: "why_choose", position: 35, enabled: true },
-  { id: "d-journey", type: "journey", position: 40, enabled: true },
-  { id: "d-sem", type: "semester_overview", position: 50, enabled: true },
-  { id: "d-ben", type: "benefits", position: 60, enabled: true },
-  { id: "d-test", type: "testimonials", position: 65, enabled: true },
-  { id: "d-faq", type: "faq", position: 70, enabled: true },
-  { id: "d-cta", type: "cta", position: 80, enabled: true },
-  { id: "d-contact", type: "contact", position: 90, enabled: true },
-];
-
 function Index() {
   const { user, loading } = useAuth();
-  const { data: sections } = useQuery({
+  const { data: sections, isLoading } = useQuery({
     queryKey: ["homepage_sections", "public"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -80,45 +66,86 @@ function Index() {
     staleTime: 60_000,
   });
 
-  const list = sections && sections.length > 0 ? sections : DEFAULT_SECTIONS;
+  const list = sections ?? [];
+  const showEmpty = !isLoading && list.length === 0;
 
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader user={user} loading={loading} />
       <main>
-        {list.map((s) => {
-          switch (s.type) {
-            case "hero":
-              return <Hero key={s.id} user={user} loading={loading} />;
-            case "trust_bar":
-              return <TrustBar key={s.id} />;
-            case "features":
-              return <Features key={s.id} />;
-            case "why_choose":
-              return <WhyChoose key={s.id} />;
-            case "journey":
-              return <Journey key={s.id} />;
-            case "semester_overview":
-              return <Semesters key={s.id} />;
-            case "benefits":
-              return <Benefits key={s.id} />;
-            case "testimonials":
-              return <Testimonials key={s.id} />;
-            case "faq":
-              return <FAQ key={s.id} />;
-            case "cta":
-              return <CTA key={s.id} user={user} loading={loading} />;
-            case "contact":
-              return <Contact key={s.id} />;
-            default:
-              return null;
-          }
-        })}
+        {showEmpty ? (
+          <EmptyLanding user={user} loading={loading} />
+        ) : (
+          list.map((s) => {
+            switch (s.type) {
+              case "hero":
+                return <Hero key={s.id} user={user} loading={loading} />;
+              case "trust_bar":
+                return <TrustBar key={s.id} />;
+              case "features":
+                return <Features key={s.id} />;
+              case "why_choose":
+                return <WhyChoose key={s.id} />;
+              case "journey":
+                return <Journey key={s.id} />;
+              case "semester_overview":
+                return <Semesters key={s.id} />;
+              case "benefits":
+                return <Benefits key={s.id} />;
+              case "testimonials":
+                return <Testimonials key={s.id} />;
+              case "faq":
+                return <FAQ key={s.id} />;
+              case "cta":
+                return <CTA key={s.id} user={user} loading={loading} />;
+              case "contact":
+                return <Contact key={s.id} />;
+              default:
+                return null;
+            }
+          })
+        )}
       </main>
       <SiteFooter />
     </div>
   );
 }
+
+function EmptyLanding({ user, loading }: { user: unknown; loading: boolean }) {
+  return (
+    <section className="relative overflow-hidden">
+      <div className="mx-auto max-w-3xl px-6 py-24 text-center sm:py-32">
+        <div className="mx-auto inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted-foreground">
+          <Sparkles className="h-3 w-3" />
+          BCA Gurukul
+        </div>
+        <h1 className="mt-6 font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          Your platform is ready.
+        </h1>
+        <p className="mt-4 text-base text-muted-foreground">
+          No homepage content has been published yet. An administrator can compose this
+          page from the admin panel — every section is editable, nothing is hardcoded.
+        </p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          {!loading && !user && (
+            <Button asChild size="lg">
+              <Link to="/auth">Sign in</Link>
+            </Button>
+          )}
+          {!loading && user && (
+            <Button asChild size="lg">
+              <Link to="/admin">Open admin panel</Link>
+            </Button>
+          )}
+          <Button asChild variant="outline" size="lg">
+            <Link to="/courses">Browse courses</Link>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 /* ──────────────────────────────────────────────────────────── Header */
 
