@@ -1,8 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, FileText } from "lucide-react";
+import { ArrowLeft, FileText, Bookmark, BookOpen } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PublicHeader } from "./courses.index";
 
 export const Route = createFileRoute("/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber")({
@@ -82,9 +83,23 @@ function UnitDetail() {
               </h2>
               <div className="mt-4 space-y-3">
                 {dataQuery.data.notes.length === 0 && (
-                  <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-sm text-muted-foreground">
-                    No notes published for this unit yet.
-                  </p>
+                  <EmptyState
+                    icon={FileText}
+                    tone="accent"
+                    title="Notes are being prepared"
+                    description="A senior is curating structured, exam-ready notes for this unit. As soon as they're published, you'll see them right here."
+                    tip="Bookmark this unit and we'll keep your spot — pick up exactly where you left off."
+                    primaryAction={{
+                      label: "Bookmark this unit",
+                      to: "/dashboard",
+                      icon: Bookmark,
+                    }}
+                    secondaryAction={{
+                      label: "Explore other units",
+                      to: "/courses",
+                      icon: BookOpen,
+                    }}
+                  />
                 )}
                 {dataQuery.data.notes.map((n) => (
                   <Link

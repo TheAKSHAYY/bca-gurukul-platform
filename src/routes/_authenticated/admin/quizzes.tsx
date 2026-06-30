@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, FlaskConical, Plus, Pencil, Trash2, ExternalLink, Wrench } from "lucide-react";
+import { ArrowLeft, FlaskConical, Plus, Pencil, Trash2, ExternalLink, Wrench, Sparkles } from "lucide-react";
+
+import { EmptyState } from "@/components/ui/empty-state";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -142,9 +144,18 @@ function AdminQuizzesPage() {
             </div>
             <div className="mt-4 space-y-3">
               {(quizzesQ.data ?? []).length === 0 && (
-                <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-sm text-muted-foreground">
-                  No quizzes yet.
-                </p>
+                <EmptyState
+                  icon={FlaskConical}
+                  tone="success"
+                  title="No quizzes for this unit yet"
+                  description="Add 8–10 conceptual MCQs to lock in the unit. Students get instant scoring with per-question explanations, and you'll see attempt analytics roll in on the dashboard."
+                  tip="Mix one easy recall question for every two application questions to keep momentum high."
+                  primaryAction={{
+                    label: "Create the first quiz",
+                    icon: Sparkles,
+                    onClick: () => { setEditing(null); setOpen(true); },
+                  }}
+                />
               )}
               {(quizzesQ.data ?? []).map((q) => (
                 <div key={q.id} className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-border bg-surface p-4">
