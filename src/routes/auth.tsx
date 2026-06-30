@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
-import { Loader2 } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle2, Loader2, ShieldCheck, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +22,8 @@ export const Route = createFileRoute("/auth")({
       { title: "Sign in · BCA Gurukul" },
       {
         name: "description",
-        content: "Sign in or create your BCA Gurukul account to access notes, papers, videos, and MCQ practice.",
+        content:
+          "Sign in or create your BCA Gurukul account to access notes, papers, videos, and MCQ practice.",
       },
     ],
   }),
@@ -35,34 +36,115 @@ const passwordSchema = z.string().min(8, "At least 8 characters");
 function AuthPage() {
   const { mode = "signin" } = Route.useSearch();
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto flex min-h-screen max-w-md flex-col px-6 py-10">
-        <Link to="/" className="mb-10 flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+    <div className="grid min-h-screen lg:grid-cols-2">
+      {/* Left: brand panel */}
+      <aside className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+        >
+          <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-accent/30 blur-3xl" />
+          <div className="absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-accent/15 blur-3xl" />
+          <div
+            className="absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage:
+                "radial-gradient(currentColor 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+              color: "currentColor",
+            }}
+          />
+        </div>
+
+        <Link to="/" className="relative flex items-center gap-3">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary-foreground text-primary shadow-sm">
             <span className="font-display text-lg font-semibold">ब</span>
           </div>
           <div className="leading-tight">
-            <div className="font-display text-base font-semibold text-foreground">BCA Gurukul</div>
-            <div className="text-xs text-muted-foreground">Welcome back</div>
+            <div className="font-display text-lg font-semibold">BCA Gurukul</div>
+            <div className="text-xs text-primary-foreground/70">
+              Structured learning for BCA students
+            </div>
           </div>
         </Link>
 
-        <Tabs defaultValue={mode} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="signin">Sign in</TabsTrigger>
-            <TabsTrigger value="signup">Sign up</TabsTrigger>
-            <TabsTrigger value="forgot">Reset</TabsTrigger>
-          </TabsList>
-          <TabsContent value="signin" className="mt-6">
-            <SignInForm />
-          </TabsContent>
-          <TabsContent value="signup" className="mt-6">
-            <SignUpForm />
-          </TabsContent>
-          <TabsContent value="forgot" className="mt-6">
-            <ForgotForm />
-          </TabsContent>
-        </Tabs>
+        <div className="relative space-y-8">
+          <div>
+            <Sparkles className="h-8 w-8 text-accent" />
+            <h2 className="mt-5 max-w-md font-display text-4xl font-semibold leading-tight">
+              Your syllabus, organised.<br />Your time, respected.
+            </h2>
+            <p className="mt-4 max-w-md text-sm text-primary-foreground/80">
+              Join thousands of BCA students using notes, past papers, video
+              lectures and MCQ practice — all in one place.
+            </p>
+          </div>
+
+          <ul className="space-y-3">
+            {[
+              "Free for every BCA student",
+              "Notes, papers, videos & quizzes",
+              "Track progress semester by semester",
+            ].map((b) => (
+              <li key={b} className="flex items-center gap-3 text-sm text-primary-foreground/90">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
+                {b}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="relative flex items-center gap-2 text-xs text-primary-foreground/70">
+          <ShieldCheck className="h-4 w-4" />
+          Secured by Supabase Auth · We never share your data.
+        </div>
+      </aside>
+
+      {/* Right: form */}
+      <div className="relative flex min-h-screen flex-col bg-background px-6 py-8 sm:px-10">
+        <div className="flex items-center justify-between">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to home
+          </Link>
+          <Link to="/" className="flex items-center gap-2 lg:hidden">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
+              <span className="font-display text-sm font-semibold">ब</span>
+            </div>
+            <span className="font-display text-sm font-semibold">BCA Gurukul</span>
+          </Link>
+        </div>
+
+        <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
+          <Tabs defaultValue={mode} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="signin">Sign in</TabsTrigger>
+              <TabsTrigger value="signup">Sign up</TabsTrigger>
+              <TabsTrigger value="forgot">Reset</TabsTrigger>
+            </TabsList>
+            <TabsContent value="signin" className="mt-8">
+              <SignInForm />
+            </TabsContent>
+            <TabsContent value="signup" className="mt-8">
+              <SignUpForm />
+            </TabsContent>
+            <TabsContent value="forgot" className="mt-8">
+              <ForgotForm />
+            </TabsContent>
+          </Tabs>
+
+          <p className="mt-10 text-center text-xs text-muted-foreground">
+            By continuing you agree to our terms and privacy policy.
+          </p>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <BookOpen className="h-3.5 w-3.5" />
+          Free for students · No credit card
+        </div>
       </div>
     </div>
   );
@@ -96,21 +178,44 @@ function SignInForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <h1 className="font-display text-2xl font-semibold text-foreground">Sign in</h1>
-      <p className="text-sm text-muted-foreground">Welcome back. Continue where you left off.</p>
+    <form onSubmit={onSubmit} className="space-y-5">
+      <div>
+        <h1 className="font-display text-3xl font-semibold text-foreground">Welcome back</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          Continue where you left off.
+        </p>
+      </div>
       <div className="space-y-2">
         <Label htmlFor="signin-email">Email</Label>
-        <Input id="signin-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <Input id="signin-email" type="email" autoComplete="email" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="signin-password">Password</Label>
-        <Input id="signin-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <div className="flex items-center justify-between">
+          <Label htmlFor="signin-password">Password</Label>
+          <Link
+            to="/auth"
+            search={{ mode: "forgot" }}
+            className="text-xs text-primary hover:underline"
+          >
+            Forgot?
+          </Link>
+        </div>
+        <Input id="signin-password" type="password" autoComplete="current-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" size="lg" className="w-full" disabled={loading}>
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Sign in
       </Button>
+      <p className="text-center text-sm text-muted-foreground">
+        New here?{" "}
+        <Link
+          to="/auth"
+          search={{ mode: "signup" }}
+          className="font-medium text-primary hover:underline"
+        >
+          Create an account
+        </Link>
+      </p>
     </form>
   );
 }
@@ -154,26 +259,40 @@ function SignUpForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <h1 className="font-display text-2xl font-semibold text-foreground">Create your account</h1>
-      <p className="text-sm text-muted-foreground">Free for students. Takes less than a minute.</p>
+    <form onSubmit={onSubmit} className="space-y-5">
+      <div>
+        <h1 className="font-display text-3xl font-semibold text-foreground">Create your account</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          Free for students. Takes less than a minute.
+        </p>
+      </div>
       <div className="space-y-2">
         <Label htmlFor="signup-name">Full name</Label>
-        <Input id="signup-name" autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+        <Input id="signup-name" autoComplete="name" placeholder="Your name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
       </div>
       <div className="space-y-2">
         <Label htmlFor="signup-email">Email</Label>
-        <Input id="signup-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <Input id="signup-email" type="email" autoComplete="email" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </div>
       <div className="space-y-2">
         <Label htmlFor="signup-password">Password</Label>
-        <Input id="signup-password" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <p className="text-xs text-muted-foreground">At least 8 characters.</p>
+        <Input id="signup-password" type="password" autoComplete="new-password" placeholder="At least 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <p className="text-xs text-muted-foreground">Use at least 8 characters.</p>
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" size="lg" className="w-full" disabled={loading}>
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Create account
       </Button>
+      <p className="text-center text-sm text-muted-foreground">
+        Already have an account?{" "}
+        <Link
+          to="/auth"
+          search={{ mode: "signin" }}
+          className="font-medium text-primary hover:underline"
+        >
+          Sign in
+        </Link>
+      </p>
     </form>
   );
 }
@@ -205,27 +324,44 @@ function ForgotForm() {
 
   if (sent) {
     return (
-      <div className="space-y-3 rounded-xl border border-border bg-surface p-5 text-sm">
+      <div className="space-y-3 rounded-xl border border-border bg-surface p-6 text-sm">
+        <div className="grid h-10 w-10 place-items-center rounded-xl bg-success/15 text-success">
+          <CheckCircle2 className="h-5 w-5" />
+        </div>
         <h2 className="font-display text-lg font-semibold text-foreground">Check your inbox</h2>
         <p className="text-muted-foreground">
-          We sent a password reset link to <span className="text-foreground">{email}</span>. The link expires in 1 hour.
+          We sent a password reset link to <span className="font-medium text-foreground">{email}</span>. The link expires in 1 hour.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <h1 className="font-display text-2xl font-semibold text-foreground">Reset your password</h1>
-      <p className="text-sm text-muted-foreground">We'll email you a secure link to set a new password.</p>
+    <form onSubmit={onSubmit} className="space-y-5">
+      <div>
+        <h1 className="font-display text-3xl font-semibold text-foreground">Reset your password</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          We'll email you a secure link to set a new password.
+        </p>
+      </div>
       <div className="space-y-2">
         <Label htmlFor="forgot-email">Email</Label>
-        <Input id="forgot-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <Input id="forgot-email" type="email" autoComplete="email" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" size="lg" className="w-full" disabled={loading}>
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Send reset link
       </Button>
+      <p className="text-center text-sm text-muted-foreground">
+        Remembered it?{" "}
+        <Link
+          to="/auth"
+          search={{ mode: "signin" }}
+          className="font-medium text-primary hover:underline"
+        >
+          Back to sign in
+        </Link>
+      </p>
     </form>
   );
 }
