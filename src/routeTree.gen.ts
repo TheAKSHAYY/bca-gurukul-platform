@@ -18,6 +18,7 @@ import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminAdminRouteImport } from './routes/_authenticated/_admin/admin'
 import { Route as AuthenticatedAdminSuperadminRouteRouteImport } from './routes/_authenticated/_admin/_superadmin/route'
 import { Route as AuthenticatedAdminSuperadminSuperAdminRouteImport } from './routes/_authenticated/_admin/_superadmin/super-admin'
+import { Route as AuthenticatedAdminSuperadminBrandingRouteImport } from './routes/_authenticated/_admin/_superadmin/branding'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -63,6 +64,12 @@ const AuthenticatedAdminSuperadminSuperAdminRoute =
     path: '/super-admin',
     getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
   } as any)
+const AuthenticatedAdminSuperadminBrandingRoute =
+  AuthenticatedAdminSuperadminBrandingRouteImport.update({
+    id: '/branding',
+    path: '/branding',
+    getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
+  '/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
   '/super-admin': typeof AuthenticatedAdminSuperadminSuperAdminRoute
 }
 export interface FileRoutesByTo {
@@ -78,6 +86,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
+  '/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
   '/super-admin': typeof AuthenticatedAdminSuperadminSuperAdminRoute
 }
 export interface FileRoutesById {
@@ -90,6 +99,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/_admin/_superadmin': typeof AuthenticatedAdminSuperadminRouteRouteWithChildren
   '/_authenticated/_admin/admin': typeof AuthenticatedAdminAdminRoute
+  '/_authenticated/_admin/_superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
   '/_authenticated/_admin/_superadmin/super-admin': typeof AuthenticatedAdminSuperadminSuperAdminRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/admin'
+    | '/branding'
     | '/super-admin'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/admin'
+    | '/branding'
     | '/super-admin'
   id:
     | '__root__'
@@ -119,6 +131,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/_admin/_superadmin'
     | '/_authenticated/_admin/admin'
+    | '/_authenticated/_admin/_superadmin/branding'
     | '/_authenticated/_admin/_superadmin/super-admin'
   fileRoutesById: FileRoutesById
 }
@@ -194,15 +207,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSuperadminSuperAdminRouteImport
       parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
     }
+    '/_authenticated/_admin/_superadmin/branding': {
+      id: '/_authenticated/_admin/_superadmin/branding'
+      path: '/branding'
+      fullPath: '/branding'
+      preLoaderRoute: typeof AuthenticatedAdminSuperadminBrandingRouteImport
+      parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
+    }
   }
 }
 
 interface AuthenticatedAdminSuperadminRouteRouteChildren {
+  AuthenticatedAdminSuperadminBrandingRoute: typeof AuthenticatedAdminSuperadminBrandingRoute
   AuthenticatedAdminSuperadminSuperAdminRoute: typeof AuthenticatedAdminSuperadminSuperAdminRoute
 }
 
 const AuthenticatedAdminSuperadminRouteRouteChildren: AuthenticatedAdminSuperadminRouteRouteChildren =
   {
+    AuthenticatedAdminSuperadminBrandingRoute:
+      AuthenticatedAdminSuperadminBrandingRoute,
     AuthenticatedAdminSuperadminSuperAdminRoute:
       AuthenticatedAdminSuperadminSuperAdminRoute,
   }

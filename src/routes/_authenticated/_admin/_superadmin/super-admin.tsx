@@ -25,6 +25,20 @@ function SuperAdminHome() {
         <p className="mt-2 max-w-2xl text-muted-foreground">
           System health, backups & restore, feature flags, sessions, and error monitoring land here in Phase 19+.
         </p>
+
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <Link
+            to="/branding"
+            className="group rounded-2xl border border-border bg-surface p-5 transition hover:border-primary/40 hover:shadow-sm"
+          >
+            <h3 className="font-display text-base font-semibold text-foreground group-hover:text-primary">
+              Branding & SEO
+            </h3>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Site name, logo, footer, SEO defaults, and maintenance mode.
+            </p>
+          </Link>
+        </div>
       </main>
     </div>
   );
