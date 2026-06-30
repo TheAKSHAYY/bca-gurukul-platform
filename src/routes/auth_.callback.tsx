@@ -7,7 +7,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { resolvePostAuthRoute } from "@/lib/post-auth";
 
-export const Route = createFileRoute("/auth/callback")({
+export const Route = createFileRoute("/auth_/callback")({
   ssr: false,
   validateSearch: (s) => z.object({ redirect: z.string().optional() }).parse(s),
   component: AuthCallbackPage,
