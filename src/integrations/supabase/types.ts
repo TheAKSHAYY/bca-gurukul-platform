@@ -371,6 +371,109 @@ export type Database = {
         }
         Relationships: []
       }
+      note_views: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          note_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          note_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          note_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "note_views_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notes: {
+        Row: {
+          body: string | null
+          created_at: string
+          created_by: string | null
+          download_count: number
+          file_bucket: string | null
+          file_mime: string | null
+          file_path: string | null
+          file_size_bytes: number | null
+          id: string
+          slug: string
+          sort_order: number
+          status: string
+          summary: string | null
+          title: string
+          unit_id: string
+          updated_at: string
+          view_count: number
+          visibility: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          download_count?: number
+          file_bucket?: string | null
+          file_mime?: string | null
+          file_path?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          slug: string
+          sort_order?: number
+          status?: string
+          summary?: string | null
+          title: string
+          unit_id: string
+          updated_at?: string
+          view_count?: number
+          visibility?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          download_count?: number
+          file_bucket?: string | null
+          file_mime?: string | null
+          file_path?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          slug?: string
+          sort_order?: number
+          status?: string
+          summary?: string | null
+          title?: string
+          unit_id?: string
+          updated_at?: string
+          view_count?: number
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permissions: {
         Row: {
           created_at: string
