@@ -1,5 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { BookOpen, FileText, PlayCircle, ListChecks } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, BookOpen, FileText, ListChecks, PlayCircle } from "lucide-react";
+
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,11 +25,12 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { user, loading } = useAuth();
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <span className="font-display text-lg font-semibold">ब</span>
             </div>
@@ -38,17 +42,33 @@ function Index() {
                 Structured learning for BCA students
               </div>
             </div>
-          </div>
-          <div className="hidden text-sm text-muted-foreground sm:block">
-            Phase 1 · Foundation
-          </div>
+          </Link>
+          <nav className="flex items-center gap-2">
+            {loading ? null : user ? (
+              <Button asChild size="sm">
+                <Link to="/dashboard">
+                  Open dashboard
+                  <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Link>
+              </Button>
+            ) : (
+              <>
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/auth" search={{ mode: "signin" }}>Sign in</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link to="/auth" search={{ mode: "signup" }}>Get started</Link>
+                </Button>
+              </>
+            )}
+          </nav>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
         <section className="max-w-3xl">
           <span className="inline-flex items-center rounded-full border border-accent/40 bg-accent/15 px-3 py-1 text-xs font-medium text-accent-foreground">
-            Building in phases — production-ready by design
+            Phase 3 · Authentication live
           </span>
           <h1 className="mt-6 font-display text-4xl font-semibold leading-tight text-foreground sm:text-6xl">
             Learn BCA, the{" "}
@@ -59,6 +79,19 @@ function Index() {
             course, semester by semester, subject by subject. No clutter, no
             guesswork, just a clean path through your syllabus.
           </p>
+          {!user && !loading && (
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg">
+                <Link to="/auth" search={{ mode: "signup" }}>
+                  Create your free account
+                  <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/auth" search={{ mode: "signin" }}>I already have an account</Link>
+              </Button>
+            </div>
+          )}
         </section>
 
         <section className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

@@ -256,6 +256,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sessions: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          device_kind: string
+          id: string
+          ip: unknown
+          last_seen_at: string
+          refresh_jti: string | null
+          revoked_at: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_kind?: string
+          id?: string
+          ip?: unknown
+          last_seen_at?: string
+          refresh_jti?: string | null
+          revoked_at?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_kind?: string
+          id?: string
+          ip?: unknown
+          last_seen_at?: string
+          refresh_jti?: string | null
+          revoked_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
