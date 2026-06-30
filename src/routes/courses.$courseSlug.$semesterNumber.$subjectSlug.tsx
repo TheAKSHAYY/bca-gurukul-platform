@@ -1,8 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ListTree } from "lucide-react";
+import { ArrowLeft, FileStack, ListTree } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 import { PublicHeader } from "./courses.index";
 
 export const Route = createFileRoute("/courses/$courseSlug/$semesterNumber/$subjectSlug")({
@@ -53,7 +54,14 @@ function SubjectDetail() {
         .order("number");
       if (ue) throw ue;
 
-      return { course, sem, subject, units: units ?? [] };
+      const { data: papers } = await supabase
+        .from("papers")
+        .select("id, title, year, exam_type, paper_number")
+        .eq("subject_id", subject.id)
+        .eq("status", "published")
+        .order("year", { ascending: false });
+
+      return { course, sem, subject, units: units ?? [], papers: papers ?? [] };
     },
   });
 
@@ -126,6 +134,37 @@ function SubjectDetail() {
                   </li>
                 ))}
               </ol>
+            </section>
+          </>
+        )}
+      </main>
+    </div>
+
+            <section className="mt-12">
+              <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-foreground">
+                <FileStack className="h-5 w-5 text-primary" /> Previous-year papers
+              </h2>
+              <div className="mt-4 space-y-3">
+                {subjectQuery.data.papers.length === 0 && (
+                  <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-sm text-muted-foreground">
+                    No past papers archived yet for this subject.
+                  </p>
+                )}
+                {subjectQuery.data.papers.map((p) => (
+                  <Link key={p.id} to="/papers/$paperId" params={{ paperId: p.id }}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface p-4 transition hover:border-primary">
+                    <div>
+                      <div className="font-display text-base font-semibold text-foreground">{p.title}</div>
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
+                        <Badge>{p.year}</Badge>
+                        <Badge variant="outline">{p.exam_type.replace("_", " ")}</Badge>
+                        {p.paper_number && <Badge variant="outline">#{p.paper_number}</Badge>}
+                      </div>
+                    </div>
+                    <span className="text-xs text-primary">Open paper →</span>
+                  </Link>
+                ))}
+              </div>
             </section>
           </>
         )}

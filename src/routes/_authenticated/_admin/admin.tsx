@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, FileText, FlaskConical, ImageIcon, LayoutDashboard, Shield, Tag as TagIcon } from "lucide-react";
+import { BookOpen, FileStack, FileText, FlaskConical, ImageIcon, LayoutDashboard, Shield, Tag as TagIcon } from "lucide-react";
 
 import { useRoles } from "@/hooks/use-roles";
 
@@ -45,6 +45,9 @@ function AdminHome() {
           </Link>
           <Link to="/admin/notes" className="block">
             <Tile icon={<FileText className="h-5 w-5" />} title="Notes & study materials" body="Author unit notes and upload PDF resources." />
+          </Link>
+          <Link to="/admin/papers" className="block">
+            <Tile icon={<FileStack className="h-5 w-5" />} title="Question papers" body="Archive previous-year exam papers per subject." />
           </Link>
           <Tile icon={<FlaskConical className="h-5 w-5" />} title="Quizzes & analytics" body="MCQ banks and student performance — Phase 10, 18." />
           {isSuperAdmin && (
