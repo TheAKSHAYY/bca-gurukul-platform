@@ -287,6 +287,237 @@ export type Database = {
         }
         Relationships: []
       }
+      developer_achievements: {
+        Row: {
+          created_at: string
+          date_awarded: string | null
+          description: string | null
+          enabled: boolean
+          id: string
+          image_url: string | null
+          issuer: string | null
+          kind: string
+          sort_order: number
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          date_awarded?: string | null
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          image_url?: string | null
+          issuer?: string | null
+          kind?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          date_awarded?: string | null
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          image_url?: string | null
+          issuer?: string | null
+          kind?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      developer_profile: {
+        Row: {
+          bio: string | null
+          career_objective: string | null
+          created_at: string
+          current_goal: string | null
+          education: string | null
+          email: string | null
+          enabled: boolean
+          full_name: string | null
+          github_username: string | null
+          hero_cta_primary_label: string | null
+          hero_cta_secondary_label: string | null
+          id: number
+          interests: string | null
+          photo_url: string | null
+          professional_title: string | null
+          resume_url: string | null
+          short_intro: string | null
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          career_objective?: string | null
+          created_at?: string
+          current_goal?: string | null
+          education?: string | null
+          email?: string | null
+          enabled?: boolean
+          full_name?: string | null
+          github_username?: string | null
+          hero_cta_primary_label?: string | null
+          hero_cta_secondary_label?: string | null
+          id?: number
+          interests?: string | null
+          photo_url?: string | null
+          professional_title?: string | null
+          resume_url?: string | null
+          short_intro?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          career_objective?: string | null
+          created_at?: string
+          current_goal?: string | null
+          education?: string | null
+          email?: string | null
+          enabled?: boolean
+          full_name?: string | null
+          github_username?: string | null
+          hero_cta_primary_label?: string | null
+          hero_cta_secondary_label?: string | null
+          id?: number
+          interests?: string | null
+          photo_url?: string | null
+          professional_title?: string | null
+          resume_url?: string | null
+          short_intro?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      developer_projects: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          featured: boolean
+          github_url: string | null
+          id: string
+          images: Json
+          live_url: string | null
+          name: string
+          slug: string | null
+          sort_order: number
+          status: string
+          tech_stack: string[]
+          thumbnail_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean
+          github_url?: string | null
+          id?: string
+          images?: Json
+          live_url?: string | null
+          name: string
+          slug?: string | null
+          sort_order?: number
+          status?: string
+          tech_stack?: string[]
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean
+          github_url?: string | null
+          id?: string
+          images?: Json
+          live_url?: string | null
+          name?: string
+          slug?: string | null
+          sort_order?: number
+          status?: string
+          tech_stack?: string[]
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      developer_skills: {
+        Row: {
+          category: string
+          created_at: string
+          enabled: boolean
+          icon: string | null
+          id: string
+          name: string
+          proficiency: number | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          enabled?: boolean
+          icon?: string | null
+          id?: string
+          name: string
+          proficiency?: number | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          enabled?: boolean
+          icon?: string | null
+          id?: string
+          name?: string
+          proficiency?: number | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      developer_social_links: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          label: string | null
+          platform: string
+          sort_order: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label?: string | null
+          platform: string
+          sort_order?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label?: string | null
+          platform?: string
+          sort_order?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           audience: Json

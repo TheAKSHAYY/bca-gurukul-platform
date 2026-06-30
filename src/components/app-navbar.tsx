@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
   BookMarked,
+  Code2,
   HelpCircle,
   LayoutDashboard,
   LogOut,
@@ -296,6 +297,11 @@ export function AppNavbar() {
               <DropdownMenuItem asChild>
                 <Link to="/settings">
                   <Settings className="mr-2 h-4 w-4" /> Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/developer">
+                  <Code2 className="mr-2 h-4 w-4" /> Developer
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
