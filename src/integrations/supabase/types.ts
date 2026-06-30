@@ -319,6 +319,7 @@ export type Database = {
           caption: string | null
           checksum: string | null
           created_at: string
+          deleted_at: string | null
           duration_seconds: number | null
           filename: string
           height: number | null
@@ -338,6 +339,7 @@ export type Database = {
           caption?: string | null
           checksum?: string | null
           created_at?: string
+          deleted_at?: string | null
           duration_seconds?: number | null
           filename: string
           height?: number | null
@@ -357,6 +359,7 @@ export type Database = {
           caption?: string | null
           checksum?: string | null
           created_at?: string
+          deleted_at?: string | null
           duration_seconds?: number | null
           filename?: string
           height?: number | null
@@ -408,6 +411,7 @@ export type Database = {
           body: string | null
           created_at: string
           created_by: string | null
+          deleted_at: string | null
           download_count: number
           file_bucket: string | null
           file_mime: string | null
@@ -428,6 +432,7 @@ export type Database = {
           body?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           download_count?: number
           file_bucket?: string | null
           file_mime?: string | null
@@ -448,6 +453,7 @@ export type Database = {
           body?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           download_count?: number
           file_bucket?: string | null
           file_mime?: string | null
@@ -507,6 +513,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          deleted_at: string | null
           description: string | null
           download_count: number
           exam_type: string
@@ -525,6 +532,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           description?: string | null
           download_count?: number
           exam_type?: string
@@ -543,6 +551,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           description?: string | null
           download_count?: number
           exam_type?: string
@@ -936,6 +945,7 @@ export type Database = {
         Row: {
           course_id: string
           created_at: string
+          deleted_at: string | null
           description: string | null
           id: string
           number: number
@@ -946,6 +956,7 @@ export type Database = {
         Insert: {
           course_id: string
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           number: number
@@ -956,6 +967,7 @@ export type Database = {
         Update: {
           course_id?: string
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           number?: number
@@ -979,6 +991,7 @@ export type Database = {
           cover_url: string | null
           created_at: string
           credits: number | null
+          deleted_at: string | null
           description: string | null
           id: string
           instructor_id: string | null
@@ -994,6 +1007,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           credits?: number | null
+          deleted_at?: string | null
           description?: string | null
           id?: string
           instructor_id?: string | null
@@ -1009,6 +1023,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           credits?: number | null
+          deleted_at?: string | null
           description?: string | null
           id?: string
           instructor_id?: string | null
@@ -1097,6 +1112,7 @@ export type Database = {
       units: {
         Row: {
           created_at: string
+          deleted_at: string | null
           id: string
           number: number
           sort_order: number
@@ -1108,6 +1124,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
           id?: string
           number: number
           sort_order?: number
@@ -1119,6 +1136,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
           id?: string
           number?: number
           sort_order?: number
@@ -1225,6 +1243,26 @@ export type Database = {
       }
     }
     Functions: {
+      admin_dashboard_stats: { Args: never; Returns: Json }
+      admin_recent_activity: {
+        Args: { _limit?: number }
+        Returns: {
+          at: string
+          kind: string
+          ref_id: string
+          title: string
+          user_id: string
+        }[]
+      }
+      admin_recent_uploads: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string
+          id: string
+          kind: string
+          title: string
+        }[]
+      }
       check_and_increment_rate_limit: {
         Args: {
           _bucket_key: string
