@@ -47,8 +47,11 @@ import { Route as AuthenticatedAdminSuperadminRouteRouteImport } from './routes/
 import { Route as CoursesCourseSlugSemesterNumberIndexRouteImport } from './routes/courses.$courseSlug.$semesterNumber.index'
 import { Route as AuthenticatedAdminSuperadminIndexRouteImport } from './routes/_authenticated/admin/superadmin/index'
 import { Route as CoursesCourseSlugSemesterNumberSubjectSlugRouteImport } from './routes/courses.$courseSlug.$semesterNumber.$subjectSlug'
+import { Route as AuthenticatedAdminSuperadminUsersRouteImport } from './routes/_authenticated/admin/superadmin/users'
 import { Route as AuthenticatedAdminSuperadminSeoRouteImport } from './routes/_authenticated/admin/superadmin/seo'
+import { Route as AuthenticatedAdminSuperadminFlagsRouteImport } from './routes/_authenticated/admin/superadmin/flags'
 import { Route as AuthenticatedAdminSuperadminBrandingRouteImport } from './routes/_authenticated/admin/superadmin/branding'
+import { Route as AuthenticatedAdminSuperadminAuditRouteImport } from './routes/_authenticated/admin/superadmin/audit'
 import { Route as AuthenticatedAdminQuizzesQuizIdRouteImport } from './routes/_authenticated/admin/quizzes.$quizId'
 import { Route as AuthenticatedAdminCoursesCourseIdRouteImport } from './routes/_authenticated/admin/courses.$courseId'
 import { Route as CoursesCourseSlugSemesterNumberSubjectSlugIndexRouteImport } from './routes/courses.$courseSlug.$semesterNumber.$subjectSlug.index'
@@ -253,16 +256,34 @@ const CoursesCourseSlugSemesterNumberSubjectSlugRoute =
     path: '/courses/$courseSlug/$semesterNumber/$subjectSlug',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminSuperadminUsersRoute =
+  AuthenticatedAdminSuperadminUsersRouteImport.update({
+    id: '/users',
+    path: '/users',
+    getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
+  } as any)
 const AuthenticatedAdminSuperadminSeoRoute =
   AuthenticatedAdminSuperadminSeoRouteImport.update({
     id: '/seo',
     path: '/seo',
     getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
   } as any)
+const AuthenticatedAdminSuperadminFlagsRoute =
+  AuthenticatedAdminSuperadminFlagsRouteImport.update({
+    id: '/flags',
+    path: '/flags',
+    getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
+  } as any)
 const AuthenticatedAdminSuperadminBrandingRoute =
   AuthenticatedAdminSuperadminBrandingRouteImport.update({
     id: '/branding',
     path: '/branding',
+    getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
+  } as any)
+const AuthenticatedAdminSuperadminAuditRoute =
+  AuthenticatedAdminSuperadminAuditRouteImport.update({
+    id: '/audit',
+    path: '/audit',
     getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
   } as any)
 const AuthenticatedAdminQuizzesQuizIdRoute =
@@ -327,8 +348,11 @@ export interface FileRoutesByFullPath {
   '/courses/$courseSlug/': typeof CoursesCourseSlugIndexRoute
   '/admin/courses/$courseId': typeof AuthenticatedAdminCoursesCourseIdRoute
   '/admin/quizzes/$quizId': typeof AuthenticatedAdminQuizzesQuizIdRoute
+  '/admin/superadmin/audit': typeof AuthenticatedAdminSuperadminAuditRoute
   '/admin/superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
+  '/admin/superadmin/flags': typeof AuthenticatedAdminSuperadminFlagsRoute
   '/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
+  '/admin/superadmin/users': typeof AuthenticatedAdminSuperadminUsersRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
   '/admin/superadmin/': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber/': typeof CoursesCourseSlugSemesterNumberIndexRoute
@@ -370,8 +394,11 @@ export interface FileRoutesByTo {
   '/courses/$courseSlug': typeof CoursesCourseSlugIndexRoute
   '/admin/courses/$courseId': typeof AuthenticatedAdminCoursesCourseIdRoute
   '/admin/quizzes/$quizId': typeof AuthenticatedAdminQuizzesQuizIdRoute
+  '/admin/superadmin/audit': typeof AuthenticatedAdminSuperadminAuditRoute
   '/admin/superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
+  '/admin/superadmin/flags': typeof AuthenticatedAdminSuperadminFlagsRoute
   '/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
+  '/admin/superadmin/users': typeof AuthenticatedAdminSuperadminUsersRoute
   '/admin/superadmin': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber': typeof CoursesCourseSlugSemesterNumberIndexRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber': typeof CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute
@@ -416,8 +443,11 @@ export interface FileRoutesById {
   '/courses/$courseSlug/': typeof CoursesCourseSlugIndexRoute
   '/_authenticated/admin/courses/$courseId': typeof AuthenticatedAdminCoursesCourseIdRoute
   '/_authenticated/admin/quizzes/$quizId': typeof AuthenticatedAdminQuizzesQuizIdRoute
+  '/_authenticated/admin/superadmin/audit': typeof AuthenticatedAdminSuperadminAuditRoute
   '/_authenticated/admin/superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
+  '/_authenticated/admin/superadmin/flags': typeof AuthenticatedAdminSuperadminFlagsRoute
   '/_authenticated/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
+  '/_authenticated/admin/superadmin/users': typeof AuthenticatedAdminSuperadminUsersRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
   '/_authenticated/admin/superadmin/': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber/': typeof CoursesCourseSlugSemesterNumberIndexRoute
@@ -463,8 +493,11 @@ export interface FileRouteTypes {
     | '/courses/$courseSlug/'
     | '/admin/courses/$courseId'
     | '/admin/quizzes/$quizId'
+    | '/admin/superadmin/audit'
     | '/admin/superadmin/branding'
+    | '/admin/superadmin/flags'
     | '/admin/superadmin/seo'
+    | '/admin/superadmin/users'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
     | '/admin/superadmin/'
     | '/courses/$courseSlug/$semesterNumber/'
@@ -506,8 +539,11 @@ export interface FileRouteTypes {
     | '/courses/$courseSlug'
     | '/admin/courses/$courseId'
     | '/admin/quizzes/$quizId'
+    | '/admin/superadmin/audit'
     | '/admin/superadmin/branding'
+    | '/admin/superadmin/flags'
     | '/admin/superadmin/seo'
+    | '/admin/superadmin/users'
     | '/admin/superadmin'
     | '/courses/$courseSlug/$semesterNumber'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber'
@@ -551,8 +587,11 @@ export interface FileRouteTypes {
     | '/courses/$courseSlug/'
     | '/_authenticated/admin/courses/$courseId'
     | '/_authenticated/admin/quizzes/$quizId'
+    | '/_authenticated/admin/superadmin/audit'
     | '/_authenticated/admin/superadmin/branding'
+    | '/_authenticated/admin/superadmin/flags'
     | '/_authenticated/admin/superadmin/seo'
+    | '/_authenticated/admin/superadmin/users'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
     | '/_authenticated/admin/superadmin/'
     | '/courses/$courseSlug/$semesterNumber/'
@@ -848,6 +887,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/superadmin/users': {
+      id: '/_authenticated/admin/superadmin/users'
+      path: '/users'
+      fullPath: '/admin/superadmin/users'
+      preLoaderRoute: typeof AuthenticatedAdminSuperadminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
+    }
     '/_authenticated/admin/superadmin/seo': {
       id: '/_authenticated/admin/superadmin/seo'
       path: '/seo'
@@ -855,11 +901,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSuperadminSeoRouteImport
       parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
     }
+    '/_authenticated/admin/superadmin/flags': {
+      id: '/_authenticated/admin/superadmin/flags'
+      path: '/flags'
+      fullPath: '/admin/superadmin/flags'
+      preLoaderRoute: typeof AuthenticatedAdminSuperadminFlagsRouteImport
+      parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
+    }
     '/_authenticated/admin/superadmin/branding': {
       id: '/_authenticated/admin/superadmin/branding'
       path: '/branding'
       fullPath: '/admin/superadmin/branding'
       preLoaderRoute: typeof AuthenticatedAdminSuperadminBrandingRouteImport
+      parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
+    }
+    '/_authenticated/admin/superadmin/audit': {
+      id: '/_authenticated/admin/superadmin/audit'
+      path: '/audit'
+      fullPath: '/admin/superadmin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminSuperadminAuditRouteImport
       parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
     }
     '/_authenticated/admin/quizzes/$quizId': {
@@ -894,16 +954,25 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminSuperadminRouteRouteChildren {
+  AuthenticatedAdminSuperadminAuditRoute: typeof AuthenticatedAdminSuperadminAuditRoute
   AuthenticatedAdminSuperadminBrandingRoute: typeof AuthenticatedAdminSuperadminBrandingRoute
+  AuthenticatedAdminSuperadminFlagsRoute: typeof AuthenticatedAdminSuperadminFlagsRoute
   AuthenticatedAdminSuperadminSeoRoute: typeof AuthenticatedAdminSuperadminSeoRoute
+  AuthenticatedAdminSuperadminUsersRoute: typeof AuthenticatedAdminSuperadminUsersRoute
   AuthenticatedAdminSuperadminIndexRoute: typeof AuthenticatedAdminSuperadminIndexRoute
 }
 
 const AuthenticatedAdminSuperadminRouteRouteChildren: AuthenticatedAdminSuperadminRouteRouteChildren =
   {
+    AuthenticatedAdminSuperadminAuditRoute:
+      AuthenticatedAdminSuperadminAuditRoute,
     AuthenticatedAdminSuperadminBrandingRoute:
       AuthenticatedAdminSuperadminBrandingRoute,
+    AuthenticatedAdminSuperadminFlagsRoute:
+      AuthenticatedAdminSuperadminFlagsRoute,
     AuthenticatedAdminSuperadminSeoRoute: AuthenticatedAdminSuperadminSeoRoute,
+    AuthenticatedAdminSuperadminUsersRoute:
+      AuthenticatedAdminSuperadminUsersRoute,
     AuthenticatedAdminSuperadminIndexRoute:
       AuthenticatedAdminSuperadminIndexRoute,
   }
