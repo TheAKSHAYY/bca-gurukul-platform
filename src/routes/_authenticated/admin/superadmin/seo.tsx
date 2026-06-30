@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, FileSearch, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -148,6 +148,7 @@ function SeoPage() {
               />
             ) : (
               <EmptyState
+                icon={FileSearch}
                 title="Pick a route"
                 description="Choose a route on the left or add a new one to override its SEO metadata."
               />
