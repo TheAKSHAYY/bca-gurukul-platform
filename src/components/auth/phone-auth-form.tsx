@@ -155,8 +155,6 @@ export function PhoneAuthForm({ redirect }: { redirect?: string }) {
             }}
             autoFocus
             inputMode="numeric"
-            // hint to browsers / SMS auto-fill
-            // @ts-expect-error standard HTML attribute
             autoComplete="one-time-code"
           >
             <InputOTPGroup>
