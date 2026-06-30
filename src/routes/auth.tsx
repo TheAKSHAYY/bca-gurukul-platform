@@ -65,9 +65,7 @@ function AuthPage() {
         </div>
 
         <Link to="/" className="relative flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary-foreground text-primary shadow-sm">
-            <span className="font-display text-lg font-semibold">ब</span>
-          </div>
+          <BrandMark variant="inverse" className="h-10 w-10" />
           <div className="leading-tight">
             <div className="font-display text-lg font-semibold">BCA Gurukul</div>
             <div className="text-xs text-primary-foreground/70">
