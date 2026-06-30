@@ -157,7 +157,41 @@ function AuthPage() {
   );
 }
 
+function OrDivider() {
+  return (
+    <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
+      <div className="h-px flex-1 bg-border" />
+      or
+      <div className="h-px flex-1 bg-border" />
+    </div>
+  );
+}
+
 function SignInForm() {
+  const { redirect } = Route.useSearch();
+  const [method, setMethod] = useState<"email" | "phone">("email");
+
+  return (
+    <div className="space-y-4">
+      <GoogleSignInButton redirect={redirect} />
+      <OrDivider />
+      <Tabs value={method} onValueChange={(v) => setMethod(v as "email" | "phone")}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="email">Email</TabsTrigger>
+          <TabsTrigger value="phone">Mobile OTP</TabsTrigger>
+        </TabsList>
+        <TabsContent value="email" className="mt-6">
+          <EmailSignInForm />
+        </TabsContent>
+        <TabsContent value="phone" className="mt-6">
+          <PhoneAuthForm redirect={redirect} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function EmailSignInForm() {
   const navigate = useNavigate();
   const router = useRouter();
   const { redirect } = Route.useSearch();
@@ -184,7 +218,7 @@ function SignInForm() {
         /* ignore */
       }
     }
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
       toast.error(error.message);
@@ -192,17 +226,12 @@ function SignInForm() {
     }
     toast.success("Welcome back");
     await router.invalidate();
-    navigate({ to: redirect ?? "/dashboard", replace: true });
+    const dest = redirect ?? (data.user ? await resolvePostAuthRoute(data.user.id) : "/dashboard");
+    navigate({ to: dest, replace: true });
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-foreground">Welcome back</h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Continue where you left off.
-        </p>
-      </div>
       <div className="space-y-2">
         <Label htmlFor="signin-email">Email</Label>
         <Input
@@ -267,6 +296,8 @@ function SignInForm() {
 
 function SignUpForm() {
   const navigate = useNavigate();
+  const router = useRouter();
+  const { redirect } = Route.useSearch();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -276,10 +307,18 @@ function SignUpForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = z
-      .object({ fullName: z.string().min(2, "Full name is required"), email: emailSchema, password: passwordSchema })
+      .object({
+        fullName: z.string().min(2, "Full name is required"),
+        email: emailSchema,
+        password: passwordSchema,
+      })
       .safeParse({ fullName, email, password });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    if (scorePassword(password).score < 2) {
+      toast.error("Please choose a stronger password");
       return;
     }
     setLoading(true);
@@ -287,7 +326,7 @@ function SignUpForm() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: { full_name: fullName },
       },
     });
@@ -296,64 +335,79 @@ function SignUpForm() {
       toast.error(error.message);
       return;
     }
-    if (!data.session) {
+    if (!data.session || !data.user) {
       toast.success("Check your email to confirm your account.");
       return;
     }
     toast.success("Account created — welcome!");
-    navigate({ to: "/dashboard", replace: true });
+    await router.invalidate();
+    const dest = redirect ?? (await resolvePostAuthRoute(data.user.id));
+    navigate({ to: dest, replace: true });
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
-      <div>
-        <h1 className="font-display text-3xl font-semibold text-foreground">Create your account</h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Free for students. Takes less than a minute.
+    <div className="space-y-4">
+      <GoogleSignInButton redirect={redirect} />
+      <OrDivider />
+      <form onSubmit={onSubmit} className="space-y-5">
+        <div className="space-y-2">
+          <Label htmlFor="signup-name">Full name</Label>
+          <Input
+            id="signup-name"
+            autoComplete="name"
+            placeholder="Your name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="signup-email">Email</Label>
+          <Input
+            id="signup-email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="signup-password">Password</Label>
+          <PasswordInput
+            id="signup-password"
+            autoComplete="new-password"
+            placeholder="At least 8 characters"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onCapsLockChange={setCapsOn}
+            required
+          />
+          {capsOn && (
+            <p className="text-xs font-medium text-accent-foreground">Caps Lock is on</p>
+          )}
+          <PasswordStrengthMeter password={password} />
+        </div>
+        <Button type="submit" size="lg" className="w-full" disabled={loading}>
+          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Create account
+        </Button>
+        <p className="text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            to="/auth"
+            search={{ mode: "signin" }}
+            className="font-medium text-primary hover:underline"
+          >
+            Sign in
+          </Link>
         </p>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="signup-name">Full name</Label>
-        <Input id="signup-name" autoComplete="name" placeholder="Your name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="signup-email">Email</Label>
-        <Input id="signup-email" type="email" autoComplete="email" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="signup-password">Password</Label>
-        <PasswordInput
-          id="signup-password"
-          autoComplete="new-password"
-          placeholder="At least 8 characters"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          onCapsLockChange={setCapsOn}
-          required
-        />
-        {capsOn ? (
-          <p className="text-xs font-medium text-accent-foreground">Caps Lock is on</p>
-        ) : (
-          <p className="text-xs text-muted-foreground">Use at least 8 characters.</p>
-        )}
-      </div>
-      <Button type="submit" size="lg" className="w-full" disabled={loading}>
-        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Create account
-      </Button>
-      <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
-        <Link
-          to="/auth"
-          search={{ mode: "signin" }}
-          className="font-medium text-primary hover:underline"
-        >
-          Sign in
-        </Link>
-      </p>
-    </form>
+      </form>
+    </div>
   );
 }
+
 
 
 function ForgotForm() {
