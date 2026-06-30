@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shield } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/_admin/_superadmin/super-admin")({
+export const Route = createFileRoute("/_authenticated/admin/superadmin/")({
   head: () => ({ meta: [{ title: "Super Admin · BCA Gurukul" }] }),
   component: SuperAdminHome,
 });
@@ -28,7 +28,7 @@ function SuperAdminHome() {
 
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <Link
-            to="/branding"
+            to="/admin/superadmin/branding"
             className="group rounded-2xl border border-border bg-surface p-5 transition hover:border-primary/40 hover:shadow-sm"
           >
             <h3 className="font-display text-base font-semibold text-foreground group-hover:text-primary">

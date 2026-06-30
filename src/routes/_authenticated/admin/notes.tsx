@@ -25,7 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export const Route = createFileRoute("/_authenticated/_admin/notes")({
+export const Route = createFileRoute("/_authenticated/admin/notes")({
   head: () => ({ meta: [{ title: "Notes · Admin · BCA Gurukul" }] }),
   component: AdminNotesPage,
 });
@@ -441,3 +441,4 @@ function NoteDialog({
     </Dialog>
   );
 }
+

@@ -3,7 +3,7 @@ import { BookOpen, FileStack, FileText, FlaskConical, ImageIcon, LayoutDashboard
 
 import { useRoles } from "@/hooks/use-roles";
 
-export const Route = createFileRoute("/_authenticated/_admin/admin")({
+export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({ meta: [{ title: "Admin · BCA Gurukul" }] }),
   component: AdminHome,
 });
@@ -49,9 +49,11 @@ function AdminHome() {
           <Link to="/admin/papers" className="block">
             <Tile icon={<FileStack className="h-5 w-5" />} title="Question papers" body="Archive previous-year exam papers per subject." />
           </Link>
-          <Tile icon={<FlaskConical className="h-5 w-5" />} title="Quizzes & analytics" body="MCQ banks and student performance — Phase 10, 18." />
+          <Link to="/admin/quizzes" className="block">
+            <Tile icon={<FlaskConical className="h-5 w-5" />} title="Quizzes & MCQ banks" body="Author quizzes with secure server-side scoring." />
+          </Link>
           {isSuperAdmin && (
-            <Link to="/super-admin" className="block">
+            <Link to="/admin/superadmin" className="block">
               <Tile icon={<Shield className="h-5 w-5" />} title="Super admin" body="System health, backups, feature flags, branding." />
             </Link>
           )}
@@ -70,3 +72,4 @@ function Tile({ icon, title, body }: { icon: React.ReactNode; title: string; bod
     </div>
   );
 }
+// ping again

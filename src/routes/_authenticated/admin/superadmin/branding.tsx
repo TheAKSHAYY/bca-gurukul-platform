@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 
-export const Route = createFileRoute("/_authenticated/_admin/_superadmin/branding")({
+export const Route = createFileRoute("/_authenticated/admin/superadmin/branding")({
   head: () => ({ meta: [{ title: "Branding · BCA Gurukul" }] }),
   component: BrandingPage,
 });
@@ -120,7 +120,7 @@ function BrandingPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-5">
-          <Link to="/super-admin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link to="/admin/superadmin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" /> Super Admin
           </Link>
         </div>

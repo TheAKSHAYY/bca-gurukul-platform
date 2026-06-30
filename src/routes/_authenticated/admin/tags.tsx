@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export const Route = createFileRoute("/_authenticated/_admin/tags")({
+export const Route = createFileRoute("/_authenticated/admin/tags")({
   head: () => ({ meta: [{ title: "Tags · Admin · BCA Gurukul" }] }),
   component: TagsAdmin,
 });
