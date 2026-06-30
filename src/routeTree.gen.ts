@@ -48,6 +48,7 @@ import { Route as AuthenticatedAdminSuperadminSeoRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminSuperadminBrandingRouteImport } from './routes/_authenticated/admin/superadmin/branding'
 import { Route as AuthenticatedAdminQuizzesQuizIdRouteImport } from './routes/_authenticated/admin/quizzes.$quizId'
 import { Route as AuthenticatedAdminCoursesCourseIdRouteImport } from './routes/_authenticated/admin/courses.$courseId'
+import { Route as CoursesCourseSlugSemesterNumberSubjectSlugIndexRouteImport } from './routes/courses.$courseSlug.$semesterNumber.$subjectSlug.index'
 import { Route as CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRouteImport } from './routes/courses.$courseSlug.$semesterNumber.$subjectSlug.$unitNumber'
 
 const TermsRoute = TermsRouteImport.update({
@@ -257,6 +258,12 @@ const AuthenticatedAdminCoursesCourseIdRoute =
     path: '/$courseId',
     getParentRoute: () => AuthenticatedAdminCoursesRoute,
   } as any)
+const CoursesCourseSlugSemesterNumberSubjectSlugIndexRoute =
+  CoursesCourseSlugSemesterNumberSubjectSlugIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CoursesCourseSlugSemesterNumberSubjectSlugRoute,
+  } as any)
 const CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute =
   CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRouteImport.update({
     id: '/$unitNumber',
@@ -304,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/admin/superadmin/': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber/': typeof CoursesCourseSlugSemesterNumberIndexRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber': typeof CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute
+  '/courses/$courseSlug/$semesterNumber/$subjectSlug/': typeof CoursesCourseSlugSemesterNumberSubjectSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -339,10 +347,10 @@ export interface FileRoutesByTo {
   '/admin/quizzes/$quizId': typeof AuthenticatedAdminQuizzesQuizIdRoute
   '/admin/superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
   '/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
-  '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
   '/admin/superadmin': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber': typeof CoursesCourseSlugSemesterNumberIndexRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber': typeof CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute
+  '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -386,6 +394,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/superadmin/': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber/': typeof CoursesCourseSlugSemesterNumberIndexRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber': typeof CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute
+  '/courses/$courseSlug/$semesterNumber/$subjectSlug/': typeof CoursesCourseSlugSemesterNumberSubjectSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -429,6 +438,7 @@ export interface FileRouteTypes {
     | '/admin/superadmin/'
     | '/courses/$courseSlug/$semesterNumber/'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber'
+    | '/courses/$courseSlug/$semesterNumber/$subjectSlug/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -464,10 +474,10 @@ export interface FileRouteTypes {
     | '/admin/quizzes/$quizId'
     | '/admin/superadmin/branding'
     | '/admin/superadmin/seo'
-    | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
     | '/admin/superadmin'
     | '/courses/$courseSlug/$semesterNumber'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber'
+    | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
   id:
     | '__root__'
     | '/'
@@ -510,6 +520,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/superadmin/'
     | '/courses/$courseSlug/$semesterNumber/'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber'
+    | '/courses/$courseSlug/$semesterNumber/$subjectSlug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -806,6 +817,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCoursesCourseIdRouteImport
       parentRoute: typeof AuthenticatedAdminCoursesRoute
     }
+    '/courses/$courseSlug/$semesterNumber/$subjectSlug/': {
+      id: '/courses/$courseSlug/$semesterNumber/$subjectSlug/'
+      path: '/'
+      fullPath: '/courses/$courseSlug/$semesterNumber/$subjectSlug/'
+      preLoaderRoute: typeof CoursesCourseSlugSemesterNumberSubjectSlugIndexRouteImport
+      parentRoute: typeof CoursesCourseSlugSemesterNumberSubjectSlugRoute
+    }
     '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber': {
       id: '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber'
       path: '/$unitNumber'
@@ -925,12 +943,15 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface CoursesCourseSlugSemesterNumberSubjectSlugRouteChildren {
   CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute: typeof CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute
+  CoursesCourseSlugSemesterNumberSubjectSlugIndexRoute: typeof CoursesCourseSlugSemesterNumberSubjectSlugIndexRoute
 }
 
 const CoursesCourseSlugSemesterNumberSubjectSlugRouteChildren: CoursesCourseSlugSemesterNumberSubjectSlugRouteChildren =
   {
     CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute:
       CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute,
+    CoursesCourseSlugSemesterNumberSubjectSlugIndexRoute:
+      CoursesCourseSlugSemesterNumberSubjectSlugIndexRoute,
   }
 
 const CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren =
