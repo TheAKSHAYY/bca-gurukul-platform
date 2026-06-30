@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { setRememberMe, supabase } from "@/integrations/supabase/client";
 
 /**
  * Google OAuth sign-in. Requires the Google provider to be enabled
@@ -17,6 +17,7 @@ export function GoogleSignInButton({ redirect }: { redirect?: string }) {
 
   async function signIn() {
     setLoading(true);
+    setRememberMe(true);
     const params = new URLSearchParams();
     if (redirect) params.set("redirect", redirect);
     const { error } = await supabase.auth.signInWithOAuth({

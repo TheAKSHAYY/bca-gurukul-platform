@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, notFound, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, FileStack, ListTree } from "lucide-react";
 
@@ -13,6 +13,11 @@ export const Route = createFileRoute("/courses/$courseSlug/$semesterNumber/$subj
 
 function SubjectDetail() {
   const { courseSlug, semesterNumber, subjectSlug } = Route.useParams();
+  const isUnitRoute = useRouterState({
+    select: (state) => state.location.pathname.split("/").filter(Boolean).length > 4,
+  });
+
+  if (isUnitRoute) return <Outlet />;
 
   const subjectQuery = useQuery({
     queryKey: ["public", "subject", courseSlug, semesterNumber, subjectSlug],

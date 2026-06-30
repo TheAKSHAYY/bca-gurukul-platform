@@ -322,6 +322,7 @@ function SignUpForm() {
       return;
     }
     setLoading(true);
+    setRememberMe(true);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,

@@ -5,6 +5,7 @@ import { ArrowLeft, Download, FileText } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { PdfViewer } from "@/components/pdf-viewer";
 import { PublicHeader } from "./courses.index";
 
 export const Route = createFileRoute("/notes/$noteId")({
@@ -22,6 +23,8 @@ function NoteViewer() {
         .from("notes")
         .select("id, title, summary, body, file_path, file_bucket, file_mime, unit_id")
         .eq("id", noteId)
+        .eq("status", "published")
+        .is("deleted_at", null)
         .maybeSingle();
       if (error) throw error;
       if (!data) throw notFound();
@@ -105,13 +108,7 @@ function NoteViewer() {
                     </Button>
                   </a>
                 </div>
-                <div className="overflow-hidden rounded-2xl border border-border bg-surface">
-                  <iframe
-                    src={pdfUrl}
-                    title={noteQuery.data.title}
-                    className="h-[80vh] w-full"
-                  />
-                </div>
+                <PdfViewer url={pdfUrl} title={noteQuery.data.title} />
               </section>
             )}
 

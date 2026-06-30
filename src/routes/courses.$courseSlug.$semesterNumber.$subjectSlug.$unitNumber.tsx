@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, FileText, Bookmark, BookOpen } from "lucide-react";
+import { AlertCircle, ArrowLeft, FileText, Bookmark, BookOpen } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -18,19 +18,19 @@ function UnitDetail() {
     queryKey: ["public", "unit", courseSlug, semesterNumber, subjectSlug, unitNumber],
     queryFn: async () => {
       const { data: course } = await supabase
-        .from("courses").select("id, title").eq("slug", courseSlug).eq("status", "published").maybeSingle();
+        .from("courses").select("id, title").eq("slug", courseSlug).eq("status", "published").is("deleted_at", null).maybeSingle();
       if (!course) throw notFound();
       const { data: sem } = await supabase
         .from("semesters").select("id, number, title").eq("course_id", course.id)
-        .eq("number", Number(semesterNumber)).eq("status", "published").maybeSingle();
+        .eq("number", Number(semesterNumber)).eq("status", "published").is("deleted_at", null).maybeSingle();
       if (!sem) throw notFound();
       const { data: subject } = await supabase
         .from("subjects").select("id, code, title").eq("semester_id", sem.id)
-        .eq("slug", subjectSlug).eq("status", "published").maybeSingle();
+        .eq("slug", subjectSlug).eq("status", "published").is("deleted_at", null).maybeSingle();
       if (!subject) throw notFound();
       const { data: unit } = await supabase
         .from("units").select("id, number, title, summary").eq("subject_id", subject.id)
-        .eq("number", Number(unitNumber)).eq("status", "published").maybeSingle();
+        .eq("number", Number(unitNumber)).eq("status", "published").is("deleted_at", null).maybeSingle();
       if (!unit) throw notFound();
 
       const { data: notes } = await supabase
@@ -38,6 +38,7 @@ function UnitDetail() {
         .select("id, title, summary, file_path")
         .eq("unit_id", unit.id)
         .eq("status", "published")
+        .is("deleted_at", null)
         .order("sort_order")
         .order("created_at");
 
@@ -49,6 +50,20 @@ function UnitDetail() {
     <div className="min-h-screen bg-background">
       <PublicHeader />
       <main className="mx-auto max-w-5xl px-6 py-12">
+        {dataQuery.isLoading && (
+          <div className="rounded-2xl border border-border bg-surface p-8 text-sm text-muted-foreground">
+            Opening unit…
+          </div>
+        )}
+        {dataQuery.isError && (
+          <EmptyState
+            icon={AlertCircle}
+            tone="accent"
+            title="This unit is not available yet"
+            description="The unit may still be a draft, unpublished, or temporarily unavailable. Published content will open here automatically."
+            primaryAction={{ label: "Browse courses", to: "/courses", icon: BookOpen }}
+          />
+        )}
         {dataQuery.data && (
           <>
             <Link

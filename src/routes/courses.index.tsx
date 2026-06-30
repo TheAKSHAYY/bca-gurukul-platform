@@ -4,6 +4,7 @@ import { BookOpen, ArrowRight, GraduationCap, Library, Bell } from "lucide-react
 
 import { supabase } from "@/integrations/supabase/client";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/courses/")({
   head: () => ({
@@ -94,6 +95,8 @@ function CoursesIndex() {
 }
 
 export function PublicHeader() {
+  const { user, loading } = useAuth();
+
   return (
     <header className="border-b border-border/60">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -107,12 +110,21 @@ export function PublicHeader() {
           <Link to="/courses" className="text-foreground hover:text-primary" activeProps={{ className: "text-primary" }}>
             Courses
           </Link>
-          <Link
-            to="/auth"
-            className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground hover:bg-primary/90"
-          >
-            Sign in
-          </Link>
+          {!loading && user ? (
+            <Link
+              to="/dashboard"
+              className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground hover:bg-primary/90"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              to="/auth"
+              className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground hover:bg-primary/90"
+            >
+              Sign in
+            </Link>
+          )}
         </nav>
       </div>
     </header>
