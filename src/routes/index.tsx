@@ -968,8 +968,8 @@ function SiteFooter() {
             title="Company"
             links={[
               { label: "Contact", href: "#contact" },
-              { label: "Privacy", href: "#" },
-              { label: "Terms", href: "#" },
+              { label: "Privacy", to: "/privacy" },
+              { label: "Terms", to: "/terms" },
             ]}
           />
         </div>
@@ -983,7 +983,7 @@ function SiteFooter() {
 }
 
 type FooterLink =
-  | { label: string; to: "/courses" | "/auth"; search?: { mode: "signin" | "signup" | "forgot" }; href?: never }
+  | { label: string; to: "/courses" | "/auth" | "/privacy" | "/terms"; search?: { mode: "signin" | "signup" | "forgot" }; href?: never }
   | { label: string; href: string; to?: never; search?: never };
 
 function FooterCol({ title, links }: { title: string; links: FooterLink[] }) {
@@ -1008,6 +1008,16 @@ function FooterCol({ title, links }: { title: string; links: FooterLink[] }) {
             <li key={l.label}>
               <a
                 href={l.href}
+                onClick={(e) => {
+                  if (l.href.startsWith("#") && l.href.length > 1) {
+                    const el = document.getElementById(l.href.slice(1));
+                    if (el) {
+                      e.preventDefault();
+                      const y = el.getBoundingClientRect().top + window.scrollY - 80;
+                      window.scrollTo({ top: y, behavior: "smooth" });
+                    }
+                  }
+                }}
                 className="text-muted-foreground transition-colors hover:text-foreground"
               >
                 {l.label}
