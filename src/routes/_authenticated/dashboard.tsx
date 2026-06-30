@@ -542,3 +542,26 @@ function ActionCard({
     </Link>
   );
 }
+
+const resultLinkClass =
+  "block truncate rounded-md border border-border/60 bg-background px-3 py-2 text-sm text-foreground transition-colors hover:border-primary/40 hover:bg-surface hover:text-primary";
+
+function ResultGroup({
+  label,
+  icon,
+  children,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="mb-2 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {icon}
+        {label}
+      </div>
+      <div className="space-y-1.5">{children}</div>
+    </div>
+  );
+}
