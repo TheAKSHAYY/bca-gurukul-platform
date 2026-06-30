@@ -1,0 +1,1 @@
+UPDATE public.homepage_sections SET enabled = false WHERE type IN ('trust_bar','journey','benefits','testimonials');
