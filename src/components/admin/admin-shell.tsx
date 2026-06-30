@@ -64,9 +64,7 @@ export function AdminShell() {
         <Sidebar collapsible="icon" className="border-r border-border/70">
           <SidebarContent>
             <div className="flex items-center gap-2 px-3 py-3">
-              <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
-                <span className="font-display text-sm font-semibold">ब</span>
-              </div>
+              <BrandMark className="h-8 w-8" />
               <div className="text-sm font-semibold text-foreground">BCA Gurukul CMS</div>
             </div>
 
