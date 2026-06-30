@@ -252,7 +252,7 @@ function Hero({ user, loading }: { user: unknown; loading: boolean }) {
             <span className="absolute inset-0 animate-ping rounded-full bg-accent/60" />
             <span className="relative h-2 w-2 rounded-full bg-accent" />
           </span>
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-foreground/90">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
             BCA Batch 2025–26 is live
           </span>
         </div>
