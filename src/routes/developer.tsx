@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Github,
   Globe,
+  Home,
   Instagram,
   Linkedin,
   Mail,
@@ -263,6 +264,11 @@ function DeveloperPage() {
               </p>
             )}
             <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Button asChild variant="outline" size="lg">
+                <Link to="/">
+                  <Home className="mr-1.5 h-4 w-4" /> Back to Home
+                </Link>
+              </Button>
               <Button asChild size="lg">
                 <a href="#projects">
                   {profile.hero_cta_primary_label || "View Projects"}
