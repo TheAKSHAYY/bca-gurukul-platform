@@ -7,11 +7,12 @@ import { useAuth } from "@/hooks/use-auth";
 
 type Bookmark = {
   id: string;
-  kind: string;
-  target_id: string;
+  kind: "note" | "paper" | "quiz" | "unit";
+  ref_id: string;
   title: string | null;
   created_at: string;
 };
+
 
 export const Route = createFileRoute("/_authenticated/bookmarks")({
   head: () => ({ meta: [{ title: "Your bookmarks · BCA Gurukul" }] }),
