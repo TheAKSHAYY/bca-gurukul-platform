@@ -32,10 +32,21 @@ function SuperAdminHome() {
             className="group rounded-2xl border border-border bg-surface p-5 transition hover:border-primary/40 hover:shadow-sm"
           >
             <h3 className="font-display text-base font-semibold text-foreground group-hover:text-primary">
-              Branding & SEO
+              Branding & Theme
             </h3>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              Site name, logo, footer, SEO defaults, and maintenance mode.
+              Site identity, logo, colors, typography, radius, and maintenance mode.
+            </p>
+          </Link>
+          <Link
+            to="/admin/superadmin/seo"
+            className="group rounded-2xl border border-border bg-surface p-5 transition hover:border-primary/40 hover:shadow-sm"
+          >
+            <h3 className="font-display text-base font-semibold text-foreground group-hover:text-primary">
+              SEO Manager
+            </h3>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Per-route titles, descriptions, Open Graph images, and robots rules.
             </p>
           </Link>
         </div>

@@ -103,17 +103,24 @@ export type Database = {
           accent_color: string | null
           created_at: string
           favicon_url: string | null
+          font_body: string | null
+          font_heading: string | null
           footer_text: string | null
           id: number
+          logo_text: string | null
           logo_url: string | null
           og_image_url: string | null
           primary_color: string | null
+          radius_rem: number | null
+          secondary_color: string | null
           seo_description: string | null
           seo_title: string | null
           site_name: string
           social_links: Json
           support_email: string | null
           tagline: string | null
+          theme_dark: Json | null
+          theme_light: Json | null
           updated_at: string
           updated_by: string | null
         }
@@ -121,17 +128,24 @@ export type Database = {
           accent_color?: string | null
           created_at?: string
           favicon_url?: string | null
+          font_body?: string | null
+          font_heading?: string | null
           footer_text?: string | null
           id?: number
+          logo_text?: string | null
           logo_url?: string | null
           og_image_url?: string | null
           primary_color?: string | null
+          radius_rem?: number | null
+          secondary_color?: string | null
           seo_description?: string | null
           seo_title?: string | null
           site_name?: string
           social_links?: Json
           support_email?: string | null
           tagline?: string | null
+          theme_dark?: Json | null
+          theme_light?: Json | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -139,17 +153,24 @@ export type Database = {
           accent_color?: string | null
           created_at?: string
           favicon_url?: string | null
+          font_body?: string | null
+          font_heading?: string | null
           footer_text?: string | null
           id?: number
+          logo_text?: string | null
           logo_url?: string | null
           og_image_url?: string | null
           primary_color?: string | null
+          radius_rem?: number | null
+          secondary_color?: string | null
           seo_description?: string | null
           seo_title?: string | null
           site_name?: string
           social_links?: Json
           support_email?: string | null
           tagline?: string | null
+          theme_dark?: Json | null
+          theme_light?: Json | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -1200,6 +1221,51 @@ export type Database = {
           },
         ]
       }
+      seo_meta: {
+        Row: {
+          canonical: string | null
+          created_at: string
+          description: string | null
+          id: string
+          keywords: string | null
+          og_image: string | null
+          path: string
+          robots: string | null
+          title: string | null
+          twitter_card: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          canonical?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          keywords?: string | null
+          og_image?: string | null
+          path: string
+          robots?: string | null
+          title?: string | null
+          twitter_card?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          canonical?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          keywords?: string | null
+          og_image?: string | null
+          path?: string
+          robots?: string | null
+          title?: string | null
+          twitter_card?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       subjects: {
         Row: {
           code: string
@@ -1514,6 +1580,40 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "homepage_sections"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      get_public_branding: {
+        Args: never
+        Returns: {
+          accent_color: string | null
+          created_at: string
+          favicon_url: string | null
+          font_body: string | null
+          font_heading: string | null
+          footer_text: string | null
+          id: number
+          logo_text: string | null
+          logo_url: string | null
+          og_image_url: string | null
+          primary_color: string | null
+          radius_rem: number | null
+          secondary_color: string | null
+          seo_description: string | null
+          seo_title: string | null
+          site_name: string
+          social_links: Json
+          support_email: string | null
+          tagline: string | null
+          theme_dark: Json | null
+          theme_light: Json | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "branding"
           isOneToOne: true
           isSetofReturn: false
         }

@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/admin/superadmin/branding"
 const schema = z.object({
   site_name: z.string().min(1, "Required").max(80),
   tagline: z.string().max(200).optional().nullable(),
+  logo_text: z.string().max(40).optional().nullable(),
   logo_url: z.string().url().optional().or(z.literal("")).nullable(),
   favicon_url: z.string().url().optional().or(z.literal("")).nullable(),
   support_email: z.string().email().optional().or(z.literal("")).nullable(),
@@ -28,6 +29,12 @@ const schema = z.object({
   seo_title: z.string().max(120).optional().nullable(),
   seo_description: z.string().max(300).optional().nullable(),
   og_image_url: z.string().url().optional().or(z.literal("")).nullable(),
+  primary_color: z.string().max(80).optional().nullable(),
+  secondary_color: z.string().max(80).optional().nullable(),
+  accent_color: z.string().max(80).optional().nullable(),
+  font_heading: z.string().max(60).optional().nullable(),
+  font_body: z.string().max(60).optional().nullable(),
+  radius_rem: z.coerce.number().min(0).max(2).optional().nullable(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -59,6 +66,7 @@ function BrandingPage() {
       ? {
           site_name: brandingQuery.data.site_name ?? "",
           tagline: brandingQuery.data.tagline ?? "",
+          logo_text: brandingQuery.data.logo_text ?? "",
           logo_url: brandingQuery.data.logo_url ?? "",
           favicon_url: brandingQuery.data.favicon_url ?? "",
           support_email: brandingQuery.data.support_email ?? "",
@@ -66,6 +74,12 @@ function BrandingPage() {
           seo_title: brandingQuery.data.seo_title ?? "",
           seo_description: brandingQuery.data.seo_description ?? "",
           og_image_url: brandingQuery.data.og_image_url ?? "",
+          primary_color: brandingQuery.data.primary_color ?? "",
+          secondary_color: brandingQuery.data.secondary_color ?? "",
+          accent_color: brandingQuery.data.accent_color ?? "",
+          font_heading: brandingQuery.data.font_heading ?? "Fraunces",
+          font_body: brandingQuery.data.font_body ?? "Inter",
+          radius_rem: brandingQuery.data.radius_rem ?? 0.75,
         }
       : undefined,
   });
@@ -75,6 +89,7 @@ function BrandingPage() {
       const payload = {
         site_name: values.site_name,
         tagline: values.tagline || null,
+        logo_text: values.logo_text || null,
         logo_url: values.logo_url || null,
         favicon_url: values.favicon_url || null,
         support_email: values.support_email || null,
@@ -82,6 +97,12 @@ function BrandingPage() {
         seo_title: values.seo_title || null,
         seo_description: values.seo_description || null,
         og_image_url: values.og_image_url || null,
+        primary_color: values.primary_color || null,
+        secondary_color: values.secondary_color || null,
+        accent_color: values.accent_color || null,
+        font_heading: values.font_heading || null,
+        font_body: values.font_body || null,
+        radius_rem: values.radius_rem ?? null,
       };
       const { error } = await supabase.from("branding").update(payload).eq("id", 1);
       if (error) throw error;
@@ -161,6 +182,9 @@ function BrandingPage() {
           <Field label="Tagline" error={form.formState.errors.tagline?.message}>
             <Input {...form.register("tagline")} placeholder="Short one-liner shown on the landing page" />
           </Field>
+          <Field label="Logo wordmark" error={form.formState.errors.logo_text?.message}>
+            <Input {...form.register("logo_text")} placeholder="Shown next to the logo mark" />
+          </Field>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Logo URL" error={form.formState.errors.logo_url?.message}>
               <Input {...form.register("logo_url")} placeholder="https://…" />
@@ -175,6 +199,39 @@ function BrandingPage() {
           <Field label="Footer text" error={form.formState.errors.footer_text?.message}>
             <Input {...form.register("footer_text")} />
           </Field>
+
+          <h2 className="pt-4 font-display text-lg font-semibold">Theme</h2>
+          <p className="-mt-3 text-xs text-muted-foreground">
+            Colors accept any CSS value (oklch, hsl, hex). Leave blank to use the design-system default.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-3">
+            <Field label="Primary" error={form.formState.errors.primary_color?.message}>
+              <Input {...form.register("primary_color")} placeholder="oklch(0.36 0.13 268)" />
+            </Field>
+            <Field label="Secondary" error={form.formState.errors.secondary_color?.message}>
+              <Input {...form.register("secondary_color")} placeholder="oklch(0.94 0.018 270)" />
+            </Field>
+            <Field label="Accent" error={form.formState.errors.accent_color?.message}>
+              <Input {...form.register("accent_color")} placeholder="oklch(0.78 0.16 60)" />
+            </Field>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-3">
+            <Field label="Heading font" error={form.formState.errors.font_heading?.message}>
+              <Input {...form.register("font_heading")} placeholder="Fraunces" />
+            </Field>
+            <Field label="Body font" error={form.formState.errors.font_body?.message}>
+              <Input {...form.register("font_body")} placeholder="Inter" />
+            </Field>
+            <Field label="Radius (rem)" error={form.formState.errors.radius_rem?.message}>
+              <Input
+                type="number"
+                step="0.05"
+                min="0"
+                max="2"
+                {...form.register("radius_rem")}
+              />
+            </Field>
+          </div>
 
           <h2 className="pt-4 font-display text-lg font-semibold">SEO defaults</h2>
           <Field label="SEO title" error={form.formState.errors.seo_title?.message}>

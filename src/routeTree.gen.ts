@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -42,6 +43,7 @@ import { Route as AuthenticatedAdminSuperadminRouteRouteImport } from './routes/
 import { Route as CoursesCourseSlugSemesterNumberIndexRouteImport } from './routes/courses.$courseSlug.$semesterNumber.index'
 import { Route as AuthenticatedAdminSuperadminIndexRouteImport } from './routes/_authenticated/admin/superadmin/index'
 import { Route as CoursesCourseSlugSemesterNumberSubjectSlugRouteImport } from './routes/courses.$courseSlug.$semesterNumber.$subjectSlug'
+import { Route as AuthenticatedAdminSuperadminSeoRouteImport } from './routes/_authenticated/admin/superadmin/seo'
 import { Route as AuthenticatedAdminSuperadminBrandingRouteImport } from './routes/_authenticated/admin/superadmin/branding'
 import { Route as AuthenticatedAdminQuizzesQuizIdRouteImport } from './routes/_authenticated/admin/quizzes.$quizId'
 import { Route as AuthenticatedAdminCoursesCourseIdRouteImport } from './routes/_authenticated/admin/courses.$courseId'
@@ -50,6 +52,11 @@ import { Route as CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRouteImpor
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SetupRoute = SetupRouteImport.update({
@@ -219,6 +226,12 @@ const CoursesCourseSlugSemesterNumberSubjectSlugRoute =
     path: '/courses/$courseSlug/$semesterNumber/$subjectSlug',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminSuperadminSeoRoute =
+  AuthenticatedAdminSuperadminSeoRouteImport.update({
+    id: '/seo',
+    path: '/seo',
+    getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
+  } as any)
 const AuthenticatedAdminSuperadminBrandingRoute =
   AuthenticatedAdminSuperadminBrandingRouteImport.update({
     id: '/branding',
@@ -250,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/bookmarks': typeof AuthenticatedBookmarksRoute
@@ -277,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/admin/courses/$courseId': typeof AuthenticatedAdminCoursesCourseIdRoute
   '/admin/quizzes/$quizId': typeof AuthenticatedAdminQuizzesQuizIdRoute
   '/admin/superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
+  '/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
   '/admin/superadmin/': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber/': typeof CoursesCourseSlugSemesterNumberIndexRoute
@@ -288,6 +303,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/bookmarks': typeof AuthenticatedBookmarksRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -313,6 +329,7 @@ export interface FileRoutesByTo {
   '/admin/courses/$courseId': typeof AuthenticatedAdminCoursesCourseIdRoute
   '/admin/quizzes/$quizId': typeof AuthenticatedAdminQuizzesQuizIdRoute
   '/admin/superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
+  '/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
   '/admin/superadmin': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber': typeof CoursesCourseSlugSemesterNumberIndexRoute
@@ -326,6 +343,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/bookmarks': typeof AuthenticatedBookmarksRoute
@@ -353,6 +371,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/courses/$courseId': typeof AuthenticatedAdminCoursesCourseIdRoute
   '/_authenticated/admin/quizzes/$quizId': typeof AuthenticatedAdminQuizzesQuizIdRoute
   '/_authenticated/admin/superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
+  '/_authenticated/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
   '/_authenticated/admin/superadmin/': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber/': typeof CoursesCourseSlugSemesterNumberIndexRoute
@@ -366,6 +385,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/setup'
+    | '/sitemap.xml'
     | '/terms'
     | '/admin'
     | '/bookmarks'
@@ -393,6 +413,7 @@ export interface FileRouteTypes {
     | '/admin/courses/$courseId'
     | '/admin/quizzes/$quizId'
     | '/admin/superadmin/branding'
+    | '/admin/superadmin/seo'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
     | '/admin/superadmin/'
     | '/courses/$courseSlug/$semesterNumber/'
@@ -404,6 +425,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/setup'
+    | '/sitemap.xml'
     | '/terms'
     | '/bookmarks'
     | '/dashboard'
@@ -429,6 +451,7 @@ export interface FileRouteTypes {
     | '/admin/courses/$courseId'
     | '/admin/quizzes/$quizId'
     | '/admin/superadmin/branding'
+    | '/admin/superadmin/seo'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
     | '/admin/superadmin'
     | '/courses/$courseSlug/$semesterNumber'
@@ -441,6 +464,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/setup'
+    | '/sitemap.xml'
     | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/bookmarks'
@@ -468,6 +492,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/courses/$courseId'
     | '/_authenticated/admin/quizzes/$quizId'
     | '/_authenticated/admin/superadmin/branding'
+    | '/_authenticated/admin/superadmin/seo'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
     | '/_authenticated/admin/superadmin/'
     | '/courses/$courseSlug/$semesterNumber/'
@@ -481,6 +506,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SetupRoute: typeof SetupRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   NotesNoteIdRoute: typeof NotesNoteIdRoute
@@ -499,6 +525,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/setup': {
@@ -725,6 +758,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/superadmin/seo': {
+      id: '/_authenticated/admin/superadmin/seo'
+      path: '/seo'
+      fullPath: '/admin/superadmin/seo'
+      preLoaderRoute: typeof AuthenticatedAdminSuperadminSeoRouteImport
+      parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
+    }
     '/_authenticated/admin/superadmin/branding': {
       id: '/_authenticated/admin/superadmin/branding'
       path: '/branding'
@@ -758,6 +798,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminSuperadminRouteRouteChildren {
   AuthenticatedAdminSuperadminBrandingRoute: typeof AuthenticatedAdminSuperadminBrandingRoute
+  AuthenticatedAdminSuperadminSeoRoute: typeof AuthenticatedAdminSuperadminSeoRoute
   AuthenticatedAdminSuperadminIndexRoute: typeof AuthenticatedAdminSuperadminIndexRoute
 }
 
@@ -765,6 +806,7 @@ const AuthenticatedAdminSuperadminRouteRouteChildren: AuthenticatedAdminSuperadm
   {
     AuthenticatedAdminSuperadminBrandingRoute:
       AuthenticatedAdminSuperadminBrandingRoute,
+    AuthenticatedAdminSuperadminSeoRoute: AuthenticatedAdminSuperadminSeoRoute,
     AuthenticatedAdminSuperadminIndexRoute:
       AuthenticatedAdminSuperadminIndexRoute,
   }
@@ -881,6 +923,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SetupRoute: SetupRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   NotesNoteIdRoute: NotesNoteIdRoute,
