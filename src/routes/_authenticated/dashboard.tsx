@@ -212,34 +212,29 @@ function DashboardPage() {
   }, [searchInput]);
 
   const searchEnabled = debouncedQuery.length >= 2;
+  type SearchHit = {
+    kind: "course" | "unit" | "note" | "paper" | "quiz";
+    id: string;
+    title: string;
+    description: string;
+    slug: string | null;
+    rank: number;
+  };
   const searchQuery = useQuery({
     queryKey: ["dashboard-search", debouncedQuery],
     enabled: searchEnabled,
     queryFn: async () => {
-      const pattern = `%${debouncedQuery.replace(/[%_]/g, (m) => `\\${m}`)}%`;
-      const [courses, units, notes, papers, quizzes] = await Promise.all([
-        supabase.from("courses").select("id, title, slug").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(4),
-        supabase.from("units").select("id, title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(4),
-        supabase.from("notes").select("id, title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(4),
-        supabase.from("papers").select("id, title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(4),
-        supabase.from("quizzes").select("id, title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(4),
-      ]);
-      const errs = [courses.error, units.error, notes.error, papers.error, quizzes.error].filter(Boolean);
-      if (errs.length) throw errs[0];
-      return {
-        courses: (courses.data ?? []) as Array<{ id: string; title: string; slug: string }>,
-        units: (units.data ?? []) as Array<{ id: string; title: string }>,
-        notes: (notes.data ?? []) as Array<{ id: string; title: string }>,
-        papers: (papers.data ?? []) as Array<{ id: string; title: string }>,
-        quizzes: (quizzes.data ?? []) as Array<{ id: string; title: string }>,
-      };
+      const { data, error } = await supabase.rpc("student_search", {
+        _query: debouncedQuery,
+        _max_results: 20,
+      });
+      if (error) throw error;
+      return ((data ?? []) as SearchHit[]).sort((a, b) => b.rank - a.rank);
     },
   });
 
-  const searchResults = searchQuery.data;
-  const totalResults = searchResults
-    ? searchResults.courses.length + searchResults.units.length + searchResults.notes.length + searchResults.papers.length + searchResults.quizzes.length
-    : 0;
+  const searchHits = searchQuery.data ?? [];
+  const totalResults = searchHits.length;
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
@@ -281,7 +276,7 @@ function DashboardPage() {
         ) : totalResults === 0 ? (
           <div className="mt-5 rounded-xl border border-dashed border-border bg-surface-muted/40 p-5 text-center">
             <p className="text-sm font-medium text-foreground">
-              No published matches for “{debouncedQuery}”
+              No published matches for "{debouncedQuery}"
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               We only show content that has been published and is visible to you.
@@ -289,43 +284,43 @@ function DashboardPage() {
           </div>
         ) : (
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
-            {searchResults!.courses.length > 0 && (
+            {searchHits.filter((h) => h.kind === "course").length > 0 && (
               <ResultGroup label="Courses" icon={<Compass className="h-3.5 w-3.5" />}>
-                {searchResults!.courses.map((c) => (
-                  <Link key={c.id} to="/courses/$courseSlug" params={{ courseSlug: c.slug }} className={resultLinkClass}>
+                {searchHits.filter((h) => h.kind === "course").map((c) => (
+                  <Link key={c.id} to="/courses/$courseSlug" params={{ courseSlug: c.slug ?? c.id }} className={resultLinkClass}>
                     {c.title}
                   </Link>
                 ))}
               </ResultGroup>
             )}
-            {searchResults!.units.length > 0 && (
+            {searchHits.filter((h) => h.kind === "unit").length > 0 && (
               <ResultGroup label="Units" icon={<BookOpen className="h-3.5 w-3.5" />}>
-                {searchResults!.units.map((u) => (
+                {searchHits.filter((h) => h.kind === "unit").map((u) => (
                   <Link key={u.id} to="/courses" className={resultLinkClass}>{u.title}</Link>
                 ))}
               </ResultGroup>
             )}
-            {searchResults!.notes.length > 0 && (
+            {searchHits.filter((h) => h.kind === "note").length > 0 && (
               <ResultGroup label="Notes" icon={<FileText className="h-3.5 w-3.5" />}>
-                {searchResults!.notes.map((n) => (
+                {searchHits.filter((h) => h.kind === "note").map((n) => (
                   <Link key={n.id} to="/notes/$noteId" params={{ noteId: n.id }} className={resultLinkClass}>
                     {n.title}
                   </Link>
                 ))}
               </ResultGroup>
             )}
-            {searchResults!.papers.length > 0 && (
+            {searchHits.filter((h) => h.kind === "paper").length > 0 && (
               <ResultGroup label="Papers" icon={<FileText className="h-3.5 w-3.5" />}>
-                {searchResults!.papers.map((p) => (
+                {searchHits.filter((h) => h.kind === "paper").map((p) => (
                   <Link key={p.id} to="/papers/$paperId" params={{ paperId: p.id }} className={resultLinkClass}>
                     {p.title}
                   </Link>
                 ))}
               </ResultGroup>
             )}
-            {searchResults!.quizzes.length > 0 && (
+            {searchHits.filter((h) => h.kind === "quiz").length > 0 && (
               <ResultGroup label="Quizzes" icon={<ListChecks className="h-3.5 w-3.5" />}>
-                {searchResults!.quizzes.map((q) => (
+                {searchHits.filter((h) => h.kind === "quiz").map((q) => (
                   <Link key={q.id} to="/quizzes/$quizId" params={{ quizId: q.id }} className={resultLinkClass}>
                     {q.title}
                   </Link>

@@ -1966,6 +1966,17 @@ export type Database = {
           unit_title: string
         }[]
       }
+      student_search: {
+        Args: { _max_results?: number; _query: string }
+        Returns: {
+          description: string
+          id: string
+          kind: string
+          rank: number
+          slug: string
+          title: string
+        }[]
+      }
       submit_quiz_attempt: {
         Args: { _answers: Json; _attempt_id: string }
         Returns: {
