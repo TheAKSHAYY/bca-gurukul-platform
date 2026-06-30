@@ -182,6 +182,9 @@ function BrandingPage() {
           <Field label="Tagline" error={form.formState.errors.tagline?.message}>
             <Input {...form.register("tagline")} placeholder="Short one-liner shown on the landing page" />
           </Field>
+          <Field label="Logo wordmark" error={form.formState.errors.logo_text?.message}>
+            <Input {...form.register("logo_text")} placeholder="Shown next to the logo mark" />
+          </Field>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Logo URL" error={form.formState.errors.logo_url?.message}>
               <Input {...form.register("logo_url")} placeholder="https://…" />
@@ -196,6 +199,39 @@ function BrandingPage() {
           <Field label="Footer text" error={form.formState.errors.footer_text?.message}>
             <Input {...form.register("footer_text")} />
           </Field>
+
+          <h2 className="pt-4 font-display text-lg font-semibold">Theme</h2>
+          <p className="-mt-3 text-xs text-muted-foreground">
+            Colors accept any CSS value (oklch, hsl, hex). Leave blank to use the design-system default.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-3">
+            <Field label="Primary" error={form.formState.errors.primary_color?.message}>
+              <Input {...form.register("primary_color")} placeholder="oklch(0.36 0.13 268)" />
+            </Field>
+            <Field label="Secondary" error={form.formState.errors.secondary_color?.message}>
+              <Input {...form.register("secondary_color")} placeholder="oklch(0.94 0.018 270)" />
+            </Field>
+            <Field label="Accent" error={form.formState.errors.accent_color?.message}>
+              <Input {...form.register("accent_color")} placeholder="oklch(0.78 0.16 60)" />
+            </Field>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-3">
+            <Field label="Heading font" error={form.formState.errors.font_heading?.message}>
+              <Input {...form.register("font_heading")} placeholder="Fraunces" />
+            </Field>
+            <Field label="Body font" error={form.formState.errors.font_body?.message}>
+              <Input {...form.register("font_body")} placeholder="Inter" />
+            </Field>
+            <Field label="Radius (rem)" error={form.formState.errors.radius_rem?.message}>
+              <Input
+                type="number"
+                step="0.05"
+                min="0"
+                max="2"
+                {...form.register("radius_rem")}
+              />
+            </Field>
+          </div>
 
           <h2 className="pt-4 font-display text-lg font-semibold">SEO defaults</h2>
           <Field label="SEO title" error={form.formState.errors.seo_title?.message}>
