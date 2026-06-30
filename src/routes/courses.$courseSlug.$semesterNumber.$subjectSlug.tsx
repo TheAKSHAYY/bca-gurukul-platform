@@ -135,10 +135,7 @@ function SubjectDetail() {
                 ))}
               </ol>
             </section>
-          </>
-        )}
-      </main>
-    </div>
+
 
             <section className="mt-12">
               <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-foreground">
