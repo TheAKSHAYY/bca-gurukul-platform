@@ -203,38 +203,6 @@ function DashboardPage() {
     await queryClient.invalidateQueries({ queryKey: ["student-notifications", user.id] });
   }
 
-  // ---------- search ----------
-  const [searchInput, setSearchInput] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
-  useEffect(() => {
-    const id = setTimeout(() => setDebouncedQuery(searchInput.trim()), 250);
-    return () => clearTimeout(id);
-  }, [searchInput]);
-
-  const searchEnabled = debouncedQuery.length >= 2;
-  type SearchHit = {
-    kind: "course" | "unit" | "note" | "paper" | "quiz";
-    id: string;
-    title: string;
-    description: string;
-    slug: string | null;
-    rank: number;
-  };
-  const searchQuery = useQuery({
-    queryKey: ["dashboard-search", debouncedQuery],
-    enabled: searchEnabled,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("student_search", {
-        _query: debouncedQuery,
-        _max_results: 20,
-      });
-      if (error) throw error;
-      return ((data ?? []) as SearchHit[]).sort((a, b) => b.rank - a.rank);
-    },
-  });
-
-  const searchHits = searchQuery.data ?? [];
-  const totalResults = searchHits.length;
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
@@ -704,25 +672,3 @@ function ActionCard({
   );
 }
 
-const resultLinkClass =
-  "block truncate rounded-md border border-border/60 bg-background px-3 py-2 text-sm text-foreground transition-colors hover:border-primary/40 hover:bg-surface hover:text-primary";
-
-function ResultGroup({
-  label,
-  icon,
-  children,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="mb-2 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-        {icon}
-        {label}
-      </div>
-      <div className="space-y-1.5">{children}</div>
-    </div>
-  );
-}
