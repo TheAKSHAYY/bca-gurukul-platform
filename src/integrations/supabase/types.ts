@@ -579,6 +579,54 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          kind: Database["public"]["Enums"]["notification_kind"]
+          link: string | null
+          published_at: string | null
+          read_at: string | null
+          status: Database["public"]["Enums"]["notification_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["notification_kind"]
+          link?: string | null
+          published_at?: string | null
+          read_at?: string | null
+          status?: Database["public"]["Enums"]["notification_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["notification_kind"]
+          link?: string | null
+          published_at?: string | null
+          read_at?: string | null
+          status?: Database["public"]["Enums"]["notification_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       paper_downloads: {
         Row: {
           created_at: string
@@ -1497,6 +1545,8 @@ export type Database = {
         | "stats"
         | "custom_richtext"
       media_kind: "image" | "pdf" | "video" | "audio" | "document" | "other"
+      notification_kind: "system" | "content" | "quiz" | "announcement"
+      notification_status: "draft" | "published"
       progress_status: "not_started" | "in_progress" | "completed"
       quiz_question_type: "single" | "multiple" | "true_false"
       quiz_status: "draft" | "published" | "archived"
@@ -1652,6 +1702,8 @@ export const Constants = {
         "custom_richtext",
       ],
       media_kind: ["image", "pdf", "video", "audio", "document", "other"],
+      notification_kind: ["system", "content", "quiz", "announcement"],
+      notification_status: ["draft", "published"],
       progress_status: ["not_started", "in_progress", "completed"],
       quiz_question_type: ["single", "multiple", "true_false"],
       quiz_status: ["draft", "published", "archived"],
