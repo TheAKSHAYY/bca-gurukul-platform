@@ -6,11 +6,15 @@ import { AppNavbar } from "@/components/app-navbar";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ location }) => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) {
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) {
       throw redirect({ to: "/auth", search: { redirect: location.href } });
     }
-    return { user: data.user };
+    const { data } = await supabase.auth.getUser();
+    if (!data.user && !sessionData.session.user) {
+      throw redirect({ to: "/auth", search: { redirect: location.href } });
+    }
+    return { user: data.user ?? sessionData.session.user };
   },
   component: AuthenticatedLayout,
 });

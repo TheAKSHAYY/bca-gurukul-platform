@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
+import { setRememberMe, supabase } from "@/integrations/supabase/client";
 import { resolvePostAuthRoute } from "@/lib/post-auth";
 
 const COUNTRY_CODES = [
@@ -87,6 +87,7 @@ export function PhoneAuthForm({ redirect }: { redirect?: string }) {
       return;
     }
     setLoading(true);
+    setRememberMe(true);
     const { error } = await supabase.auth.signInWithOtp({
       phone: fullNumber,
       options: { channel: "sms" },
