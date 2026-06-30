@@ -95,10 +95,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#2a2566" },
       { property: "og:site_name", content: "BCA Gurukul" },
       { property: "og:type", content: "website" },
+      { property: "og:title", content: "BCA Gurukul — Learn BCA, the right way" },
+      {
+        property: "og:description",
+        content:
+          "Structured notes, past papers, videos, and MCQ practice for BCA students — organized by semester and subject.",
+      },
+      { property: "og:image", content: "/og-image.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "640" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "BCA Gurukul — Learn BCA, the right way" },
+      {
+        name: "twitter:description",
+        content:
+          "Structured notes, past papers, videos, and MCQ practice for BCA students — organized by semester and subject.",
+      },
+      { name: "twitter:image", content: "/og-image.jpg" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       {
         rel: "preconnect",
@@ -110,6 +128,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap",
       },
     ],
+
   }),
   shellComponent: RootShell,
   component: RootComponent,
