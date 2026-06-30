@@ -11,6 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PasswordInput } from "@/components/auth/password-input";
+import { PasswordStrengthMeter, scorePassword } from "@/components/auth/password-strength";
+import { PhoneAuthForm } from "@/components/auth/phone-auth-form";
+import { GoogleSignInButton } from "@/components/auth/google-signin-button";
+import { resolvePostAuthRoute } from "@/lib/post-auth";
 
 
 const searchSchema = z.object({
