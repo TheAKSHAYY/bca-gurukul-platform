@@ -44,6 +44,9 @@ function Index() {
             </div>
           </Link>
           <nav className="flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/courses">Browse courses</Link>
+            </Button>
             {loading ? null : user ? (
               <Button asChild size="sm">
                 <Link to="/dashboard">
@@ -79,19 +82,19 @@ function Index() {
             course, semester by semester, subject by subject. No clutter, no
             guesswork, just a clean path through your syllabus.
           </p>
-          {!user && !loading && (
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg">
-                <Link to="/auth" search={{ mode: "signup" }}>
-                  Create your free account
-                  <ArrowRight className="ml-1.5 h-4 w-4" />
-                </Link>
-              </Button>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button asChild size="lg">
+              <Link to="/courses">
+                Explore courses
+                <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
+            {!user && !loading && (
               <Button asChild size="lg" variant="outline">
-                <Link to="/auth" search={{ mode: "signin" }}>I already have an account</Link>
+                <Link to="/auth" search={{ mode: "signup" }}>Create free account</Link>
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </section>
 
         <section className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

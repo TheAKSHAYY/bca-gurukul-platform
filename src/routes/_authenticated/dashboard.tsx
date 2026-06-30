@@ -48,8 +48,17 @@ function DashboardPage() {
           Welcome, <span className="text-primary">{name.split(" ")[0]}</span>.
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Your courses and progress will appear here as content is published. The catalog opens in Phase 6.
+          Jump into the catalog or pick up where you left off.
         </p>
+
+        <div className="mt-6">
+          <Button asChild size="lg">
+            <Link to="/courses">
+              Browse all courses
+              <BookOpen className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
 
         <section className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <PlaceholderCard icon={<BookOpen className="h-5 w-5" />} title="Notes" body="Coming in Phase 8" />
