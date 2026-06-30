@@ -47,9 +47,20 @@ function CoursesIndex() {
         <section className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
           {!isLoading && (data?.length ?? 0) === 0 && (
-            <div className="col-span-full rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
-              <p className="font-display text-lg text-foreground">No courses published yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">Check back soon.</p>
+            <div className="col-span-full">
+              <EmptyState
+                icon={Library}
+                tone="accent"
+                title="Courses are being curated"
+                description="We're building each program semester by semester — notes, past papers, video lectures and timed MCQ practice, all syllabus-aligned. The catalog opens here the moment it's live."
+                tip="Sign up free and we'll email you the day your course goes live — no spam, just one ping."
+                primaryAction={{
+                  label: "Get notified",
+                  to: "/auth",
+                  icon: Bell,
+                }}
+                secondaryAction={{ label: "Back to home", to: "/" }}
+              />
             </div>
           )}
           {data?.map((c) => (
