@@ -92,19 +92,43 @@ function DashboardPage() {
     enabled: searchEnabled,
     queryFn: async () => {
       const pattern = `%${debouncedQuery.replace(/[%_]/g, (m) => `\\${m}`)}%`;
-      const baseFilter = (q: ReturnType<typeof buildBase>) =>
-        q.eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(5);
-
-      function buildBase() {
-        return supabase.from("courses").select("id, title, slug");
-      }
 
       const [courses, units, notes, papers, quizzes] = await Promise.all([
-        baseFilter(supabase.from("courses").select("id, title, slug")),
-        baseFilter(supabase.from("units").select("id, title, unit_number, subject_id")),
-        baseFilter(supabase.from("notes").select("id, title")),
-        baseFilter(supabase.from("papers").select("id, title")),
-        baseFilter(supabase.from("quizzes").select("id, title")),
+        supabase
+          .from("courses")
+          .select("id, title, slug")
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .ilike("title", pattern)
+          .limit(5),
+        supabase
+          .from("units")
+          .select("id, title")
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .ilike("title", pattern)
+          .limit(5),
+        supabase
+          .from("notes")
+          .select("id, title")
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .ilike("title", pattern)
+          .limit(5),
+        supabase
+          .from("papers")
+          .select("id, title")
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .ilike("title", pattern)
+          .limit(5),
+        supabase
+          .from("quizzes")
+          .select("id, title")
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .ilike("title", pattern)
+          .limit(5),
       ]);
 
       const errs = [courses.error, units.error, notes.error, papers.error, quizzes.error].filter(Boolean);
