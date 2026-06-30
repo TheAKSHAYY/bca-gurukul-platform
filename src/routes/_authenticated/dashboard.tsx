@@ -212,34 +212,29 @@ function DashboardPage() {
   }, [searchInput]);
 
   const searchEnabled = debouncedQuery.length >= 2;
+  type SearchHit = {
+    kind: "course" | "unit" | "note" | "paper" | "quiz";
+    id: string;
+    title: string;
+    description: string;
+    slug: string | null;
+    rank: number;
+  };
   const searchQuery = useQuery({
     queryKey: ["dashboard-search", debouncedQuery],
     enabled: searchEnabled,
     queryFn: async () => {
-      const pattern = `%${debouncedQuery.replace(/[%_]/g, (m) => `\\${m}`)}%`;
-      const [courses, units, notes, papers, quizzes] = await Promise.all([
-        supabase.from("courses").select("id, title, slug").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(4),
-        supabase.from("units").select("id, title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(4),
-        supabase.from("notes").select("id, title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(4),
-        supabase.from("papers").select("id, title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(4),
-        supabase.from("quizzes").select("id, title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(4),
-      ]);
-      const errs = [courses.error, units.error, notes.error, papers.error, quizzes.error].filter(Boolean);
-      if (errs.length) throw errs[0];
-      return {
-        courses: (courses.data ?? []) as Array<{ id: string; title: string; slug: string }>,
-        units: (units.data ?? []) as Array<{ id: string; title: string }>,
-        notes: (notes.data ?? []) as Array<{ id: string; title: string }>,
-        papers: (papers.data ?? []) as Array<{ id: string; title: string }>,
-        quizzes: (quizzes.data ?? []) as Array<{ id: string; title: string }>,
-      };
+      const { data, error } = await supabase.rpc("student_search", {
+        _query: debouncedQuery,
+        _max_results: 20,
+      });
+      if (error) throw error;
+      return ((data ?? []) as SearchHit[]).sort((a, b) => b.rank - a.rank);
     },
   });
 
-  const searchResults = searchQuery.data;
-  const totalResults = searchResults
-    ? searchResults.courses.length + searchResults.units.length + searchResults.notes.length + searchResults.papers.length + searchResults.quizzes.length
-    : 0;
+  const searchHits = searchQuery.data ?? [];
+  const totalResults = searchHits.length;
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
