@@ -137,6 +137,7 @@ function SemesterCard({
 }) {
   const qc = useQueryClient();
   const [subOpen, setSubOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const subjectsQuery = useQuery({
     queryKey: ["admin", "subjects", sem.id],
@@ -190,6 +191,9 @@ function SemesterCard({
             <Button size="sm" variant="outline" onClick={() => setSubOpen(true)}>
               <Plus className="mr-1 h-4 w-4" /> Subject
             </Button>
+            <Button size="sm" variant="ghost" onClick={() => setEditOpen(true)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
             <Button
               size="sm"
               variant="ghost"
@@ -220,6 +224,17 @@ function SemesterCard({
         </div>
       </AccordionContent>
 
+      <SemesterDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        courseId={sem.id}
+        nextNumber={sem.number}
+        semester={sem}
+        onSaved={() => {
+          onChange();
+          setEditOpen(false);
+        }}
+      />
       <SubjectDialog
         open={subOpen}
         onOpenChange={setSubOpen}
