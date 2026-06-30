@@ -101,22 +101,28 @@ function SubjectDetail() {
                   </li>
                 )}
                 {subjectQuery.data.units.map((u) => (
-                  <li
-                    key={u.id}
-                    className="rounded-xl border border-border bg-surface p-5"
-                  >
-                    <div className="flex items-start gap-4">
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 font-display text-sm font-semibold text-primary">
-                        {u.number}
-                      </span>
-                      <div>
-                        <h3 className="font-display text-lg font-semibold text-foreground">{u.title}</h3>
-                        {u.summary && <p className="mt-1 text-sm text-muted-foreground">{u.summary}</p>}
-                        <p className="mt-3 text-xs text-muted-foreground italic">
-                          Notes, videos and practice questions will appear here as content modules ship.
-                        </p>
+                  <li key={u.id}>
+                    <Link
+                      to="/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber"
+                      params={{
+                        courseSlug,
+                        semesterNumber,
+                        subjectSlug,
+                        unitNumber: String(u.number),
+                      }}
+                      className="block rounded-xl border border-border bg-surface p-5 transition hover:border-primary"
+                    >
+                      <div className="flex items-start gap-4">
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 font-display text-sm font-semibold text-primary">
+                          {u.number}
+                        </span>
+                        <div>
+                          <h3 className="font-display text-lg font-semibold text-foreground">{u.title}</h3>
+                          {u.summary && <p className="mt-1 text-sm text-muted-foreground">{u.summary}</p>}
+                          <p className="mt-3 text-xs text-primary">Open unit →</p>
+                        </div>
                       </div>
-                    </div>
+                    </Link>
                   </li>
                 ))}
               </ol>
