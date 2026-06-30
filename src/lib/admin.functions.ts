@@ -67,9 +67,9 @@ export const getContentTree = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const sb = context.supabase;
     const [coursesRes, semestersRes, subjectsRes, unitsRes] = await Promise.all([
-      sb.from("courses").select("id,name").is("deleted_at", null).order("name"),
-      sb.from("semesters").select("id,name,course_id").is("deleted_at", null).order("name"),
-      sb.from("subjects").select("id,name,semester_id").is("deleted_at", null).order("name"),
+      sb.from("courses").select("id,title,sort_order").is("deleted_at", null).order("sort_order"),
+      sb.from("semesters").select("id,title,number,course_id").is("deleted_at", null).order("number"),
+      sb.from("subjects").select("id,title,semester_id").is("deleted_at", null).order("title"),
       sb.from("units").select("id,title,subject_id").is("deleted_at", null).order("title"),
     ]);
     const err = coursesRes.error ?? semestersRes.error ?? subjectsRes.error ?? unitsRes.error;
@@ -82,17 +82,17 @@ export const getContentTree = createServerFn({ method: "GET" })
 
     const tree: TreeNode[] = courses.map((c) => ({
       id: c.id,
-      name: c.name,
+      name: c.title,
       children: semesters
         .filter((s) => s.course_id === c.id)
         .map((s) => ({
           id: s.id,
-          name: s.name,
+          name: s.title ?? `Semester ${s.number}`,
           children: subjects
             .filter((sj) => sj.semester_id === s.id)
             .map((sj) => ({
               id: sj.id,
-              name: sj.name,
+              name: sj.title,
               children: units
                 .filter((u) => u.subject_id === sj.id)
                 .map((u) => ({ id: u.id, name: u.title })),
