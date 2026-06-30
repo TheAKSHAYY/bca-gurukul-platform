@@ -1454,6 +1454,11 @@ export type Database = {
           title: string
         }[]
       }
+      bootstrap_grant_super_admin: {
+        Args: { _target_user_id: string }
+        Returns: undefined
+      }
+      bootstrap_status: { Args: never; Returns: boolean }
       check_and_increment_rate_limit: {
         Args: {
           _bucket_key: string

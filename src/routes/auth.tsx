@@ -8,7 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PasswordInput } from "@/components/auth/password-input";
+
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -156,16 +159,27 @@ function SignInForm() {
   const { redirect } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(true);
+  const [capsOn, setCapsOn] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = z.object({ email: emailSchema, password: z.string().min(1) }).safeParse({ email, password });
+    const parsed = z
+      .object({ email: emailSchema, password: z.string().min(1, "Password is required") })
+      .safeParse({ email, password });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
       return;
     }
     setLoading(true);
+    if (!remember) {
+      try {
+        sessionStorage.setItem("sb-prefer-session-only", "1");
+      } catch {
+        /* ignore */
+      }
+    }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
@@ -187,7 +201,15 @@ function SignInForm() {
       </div>
       <div className="space-y-2">
         <Label htmlFor="signin-email">Email</Label>
-        <Input id="signin-email" type="email" autoComplete="email" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <Input
+          id="signin-email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
@@ -200,8 +222,27 @@ function SignInForm() {
             Forgot?
           </Link>
         </div>
-        <Input id="signin-password" type="password" autoComplete="current-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <PasswordInput
+          id="signin-password"
+          autoComplete="current-password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onCapsLockChange={setCapsOn}
+          required
+        />
+        {capsOn && (
+          <p className="text-xs font-medium text-accent-foreground">Caps Lock is on</p>
+        )}
       </div>
+      <label className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Checkbox
+          checked={remember}
+          onCheckedChange={(v) => setRemember(v === true)}
+          aria-label="Remember me"
+        />
+        Remember me on this device
+      </label>
       <Button type="submit" size="lg" className="w-full" disabled={loading}>
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Sign in
@@ -225,6 +266,7 @@ function SignUpForm() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [capsOn, setCapsOn] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
@@ -276,8 +318,20 @@ function SignUpForm() {
       </div>
       <div className="space-y-2">
         <Label htmlFor="signup-password">Password</Label>
-        <Input id="signup-password" type="password" autoComplete="new-password" placeholder="At least 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <p className="text-xs text-muted-foreground">Use at least 8 characters.</p>
+        <PasswordInput
+          id="signup-password"
+          autoComplete="new-password"
+          placeholder="At least 8 characters"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onCapsLockChange={setCapsOn}
+          required
+        />
+        {capsOn ? (
+          <p className="text-xs font-medium text-accent-foreground">Caps Lock is on</p>
+        ) : (
+          <p className="text-xs text-muted-foreground">Use at least 8 characters.</p>
+        )}
       </div>
       <Button type="submit" size="lg" className="w-full" disabled={loading}>
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -296,6 +350,7 @@ function SignUpForm() {
     </form>
   );
 }
+
 
 function ForgotForm() {
   const [email, setEmail] = useState("");
