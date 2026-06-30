@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { MaintenanceGate } from "@/components/maintenance-gate";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { BrandingApplier } from "@/components/branding/branding-applier";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -147,6 +148,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <BrandingApplier />
         <MaintenanceGate>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
