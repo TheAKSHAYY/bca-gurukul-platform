@@ -272,7 +272,7 @@ function Hero({ user, loading }: { user: unknown; loading: boolean }) {
 
       <div className="mx-auto flex max-w-3xl flex-col items-center px-6 pb-20 pt-20 text-center sm:pt-28">
         {/* Eyebrow pill with pulsing saffron dot */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 animate-fade-in">
+        <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1">
           <span className="relative grid h-2 w-2 place-items-center">
             <span className="absolute inset-0 animate-ping rounded-full bg-accent/60" />
             <span className="relative h-2 w-2 rounded-full bg-accent" />
