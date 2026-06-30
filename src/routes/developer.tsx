@@ -246,7 +246,7 @@ function DeveloperPage() {
         </div>
         <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 sm:py-28 lg:grid-cols-[1.2fr_1fr] lg:items-center">
           <div className="animate-fade-in">
-            <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent-foreground">
+            <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
               <Sparkles className="h-3.5 w-3.5" /> Meet the developer
             </span>
             <h1 className="mt-5 font-display text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
