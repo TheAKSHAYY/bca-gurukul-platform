@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowRight,
+  Bell,
   Bookmark,
   BookOpen,
   Compass,
@@ -15,6 +16,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
+
 
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
