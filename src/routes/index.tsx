@@ -22,6 +22,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { BrandMark } from "@/components/brand-mark";
 import {
   Accordion,
   AccordionContent,
