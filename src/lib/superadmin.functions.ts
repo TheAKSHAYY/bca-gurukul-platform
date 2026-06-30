@@ -162,6 +162,7 @@ export const listAuditLogs = createServerFn({ method: "GET" })
     }
     return (rows ?? []).map((r) => ({
       ...r,
+      metadata: r.metadata ? JSON.stringify(r.metadata) : null,
       actor_email: r.actor_id ? emailMap.get(r.actor_id) ?? null : null,
     })) as AuditLogRow[];
   });
