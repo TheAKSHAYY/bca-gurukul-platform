@@ -14,16 +14,264 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_settings: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip: unknown
+          metadata: Json
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip?: unknown
+          metadata?: Json
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip?: unknown
+          metadata?: Json
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      feature_flags: {
+        Row: {
+          audience: Json
+          created_at: string
+          description: string | null
+          enabled: boolean
+          key: string
+          kill_switch: boolean
+          module: string
+          rollout_pct: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          audience?: Json
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          key: string
+          kill_switch?: boolean
+          module: string
+          rollout_pct?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          audience?: Json
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          kill_switch?: boolean
+          module?: string
+          rollout_pct?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      maintenance: {
+        Row: {
+          allowed_roles: Database["public"]["Enums"]["app_role"][]
+          enabled: boolean
+          id: number
+          message: string | null
+          scheduled_end: string | null
+          scheduled_start: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          allowed_roles?: Database["public"]["Enums"]["app_role"][]
+          enabled?: boolean
+          id?: number
+          message?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          allowed_roles?: Database["public"]["Enums"]["app_role"][]
+          enabled?: boolean
+          id?: number
+          message?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      permissions: {
+        Row: {
+          created_at: string
+          description: string
+          key: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          key: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          key?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          current_course_id: string | null
+          current_semester_id: string | null
+          display_name: string | null
+          full_name: string | null
+          locale: string
+          onboarded_at: string | null
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          current_course_id?: string | null
+          current_semester_id?: string | null
+          display_name?: string | null
+          full_name?: string | null
+          locale?: string
+          onboarded_at?: string | null
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          current_course_id?: string | null
+          current_semester_id?: string | null
+          display_name?: string | null
+          full_name?: string | null
+          locale?: string
+          onboarded_at?: string | null
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      role_permissions: {
+        Row: {
+          permission_key: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          permission_key: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          permission_key?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_key_fkey"
+            columns: ["permission_key"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          granted_at: string
+          granted_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "super_admin" | "admin" | "instructor" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +398,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["super_admin", "admin", "instructor", "student"],
+    },
   },
 } as const
