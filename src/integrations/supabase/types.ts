@@ -1549,6 +1549,18 @@ export type Database = {
         | "cta"
         | "stats"
         | "custom_richtext"
+        | "about"
+        | "why_us"
+        | "universities"
+        | "popular_courses"
+        | "categories"
+        | "statistics"
+        | "faculty"
+        | "learning_process"
+        | "blog"
+        | "contact"
+        | "newsletter"
+        | "footer"
       media_kind: "image" | "pdf" | "video" | "audio" | "document" | "other"
       notification_kind: "system" | "content" | "quiz" | "announcement"
       notification_status: "draft" | "published"
@@ -1705,6 +1717,18 @@ export const Constants = {
         "cta",
         "stats",
         "custom_richtext",
+        "about",
+        "why_us",
+        "universities",
+        "popular_courses",
+        "categories",
+        "statistics",
+        "faculty",
+        "learning_process",
+        "blog",
+        "contact",
+        "newsletter",
+        "footer",
       ],
       media_kind: ["image", "pdf", "video", "audio", "document", "other"],
       notification_kind: ["system", "content", "quiz", "announcement"],
