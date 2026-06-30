@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   BookOpen,
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -46,23 +48,72 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+type HomepageSection = { id: string; type: string; position: number; enabled: boolean };
+
+const DEFAULT_SECTIONS: HomepageSection[] = [
+  { id: "d-hero", type: "hero", position: 10, enabled: true },
+  { id: "d-trust", type: "trust_bar", position: 20, enabled: true },
+  { id: "d-features", type: "features", position: 30, enabled: true },
+  { id: "d-why", type: "why_choose", position: 35, enabled: true },
+  { id: "d-journey", type: "journey", position: 40, enabled: true },
+  { id: "d-sem", type: "semester_overview", position: 50, enabled: true },
+  { id: "d-ben", type: "benefits", position: 60, enabled: true },
+  { id: "d-test", type: "testimonials", position: 65, enabled: true },
+  { id: "d-faq", type: "faq", position: 70, enabled: true },
+  { id: "d-cta", type: "cta", position: 80, enabled: true },
+  { id: "d-contact", type: "contact", position: 90, enabled: true },
+];
+
 function Index() {
   const { user, loading } = useAuth();
+  const { data: sections } = useQuery({
+    queryKey: ["homepage_sections", "public"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("homepage_sections")
+        .select("id,type,position,enabled")
+        .eq("enabled", true)
+        .order("position", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as HomepageSection[];
+    },
+    staleTime: 60_000,
+  });
+
+  const list = sections && sections.length > 0 ? sections : DEFAULT_SECTIONS;
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader user={user} loading={loading} />
       <main>
-        <Hero user={user} loading={loading} />
-        <TrustBar />
-        <Features />
-        <WhyChoose />
-        <Journey />
-        <Semesters />
-        <Benefits />
-        <Testimonials />
-        <FAQ />
-        <CTA user={user} loading={loading} />
-        <Contact />
+        {list.map((s) => {
+          switch (s.type) {
+            case "hero":
+              return <Hero key={s.id} user={user} loading={loading} />;
+            case "trust_bar":
+              return <TrustBar key={s.id} />;
+            case "features":
+              return <Features key={s.id} />;
+            case "why_choose":
+              return <WhyChoose key={s.id} />;
+            case "journey":
+              return <Journey key={s.id} />;
+            case "semester_overview":
+              return <Semesters key={s.id} />;
+            case "benefits":
+              return <Benefits key={s.id} />;
+            case "testimonials":
+              return <Testimonials key={s.id} />;
+            case "faq":
+              return <FAQ key={s.id} />;
+            case "cta":
+              return <CTA key={s.id} user={user} loading={loading} />;
+            case "contact":
+              return <Contact key={s.id} />;
+            default:
+              return null;
+          }
+        })}
       </main>
       <SiteFooter />
     </div>
@@ -77,6 +128,7 @@ function SiteHeader({ user, loading }: { user: unknown; loading: boolean }) {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link to="/" className="flex items-center gap-3">
           <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+
             <span className="font-display text-lg font-semibold">ब</span>
           </div>
           <div className="leading-tight">
