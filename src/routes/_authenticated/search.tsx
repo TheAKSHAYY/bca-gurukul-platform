@@ -166,7 +166,7 @@ function SearchPage() {
 const linkClass =
   "block rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground transition-colors hover:border-primary/40 hover:bg-muted";
 
-function Group<T extends Hit>({
+function Group<T extends SearchHit>({
   icon: Icon,
   title,
   items,
