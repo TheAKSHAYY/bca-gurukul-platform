@@ -307,32 +307,56 @@ export type Database = {
       }
       homepage_sections: {
         Row: {
+          content: Json
           created_at: string
           created_by: string | null
           enabled: boolean
           id: string
           position: number
           props: Json
+          published_at: string | null
+          published_content: Json
+          published_style: Json
+          slug: string | null
+          status: string
+          style: Json
+          title: string | null
           type: Database["public"]["Enums"]["homepage_section_type"]
           updated_at: string
         }
         Insert: {
+          content?: Json
           created_at?: string
           created_by?: string | null
           enabled?: boolean
           id?: string
           position: number
           props?: Json
+          published_at?: string | null
+          published_content?: Json
+          published_style?: Json
+          slug?: string | null
+          status?: string
+          style?: Json
+          title?: string | null
           type: Database["public"]["Enums"]["homepage_section_type"]
           updated_at?: string
         }
         Update: {
+          content?: Json
           created_at?: string
           created_by?: string | null
           enabled?: boolean
           id?: string
           position?: number
           props?: Json
+          published_at?: string | null
+          published_content?: Json
+          published_style?: Json
+          slug?: string | null
+          status?: string
+          style?: Json
+          title?: string | null
           type?: Database["public"]["Enums"]["homepage_section_type"]
           updated_at?: string
         }
@@ -1467,6 +1491,33 @@ export type Database = {
         }
         Returns: boolean
       }
+      duplicate_homepage_section: {
+        Args: { _id: string }
+        Returns: {
+          content: Json
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: string
+          position: number
+          props: Json
+          published_at: string | null
+          published_content: Json
+          published_style: Json
+          slug: string | null
+          status: string
+          style: Json
+          title: string | null
+          type: Database["public"]["Enums"]["homepage_section_type"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "homepage_sections"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_quiz_options: {
         Args: { _quiz_id: string }
         Returns: {
@@ -1487,6 +1538,44 @@ export type Database = {
       is_feature_enabled: {
         Args: { _key: string; _user_id?: string }
         Returns: boolean
+      }
+      list_homepage_sections_admin: {
+        Args: never
+        Returns: {
+          content: Json
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: string
+          position: number
+          props: Json
+          published_at: string | null
+          published_content: Json
+          published_style: Json
+          slug: string | null
+          status: string
+          style: Json
+          title: string | null
+          type: Database["public"]["Enums"]["homepage_section_type"]
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "homepage_sections"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      list_homepage_sections_public: {
+        Args: never
+        Returns: {
+          content: Json
+          id: string
+          position: number
+          style: Json
+          title: string
+          type: string
+        }[]
       }
       student_bookmarks: {
         Args: { _limit?: number }
