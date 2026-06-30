@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowRight,
+  Bookmark,
   BookOpen,
   Compass,
   FileText,
@@ -9,8 +10,11 @@ import {
   LogOut,
   PlayCircle,
   Sparkles,
+  TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
+
+import { Progress } from "@/components/ui/progress";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
