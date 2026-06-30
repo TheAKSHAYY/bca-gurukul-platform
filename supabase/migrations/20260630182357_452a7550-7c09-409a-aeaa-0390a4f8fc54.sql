@@ -1,0 +1,1 @@
+update public.developer_profile set photo_url = '/dev-avatar.jpg' where id = 1;
