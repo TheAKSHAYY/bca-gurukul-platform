@@ -74,6 +74,30 @@ export type Database = {
         }
         Relationships: []
       }
+      bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["bookmark_kind"]
+          ref_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: Database["public"]["Enums"]["bookmark_kind"]
+          ref_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["bookmark_kind"]
+          ref_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       branding: {
         Row: {
           accent_color: string | null
@@ -714,6 +738,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      progress_tracking: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          last_activity_at: string
+          progress_pct: number
+          status: Database["public"]["Enums"]["progress_status"]
+          unit_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_activity_at?: string
+          progress_pct?: number
+          status?: Database["public"]["Enums"]["progress_status"]
+          unit_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          last_activity_at?: string
+          progress_pct?: number
+          status?: Database["public"]["Enums"]["progress_status"]
+          unit_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progress_tracking_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quiz_attempt_answers: {
         Row: {
@@ -1367,6 +1435,28 @@ export type Database = {
         Args: { _key: string; _user_id?: string }
         Returns: boolean
       }
+      student_bookmarks: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["bookmark_kind"]
+          ref_id: string
+          title: string
+        }[]
+      }
+      student_progress: {
+        Args: { _limit?: number }
+        Returns: {
+          id: string
+          last_activity_at: string
+          progress_pct: number
+          status: Database["public"]["Enums"]["progress_status"]
+          subject_title: string
+          unit_id: string
+          unit_title: string
+        }[]
+      }
       submit_quiz_attempt: {
         Args: { _answers: Json; _attempt_id: string }
         Returns: {
@@ -1393,6 +1483,7 @@ export type Database = {
     }
     Enums: {
       app_role: "super_admin" | "admin" | "instructor" | "student"
+      bookmark_kind: "note" | "paper" | "quiz" | "unit"
       homepage_section_type:
         | "hero"
         | "trust_bar"
@@ -1406,6 +1497,7 @@ export type Database = {
         | "stats"
         | "custom_richtext"
       media_kind: "image" | "pdf" | "video" | "audio" | "document" | "other"
+      progress_status: "not_started" | "in_progress" | "completed"
       quiz_question_type: "single" | "multiple" | "true_false"
       quiz_status: "draft" | "published" | "archived"
       taggable_kind:
@@ -1545,6 +1637,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "admin", "instructor", "student"],
+      bookmark_kind: ["note", "paper", "quiz", "unit"],
       homepage_section_type: [
         "hero",
         "trust_bar",
@@ -1559,6 +1652,7 @@ export const Constants = {
         "custom_richtext",
       ],
       media_kind: ["image", "pdf", "video", "audio", "document", "other"],
+      progress_status: ["not_started", "in_progress", "completed"],
       quiz_question_type: ["single", "multiple", "true_false"],
       quiz_status: ["draft", "published", "archived"],
       taggable_kind: [
