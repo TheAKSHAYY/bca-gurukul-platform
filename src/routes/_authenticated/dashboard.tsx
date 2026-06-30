@@ -163,38 +163,152 @@ function DashboardPage() {
           </div>
         </section>
 
-        {/* Empty-state explorer */}
+        {/* Continue learning + Bookmarks */}
         <section className="mt-12 grid gap-5 lg:grid-cols-3">
-          <div className="rounded-2xl border border-dashed border-border bg-surface p-6 lg:col-span-2">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent/20 text-accent-foreground">
-              <Compass className="h-5 w-5" />
+          <div className="rounded-2xl border border-border bg-surface p-6 lg:col-span-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <TrendingUp className="h-4.5 w-4.5" />
+                </div>
+                <h3 className="font-display text-lg font-semibold text-foreground">
+                  Continue learning
+                </h3>
+              </div>
+              {progress.length > 0 && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/courses">
+                    Browse
+                    <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              )}
             </div>
-            <h3 className="mt-4 font-display text-lg font-semibold text-foreground">
-              Start exploring your syllabus
-            </h3>
-            <p className="mt-1.5 text-sm text-muted-foreground">
-              You haven't opened a unit yet. Browse the course catalog to find
-              your semester, pick a subject, and start with the first unit.
-            </p>
-            <Button asChild className="mt-5" size="sm">
-              <Link to="/courses">
-                Explore courses
-                <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Link>
-            </Button>
+
+            {progressQuery.isLoading ? (
+              <p className="mt-6 text-sm text-muted-foreground">Loading your progress…</p>
+            ) : progress.length === 0 ? (
+              <div className="mt-5 rounded-xl border border-dashed border-border bg-surface-muted/40 p-5">
+                <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent/20 text-accent-foreground">
+                  <Compass className="h-4.5 w-4.5" />
+                </div>
+                <p className="mt-3 text-sm font-medium text-foreground">
+                  No units in progress yet
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Open a unit from any subject and your progress will appear here.
+                </p>
+                <Button asChild className="mt-4" size="sm">
+                  <Link to="/courses">
+                    Explore courses
+                    <ArrowRight className="ml-1.5 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <ul className="mt-5 space-y-4">
+                {progress.map((p) => (
+                  <li key={p.id} className="rounded-xl border border-border/70 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {p.unit_title ?? "Untitled unit"}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                          {p.subject_title ?? "—"}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-xs font-medium text-muted-foreground">
+                        {Math.round(Number(p.progress_pct))}%
+                      </span>
+                    </div>
+                    <Progress value={Number(p.progress_pct)} className="mt-3 h-1.5" />
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
+
           <div className="rounded-2xl border border-border bg-surface-muted/60 p-6">
-            <h3 className="font-display text-base font-semibold text-foreground">
-              Announcements
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              No announcements yet. New units, papers and quizzes will appear
-              here as they ship.
-            </p>
+            <div className="flex items-center gap-2.5">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-accent/20 text-accent-foreground">
+                <Bookmark className="h-4.5 w-4.5" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-foreground">
+                Bookmarks
+              </h3>
+            </div>
+
+            {bookmarksQuery.isLoading ? (
+              <p className="mt-6 text-sm text-muted-foreground">Loading bookmarks…</p>
+            ) : bookmarks.length === 0 ? (
+              <p className="mt-4 text-sm text-muted-foreground">
+                Save notes, papers and quizzes to find them quickly. Your bookmarks will appear here.
+              </p>
+            ) : (
+              <ul className="mt-4 space-y-2.5">
+                {bookmarks.map((b) => (
+                  <li key={b.id}>
+                    <BookmarkLink kind={b.kind} refId={b.ref_id} title={b.title} />
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </section>
       </main>
     </div>
+  );
+}
+
+function BookmarkLink({
+  kind,
+  refId,
+  title,
+}: {
+  kind: "note" | "paper" | "quiz" | "unit";
+  refId: string;
+  title: string | null;
+}) {
+  const label = title ?? "Untitled";
+  const kindLabel =
+    kind === "note" ? "Note" : kind === "paper" ? "Paper" : kind === "quiz" ? "Quiz" : "Unit";
+
+  const inner = (
+    <div className="group flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-background px-3 py-2.5 transition-colors hover:border-primary/40 hover:bg-surface">
+      <div className="min-w-0">
+        <p className="truncate text-sm font-medium text-foreground">{label}</p>
+        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{kindLabel}</p>
+      </div>
+      <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+    </div>
+  );
+
+  if (kind === "note") {
+    return (
+      <Link to="/notes/$noteId" params={{ noteId: refId }}>
+        {inner}
+      </Link>
+    );
+  }
+  if (kind === "paper") {
+    return (
+      <Link to="/papers/$paperId" params={{ paperId: refId }}>
+        {inner}
+      </Link>
+    );
+  }
+  if (kind === "quiz") {
+    return (
+      <Link to="/quizzes/$quizId" params={{ quizId: refId }}>
+        {inner}
+      </Link>
+    );
+  }
+  return (
+    <Link to="/courses">
+      {inner}
+    </Link>
   );
 }
 
