@@ -933,9 +933,7 @@ function SiteFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Link to="/" className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-                <span className="font-display text-lg font-semibold">ब</span>
-              </div>
+              <BrandMark className="h-10 w-10" />
               <div className="font-display text-base font-semibold text-foreground">
                 BCA Gurukul
               </div>
