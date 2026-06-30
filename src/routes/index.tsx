@@ -968,8 +968,8 @@ function SiteFooter() {
             title="Company"
             links={[
               { label: "Contact", href: "#contact" },
-              { label: "Privacy", href: "#" },
-              { label: "Terms", href: "#" },
+              { label: "Privacy", to: "/privacy" },
+              { label: "Terms", to: "/terms" },
             ]}
           />
         </div>
