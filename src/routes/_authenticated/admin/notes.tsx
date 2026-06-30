@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, FileText, Plus, Trash2, Upload, Pencil, ExternalLink } from "lucide-react";
+import { ArrowLeft, FileText, Plus, Trash2, Upload, Pencil, ExternalLink, FilePlus } from "lucide-react";
+
+import { EmptyState } from "@/components/ui/empty-state";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
