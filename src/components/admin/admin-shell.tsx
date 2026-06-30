@@ -12,7 +12,9 @@ import {
   Search,
   Plus,
   Home,
+  Layout,
 } from "lucide-react";
+
 
 import {
   Sidebar,
