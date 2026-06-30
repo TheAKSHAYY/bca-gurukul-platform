@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export const Route = createFileRoute("/_authenticated/_admin/quizzes/$quizId")({
+export const Route = createFileRoute("/_authenticated/admin/quizzes/$quizId")({
   head: () => ({ meta: [{ title: "Quiz editor · Admin · BCA Gurukul" }] }),
   component: QuizEditor,
 });

@@ -3,7 +3,7 @@ import { BookOpen, FileStack, FileText, FlaskConical, ImageIcon, LayoutDashboard
 
 import { useRoles } from "@/hooks/use-roles";
 
-export const Route = createFileRoute("/_authenticated/_admin/admin")({
+export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({ meta: [{ title: "Admin · BCA Gurukul" }] }),
   component: AdminHome,
 });
@@ -53,7 +53,7 @@ function AdminHome() {
             <Tile icon={<FlaskConical className="h-5 w-5" />} title="Quizzes & MCQ banks" body="Author quizzes with secure server-side scoring." />
           </Link>
           {isSuperAdmin && (
-            <Link to="/super-admin" className="block">
+            <Link to="/admin/superadmin" className="block">
               <Tile icon={<Shield className="h-5 w-5" />} title="Super admin" body="System health, backups, feature flags, branding." />
             </Link>
           )}

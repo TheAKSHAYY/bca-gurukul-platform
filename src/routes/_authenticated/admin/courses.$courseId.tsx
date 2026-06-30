@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute("/_authenticated/_admin/courses/$courseId")({
+export const Route = createFileRoute("/_authenticated/admin/courses/$courseId")({
   head: () => ({ meta: [{ title: "Course tree · Admin · BCA Gurukul" }] }),
   component: CourseTreePage,
 });

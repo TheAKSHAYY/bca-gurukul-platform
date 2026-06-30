@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/_authenticated/_admin/media")({
+export const Route = createFileRoute("/_authenticated/admin/media")({
   head: () => ({ meta: [{ title: "Media library · Admin · BCA Gurukul" }] }),
   component: MediaAdmin,
 });

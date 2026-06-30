@@ -17,7 +17,7 @@ import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 
-export const Route = createFileRoute("/_authenticated/_admin/papers")({
+export const Route = createFileRoute("/_authenticated/admin/papers")({
   head: () => ({ meta: [{ title: "Question Papers · Admin · BCA Gurukul" }] }),
   component: AdminPapersPage,
 });
