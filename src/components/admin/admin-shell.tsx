@@ -44,7 +44,9 @@ const NAV = [
   { label: "Quizzes", to: "/admin/quizzes", icon: FlaskConical },
   { label: "Media", to: "/admin/media", icon: ImageIcon },
   { label: "Tags", to: "/admin/tags", icon: TagIcon },
+  { label: "Homepage", to: "/admin/homepage", icon: Layout },
 ];
+
 
 export function AdminShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
