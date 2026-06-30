@@ -78,6 +78,57 @@ function DashboardPage() {
   const bookmarks = bookmarksQuery.data ?? [];
   const progress = progressQuery.data ?? [];
 
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQuery(searchInput.trim()), 250);
+    return () => clearTimeout(id);
+  }, [searchInput]);
+
+  const searchEnabled = debouncedQuery.length >= 2;
+  const searchQuery = useQuery({
+    queryKey: ["dashboard-search", debouncedQuery],
+    enabled: searchEnabled,
+    queryFn: async () => {
+      const pattern = `%${debouncedQuery.replace(/[%_]/g, (m) => `\\${m}`)}%`;
+      const baseFilter = (q: ReturnType<typeof buildBase>) =>
+        q.eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(5);
+
+      function buildBase() {
+        return supabase.from("courses").select("id, title, slug");
+      }
+
+      const [courses, units, notes, papers, quizzes] = await Promise.all([
+        baseFilter(supabase.from("courses").select("id, title, slug")),
+        baseFilter(supabase.from("units").select("id, title, unit_number, subject_id")),
+        baseFilter(supabase.from("notes").select("id, title")),
+        baseFilter(supabase.from("papers").select("id, title")),
+        baseFilter(supabase.from("quizzes").select("id, title")),
+      ]);
+
+      const errs = [courses.error, units.error, notes.error, papers.error, quizzes.error].filter(Boolean);
+      if (errs.length) throw errs[0];
+
+      return {
+        courses: (courses.data ?? []) as Array<{ id: string; title: string; slug: string }>,
+        units: (units.data ?? []) as Array<{ id: string; title: string }>,
+        notes: (notes.data ?? []) as Array<{ id: string; title: string }>,
+        papers: (papers.data ?? []) as Array<{ id: string; title: string }>,
+        quizzes: (quizzes.data ?? []) as Array<{ id: string; title: string }>,
+      };
+    },
+  });
+
+  const searchResults = searchQuery.data;
+  const totalResults = searchResults
+    ? searchResults.courses.length +
+      searchResults.units.length +
+      searchResults.notes.length +
+      searchResults.papers.length +
+      searchResults.quizzes.length
+    : 0;
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-md">
