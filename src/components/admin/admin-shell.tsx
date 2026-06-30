@@ -13,6 +13,7 @@ import {
   Plus,
   Home,
   Layout,
+  FolderTree,
 } from "lucide-react";
 
 
@@ -38,6 +39,7 @@ import { CreateWizard } from "./create-wizard";
 
 const NAV = [
   { label: "Dashboard", to: "/admin", icon: LayoutDashboard, exact: true },
+  { label: "Explorer", to: "/admin/explorer", icon: FolderTree },
   { label: "Courses", to: "/admin/courses", icon: BookOpen },
   { label: "Notes", to: "/admin/notes", icon: FileText },
   { label: "Papers", to: "/admin/papers", icon: FileStack },
@@ -46,6 +48,7 @@ const NAV = [
   { label: "Tags", to: "/admin/tags", icon: TagIcon },
   { label: "Homepage", to: "/admin/homepage", icon: Layout },
 ];
+
 
 
 export function AdminShell() {
