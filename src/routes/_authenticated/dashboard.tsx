@@ -255,51 +255,71 @@ function DashboardPage() {
               </div>
             ) : (
               <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                <ResultGroup label="Courses" icon={<Compass className="h-3.5 w-3.5" />}>
-                  {searchResults!.courses.map((c) => (
-                    <ResultLink
-                      key={c.id}
-                      to="/courses/$courseSlug"
-                      params={{ courseSlug: c.slug }}
-                      title={c.title}
-                    />
-                  ))}
-                </ResultGroup>
-                <ResultGroup label="Units" icon={<BookOpen className="h-3.5 w-3.5" />}>
-                  {searchResults!.units.map((u) => (
-                    <ResultLink key={u.id} to="/courses" title={u.title} />
-                  ))}
-                </ResultGroup>
-                <ResultGroup label="Notes" icon={<FileText className="h-3.5 w-3.5" />}>
-                  {searchResults!.notes.map((n) => (
-                    <ResultLink
-                      key={n.id}
-                      to="/notes/$noteId"
-                      params={{ noteId: n.id }}
-                      title={n.title}
-                    />
-                  ))}
-                </ResultGroup>
-                <ResultGroup label="Papers" icon={<FileText className="h-3.5 w-3.5" />}>
-                  {searchResults!.papers.map((p) => (
-                    <ResultLink
-                      key={p.id}
-                      to="/papers/$paperId"
-                      params={{ paperId: p.id }}
-                      title={p.title}
-                    />
-                  ))}
-                </ResultGroup>
-                <ResultGroup label="Quizzes" icon={<ListChecks className="h-3.5 w-3.5" />}>
-                  {searchResults!.quizzes.map((q) => (
-                    <ResultLink
-                      key={q.id}
-                      to="/quizzes/$quizId"
-                      params={{ quizId: q.id }}
-                      title={q.title}
-                    />
-                  ))}
-                </ResultGroup>
+                {searchResults!.courses.length > 0 && (
+                  <ResultGroup label="Courses" icon={<Compass className="h-3.5 w-3.5" />}>
+                    {searchResults!.courses.map((c) => (
+                      <Link
+                        key={c.id}
+                        to="/courses/$courseSlug"
+                        params={{ courseSlug: c.slug }}
+                        className={resultLinkClass}
+                      >
+                        {c.title}
+                      </Link>
+                    ))}
+                  </ResultGroup>
+                )}
+                {searchResults!.units.length > 0 && (
+                  <ResultGroup label="Units" icon={<BookOpen className="h-3.5 w-3.5" />}>
+                    {searchResults!.units.map((u) => (
+                      <Link key={u.id} to="/courses" className={resultLinkClass}>
+                        {u.title}
+                      </Link>
+                    ))}
+                  </ResultGroup>
+                )}
+                {searchResults!.notes.length > 0 && (
+                  <ResultGroup label="Notes" icon={<FileText className="h-3.5 w-3.5" />}>
+                    {searchResults!.notes.map((n) => (
+                      <Link
+                        key={n.id}
+                        to="/notes/$noteId"
+                        params={{ noteId: n.id }}
+                        className={resultLinkClass}
+                      >
+                        {n.title}
+                      </Link>
+                    ))}
+                  </ResultGroup>
+                )}
+                {searchResults!.papers.length > 0 && (
+                  <ResultGroup label="Papers" icon={<FileText className="h-3.5 w-3.5" />}>
+                    {searchResults!.papers.map((p) => (
+                      <Link
+                        key={p.id}
+                        to="/papers/$paperId"
+                        params={{ paperId: p.id }}
+                        className={resultLinkClass}
+                      >
+                        {p.title}
+                      </Link>
+                    ))}
+                  </ResultGroup>
+                )}
+                {searchResults!.quizzes.length > 0 && (
+                  <ResultGroup label="Quizzes" icon={<ListChecks className="h-3.5 w-3.5" />}>
+                    {searchResults!.quizzes.map((q) => (
+                      <Link
+                        key={q.id}
+                        to="/quizzes/$quizId"
+                        params={{ quizId: q.id }}
+                        className={resultLinkClass}
+                      >
+                        {q.title}
+                      </Link>
+                    ))}
+                  </ResultGroup>
+                )}
               </div>
             )}
           </div>
