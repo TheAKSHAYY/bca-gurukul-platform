@@ -15,6 +15,7 @@ import { PasswordStrengthMeter, scorePassword } from "@/components/auth/password
 import { PhoneAuthForm } from "@/components/auth/phone-auth-form";
 import { GoogleSignInButton } from "@/components/auth/google-signin-button";
 import { resolvePostAuthRoute } from "@/lib/post-auth";
+import { BrandMark } from "@/components/brand-mark";
 
 
 const searchSchema = z.object({
