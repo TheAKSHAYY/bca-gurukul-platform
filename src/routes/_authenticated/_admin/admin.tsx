@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, FlaskConical, LayoutDashboard, Shield } from "lucide-react";
+import { BookOpen, FlaskConical, ImageIcon, LayoutDashboard, Shield, Tag as TagIcon } from "lucide-react";
 
 import { useRoles } from "@/hooks/use-roles";
 
@@ -36,6 +36,12 @@ function AdminHome() {
         <section className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <Link to="/admin/courses" className="block">
             <Tile icon={<BookOpen className="h-5 w-5" />} title="Courses & academic tree" body="Manage courses, semesters, subjects and units." />
+          </Link>
+          <Link to="/admin/tags" className="block">
+            <Tile icon={<TagIcon className="h-5 w-5" />} title="Tags" body="Reusable labels across notes, papers and quizzes." />
+          </Link>
+          <Link to="/admin/media" className="block">
+            <Tile icon={<ImageIcon className="h-5 w-5" />} title="Media library" body="Upload and manage images, PDFs and videos." />
           </Link>
           <Tile icon={<FlaskConical className="h-5 w-5" />} title="Quizzes & analytics" body="MCQ banks and student performance — Phase 10, 18." />
           {isSuperAdmin && (
