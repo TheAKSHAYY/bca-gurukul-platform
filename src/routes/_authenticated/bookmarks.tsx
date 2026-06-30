@@ -22,11 +22,11 @@ export const Route = createFileRoute("/_authenticated/bookmarks")({
 function routeFor(b: Bookmark): { to: string; params?: Record<string, string> } {
   switch (b.kind) {
     case "note":
-      return { to: "/notes/$noteId", params: { noteId: b.target_id } };
+      return { to: "/notes/$noteId", params: { noteId: b.ref_id } };
     case "paper":
-      return { to: "/papers/$paperId", params: { paperId: b.target_id } };
+      return { to: "/papers/$paperId", params: { paperId: b.ref_id } };
     case "quiz":
-      return { to: "/quizzes/$quizId", params: { quizId: b.target_id } };
+      return { to: "/quizzes/$quizId", params: { quizId: b.ref_id } };
     default:
       return { to: "/courses" };
   }
@@ -38,7 +38,7 @@ function BookmarksPage() {
     queryKey: ["all-bookmarks", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("student_bookmarks", { p_limit: 200 });
+      const { data, error } = await supabase.rpc("student_bookmarks", { _limit: 200 });
       if (error) throw error;
       return (data ?? []) as Bookmark[];
     },
