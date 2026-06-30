@@ -43,7 +43,7 @@ function SearchPage() {
     queryKey: ["global-search", debounced],
     enabled,
     queryFn: async () => {
-      const pattern = `%${debounced.replace(/[%_]/g, (m) => `\\${m}`)}%`;
+      const pattern = `%${debounced.replace(/[%_]/g, (m: string) => `\\${m}`)}%`;
       const [courses, semesters, subjects, units, notes, papers, quizzes] = await Promise.all([
         supabase.from("courses").select("id,title,slug").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(10),
         supabase.from("semesters").select("id,title").eq("status", "published").is("deleted_at", null).ilike("title", pattern).limit(10),

@@ -18,6 +18,7 @@ import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as QuizzesQuizIdRouteImport } from './routes/quizzes.$quizId'
 import { Route as PapersPaperIdRouteImport } from './routes/papers.$paperId'
 import { Route as NotesNoteIdRouteImport } from './routes/notes.$noteId'
+import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
@@ -82,6 +83,11 @@ const NotesNoteIdRoute = NotesNoteIdRouteImport.update({
   id: '/notes/$noteId',
   path: '/notes/$noteId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSearchRoute = AuthenticatedSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/search': typeof AuthenticatedSearchRoute
   '/notes/$noteId': typeof NotesNoteIdRoute
   '/papers/$paperId': typeof PapersPaperIdRoute
   '/quizzes/$quizId': typeof QuizzesQuizIdRoute
@@ -233,6 +240,7 @@ export interface FileRoutesByTo {
   '/setup': typeof SetupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/search': typeof AuthenticatedSearchRoute
   '/notes/$noteId': typeof NotesNoteIdRoute
   '/papers/$paperId': typeof PapersPaperIdRoute
   '/quizzes/$quizId': typeof QuizzesQuizIdRoute
@@ -264,6 +272,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/search': typeof AuthenticatedSearchRoute
   '/notes/$noteId': typeof NotesNoteIdRoute
   '/papers/$paperId': typeof PapersPaperIdRoute
   '/quizzes/$quizId': typeof QuizzesQuizIdRoute
@@ -296,6 +305,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/profile'
+    | '/search'
     | '/notes/$noteId'
     | '/papers/$paperId'
     | '/quizzes/$quizId'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/dashboard'
     | '/profile'
+    | '/search'
     | '/notes/$noteId'
     | '/papers/$paperId'
     | '/quizzes/$quizId'
@@ -355,6 +366,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
+    | '/_authenticated/search'
     | '/notes/$noteId'
     | '/papers/$paperId'
     | '/quizzes/$quizId'
@@ -457,6 +469,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/notes/$noteId'
       preLoaderRoute: typeof NotesNoteIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/search': {
+      id: '/_authenticated/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof AuthenticatedSearchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
@@ -683,12 +702,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSearchRoute: typeof AuthenticatedSearchRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedSearchRoute: AuthenticatedSearchRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
