@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Download, FileText } from "lucide-react";
+import { ArrowLeft, Download, FileText, Lock } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { PdfViewer } from "@/components/pdf-viewer";
+import { EmptyState } from "@/components/ui/empty-state";
+import { useAuth } from "@/hooks/use-auth";
 import { PublicHeader } from "./courses.index";
 
 export const Route = createFileRoute("/notes/$noteId")({
@@ -15,6 +17,7 @@ export const Route = createFileRoute("/notes/$noteId")({
 
 function NoteViewer() {
   const { noteId } = Route.useParams();
+  const { user, loading: authLoading } = useAuth();
 
   const noteQuery = useQuery({
     queryKey: ["public", "note", noteId],
@@ -27,7 +30,6 @@ function NoteViewer() {
         .is("deleted_at", null)
         .maybeSingle();
       if (error) throw error;
-      if (!data) throw notFound();
       return data;
     },
   });
@@ -35,7 +37,10 @@ function NoteViewer() {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!noteQuery.data?.file_path) return;
+    if (!noteQuery.data?.file_path) {
+      setPdfUrl(null);
+      return;
+    }
     let active = true;
     (async () => {
       const { data, error } = await supabase.storage
@@ -79,6 +84,33 @@ function NoteViewer() {
         <Link to="/courses" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Back to catalog
         </Link>
+
+        {noteQuery.isLoading && (
+          <div className="mt-6 rounded-2xl border border-border bg-surface p-8 text-sm text-muted-foreground">
+            Opening note…
+          </div>
+        )}
+
+        {!noteQuery.isLoading && !noteQuery.data && (
+          <div className="mt-6">
+            <EmptyState
+              icon={Lock}
+              tone="accent"
+              title={user || authLoading ? "This note is unavailable" : "Sign in to view this note"}
+              description={
+                user || authLoading
+                  ? "This note may be unpublished, deleted, or restricted by the course admin."
+                  : "Some study notes are available only to signed-in students. Sign in once, then this PDF will open here."
+              }
+              primaryAction={
+                user || authLoading
+                  ? { label: "Browse courses", to: "/courses", icon: FileText }
+                  : { label: "Sign in", to: "/auth", icon: Lock }
+              }
+              secondaryAction={{ label: "Back to catalog", to: "/courses" }}
+            />
+          </div>
+        )}
 
         {noteQuery.data && (
           <article className="mt-6">
