@@ -22,6 +22,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BrandMark } from "@/components/brand-mark";
 import {
   Accordion,
@@ -75,7 +76,9 @@ function Index() {
     <div className="min-h-screen bg-background">
       <SiteHeader user={user} loading={loading} />
       <main>
-        {showEmpty ? (
+        {isLoading ? (
+          <LandingSkeleton />
+        ) : showEmpty ? (
           <EmptyLanding user={user} loading={loading} />
         ) : (
           list.map((s) => {
@@ -109,6 +112,28 @@ function Index() {
         )}
       </main>
       <SiteFooter />
+    </div>
+  );
+}
+
+function LandingSkeleton() {
+  return (
+    <div className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+      <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+        <Skeleton className="mb-8 h-6 w-48 rounded-full" />
+        <Skeleton className="h-14 w-full max-w-2xl rounded-lg sm:h-20" />
+        <Skeleton className="mt-6 h-5 w-full max-w-xl rounded-lg" />
+        <Skeleton className="mt-6 h-5 w-5/6 max-w-lg rounded-lg" />
+        <div className="mt-9 flex gap-3">
+          <Skeleton className="h-12 w-40 rounded-xl" />
+          <Skeleton className="h-12 w-36 rounded-xl" />
+        </div>
+      </div>
+      <div className="mt-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <Skeleton className="h-48 rounded-2xl" />
+        <Skeleton className="h-48 rounded-2xl" />
+        <Skeleton className="h-48 rounded-2xl" />
+      </div>
     </div>
   );
 }
@@ -247,7 +272,7 @@ function Hero({ user, loading }: { user: unknown; loading: boolean }) {
 
       <div className="mx-auto flex max-w-3xl flex-col items-center px-6 pb-20 pt-20 text-center sm:pt-28">
         {/* Eyebrow pill with pulsing saffron dot */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 animate-fade-in">
+        <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1">
           <span className="relative grid h-2 w-2 place-items-center">
             <span className="absolute inset-0 animate-ping rounded-full bg-accent/60" />
             <span className="relative h-2 w-2 rounded-full bg-accent" />
