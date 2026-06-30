@@ -95,11 +95,12 @@ function SectionCard({
   canMoveDown,
 }: {
   section: Section;
-  onSave: (u: Partial<Section>) => void;
+  onSave: (u: Record<string, unknown>) => void;
   onMove: (dir: "up" | "down") => void;
   canMoveUp: boolean;
   canMoveDown: boolean;
 }) {
+
   const [position, setPosition] = useState(section.position);
   const [propsText, setPropsText] = useState(
     JSON.stringify(section.props ?? {}, null, 2),
