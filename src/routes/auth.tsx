@@ -352,7 +352,13 @@ function SignUpForm() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      <div>
+        <h1 className="font-display text-3xl font-semibold text-foreground">Create your account</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          Free for students. Takes less than a minute.
+        </p>
+      </div>
       <GoogleSignInButton redirect={redirect} />
       <OrDivider />
       <form onSubmit={onSubmit} className="space-y-5">
