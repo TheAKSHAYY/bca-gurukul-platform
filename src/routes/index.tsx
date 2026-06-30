@@ -231,189 +231,197 @@ function SiteHeader({ user, loading }: { user: unknown; loading: boolean }) {
 function Hero({ user, loading }: { user: unknown; loading: boolean }) {
   return (
     <section className="relative overflow-hidden border-b border-border/60">
-      {/* Decorative background */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10"
-      >
-        <div className="absolute -top-40 left-1/2 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute right-0 top-20 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+      {/* Soft saffron aurora behind the headline */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-[-12rem] h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-accent/25 blur-[120px]" />
+        <div className="absolute left-[10%] top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute right-[10%] top-1/3 h-72 w-72 rounded-full bg-accent/15 blur-3xl" />
         <div
-          className="absolute inset-0 opacity-[0.04]"
+          className="absolute inset-0 opacity-[0.035]"
           style={{
             backgroundImage:
               "radial-gradient(currentColor 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
+            backgroundSize: "28px 28px",
             color: "var(--color-foreground)",
           }}
         />
       </div>
 
-      <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 sm:py-28 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-        <div>
-          <Badge
-            variant="outline"
-            className="border-accent/40 bg-accent/15 text-accent-foreground"
-          >
-            <Sparkles className="mr-1.5 h-3 w-3" />
-            Built for Indian BCA syllabi
-          </Badge>
-          <h1 className="mt-6 font-display text-5xl font-semibold leading-[1.05] text-foreground sm:text-6xl lg:text-7xl">
-            Master your BCA,{" "}
-            <span className="relative whitespace-nowrap">
-              <span className="relative z-10 text-primary">semester by semester.</span>
-              <span
-                aria-hidden
-                className="absolute bottom-1 left-0 -z-0 h-3 w-full rounded-full bg-accent/40"
-              />
-            </span>
-          </h1>
-          <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-            One organised home for notes, past papers, video lectures and timed
-            MCQ practice — built so you always know exactly what to study next.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            {loading ? null : user ? (
-              <Button asChild size="lg">
-                <Link to="/dashboard">
-                  Open dashboard
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            ) : (
-              <Button asChild size="lg">
-                <Link to="/auth" search={{ mode: "signup" }}>
-                  Create free account
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            )}
-            <Button asChild size="lg" variant="outline">
-              <Link to="/courses">Explore syllabus</Link>
-            </Button>
-          </div>
-          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            <span className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-success" />
-              Free for students
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-success" />
-              No credit card
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-success" />
-              Mobile-friendly
-            </span>
-          </div>
+      <div className="mx-auto flex max-w-3xl flex-col items-center px-6 pb-20 pt-20 text-center sm:pt-28">
+        {/* Eyebrow pill with pulsing saffron dot */}
+        <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 animate-fade-in">
+          <span className="relative grid h-2 w-2 place-items-center">
+            <span className="absolute inset-0 animate-ping rounded-full bg-accent/60" />
+            <span className="relative h-2 w-2 rounded-full bg-accent" />
+          </span>
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-foreground/90">
+            BCA Batch 2025–26 is live
+          </span>
         </div>
 
-        <HeroMockup />
+        {/* Headline with italic-saffron accent word */}
+        <h1 className="mt-8 font-display text-5xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+          Master your BCA <br className="hidden sm:block" />
+          <span className="italic text-accent">journey</span>, with clarity.
+        </h1>
+
+        <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          One organised home for notes, past papers, video lectures and timed
+          MCQ practice — curated semester by semester, so you always know
+          exactly what to study next.
+        </p>
+
+        {/* Stacked-then-row CTAs, primary first */}
+        <div className="mt-9 flex w-full max-w-sm flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
+          {loading ? null : user ? (
+            <Button asChild size="lg" className="h-12 px-7 text-base shadow-lg shadow-primary/15">
+              <Link to="/dashboard">
+                Open your dashboard
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild size="lg" className="h-12 px-7 text-base shadow-lg shadow-primary/15">
+              <Link to="/auth" search={{ mode: "signup" }}>
+                Start learning free
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          )}
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="h-12 border-2 border-border/80 px-7 text-base"
+          >
+            <Link to="/courses">
+              Browse syllabus
+              <ArrowUpRight className="ml-1.5 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+
+        {/* Reassurance row */}
+        <div className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+            Free for every BCA student
+          </span>
+          <span className="hidden h-1 w-1 rounded-full bg-border sm:inline-block" />
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+            No credit card
+          </span>
+          <span className="hidden h-1 w-1 rounded-full bg-border sm:inline-block" />
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+            Mobile-first
+          </span>
+        </div>
       </div>
     </section>
   );
 }
 
-function HeroMockup() {
-  return (
-    <div className="relative">
-      <div
-        aria-hidden
-        className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-br from-primary/20 via-transparent to-accent/30 blur-2xl"
-      />
-      <div className="rounded-3xl border border-border bg-surface p-4 shadow-2xl shadow-primary/10">
-        <div className="flex items-center gap-1.5 border-b border-border/60 pb-3">
-          <span className="h-2.5 w-2.5 rounded-full bg-destructive/70" />
-          <span className="h-2.5 w-2.5 rounded-full bg-warning/80" />
-          <span className="h-2.5 w-2.5 rounded-full bg-success/80" />
-          <span className="ml-3 truncate text-xs text-muted-foreground">
-            bcagurukul.app / semester-3 / dbms
-          </span>
-        </div>
-        <div className="space-y-4 p-2 pt-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-display text-lg font-semibold text-foreground">
-                Database Management Systems
-              </div>
-              <div className="text-xs text-muted-foreground">Semester 3 · 8 units</div>
-            </div>
-            <Badge className="bg-primary/10 text-primary hover:bg-primary/15">
-              In progress
-            </Badge>
-          </div>
-          <div className="space-y-2">
-            <MockRow icon={<BookOpen className="h-4 w-4" />} label="Unit 4 — Normalization" meta="12 min read" tone="primary" />
-            <MockRow icon={<PlayCircle className="h-4 w-4" />} label="Joins explained visually" meta="18 min" tone="accent" />
-            <MockRow icon={<ListChecks className="h-4 w-4" />} label="MCQ — SQL basics" meta="20 questions" tone="success" />
-            <MockRow icon={<FileText className="h-4 w-4" />} label="DBMS 2023 paper" meta="PDF" tone="info" />
-          </div>
-          <div className="rounded-xl border border-border bg-surface-muted p-3">
-            <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
-              <span>Syllabus progress</span>
-              <span className="font-medium text-foreground">62%</span>
-            </div>
-            <div className="h-2 overflow-hidden rounded-full bg-muted">
-              <div className="h-full w-[62%] rounded-full bg-gradient-to-r from-primary to-accent" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MockRow({
-  icon,
-  label,
-  meta,
-  tone,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  meta: string;
-  tone: "primary" | "accent" | "success" | "info";
-}) {
-  const toneMap = {
-    primary: "bg-primary/10 text-primary",
-    accent: "bg-accent/20 text-accent-foreground",
-    success: "bg-success/15 text-success",
-    info: "bg-info/15 text-info",
-  } as const;
-  return (
-    <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-background px-3 py-2.5">
-      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${toneMap[tone]}`}>
-        {icon}
-      </span>
-      <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
-        {label}
-      </span>
-      <span className="shrink-0 text-xs text-muted-foreground">{meta}</span>
-    </div>
-  );
-}
-
 /* ──────────────────────────────────────────────────────────── Trust bar */
 
+type LandingStats = {
+  students: number;
+  notes: number;
+  papers: number;
+  quizzes: number;
+  semesters: number;
+};
+
+function useLandingStats() {
+  return useQuery({
+    queryKey: ["landing_stats"],
+    staleTime: 5 * 60_000,
+    queryFn: async (): Promise<LandingStats> => {
+      const head = { count: "exact" as const, head: true };
+      const [s, n, p, q, sem] = await Promise.all([
+        supabase.from("profiles").select("*", head),
+        supabase.from("notes").select("*", head).eq("status", "published").is("deleted_at", null),
+        supabase.from("papers").select("*", head).eq("status", "published").is("deleted_at", null),
+        supabase.from("quizzes").select("*", head).eq("status", "published").is("deleted_at", null),
+        supabase.from("semesters").select("*", head).eq("status", "published").is("deleted_at", null),
+      ]);
+      return {
+        students: s.count ?? 0,
+        notes: n.count ?? 0,
+        papers: p.count ?? 0,
+        quizzes: q.count ?? 0,
+        semesters: sem.count ?? 0,
+      };
+    },
+  });
+}
+
+function formatCompact(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k`;
+  return n.toString();
+}
+
 function TrustBar() {
-  const items = [
-    "BCA Sem 1–6",
-    "DBMS",
-    "Data Structures",
-    "Operating Systems",
-    "Java",
-    "Computer Networks",
-    "Web Tech",
+  const { data } = useLandingStats();
+  const stats = data ?? { students: 0, notes: 0, papers: 0, quizzes: 0, semesters: 6 };
+
+  // Honest zero-state copy: lead with what's structurally true (6 semesters covered)
+  // even before students arrive. Stars stay rendered as design signal, not as a
+  // false rating.
+  const items: Array<{ value: string; label: string; sub?: React.ReactNode }> = [
+    {
+      value: stats.students > 0 ? formatCompact(stats.students) : `${stats.semesters || 6}`,
+      label: stats.students > 0 ? "Students learning" : "Semesters covered",
+      sub: (
+        <div className="flex -space-x-1.5">
+          <span className="h-4 w-4 rounded-full border border-background bg-primary/80" />
+          <span className="h-4 w-4 rounded-full border border-background bg-accent/80" />
+          <span className="h-4 w-4 rounded-full border border-background bg-primary/40" />
+        </div>
+      ),
+    },
+    {
+      value: stats.notes > 0 ? formatCompact(stats.notes) : "Curated",
+      label: "Study notes",
+    },
+    {
+      value: stats.papers > 0 ? formatCompact(stats.papers) : "Year-wise",
+      label: "Past papers",
+    },
+    {
+      value: stats.quizzes > 0 ? formatCompact(stats.quizzes) : "Timed",
+      label: "MCQ practice",
+      sub: (
+        <div className="flex text-accent">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <Star key={i} className="h-3 w-3 fill-current" />
+          ))}
+        </div>
+      ),
+    },
   ];
+
   return (
-    <section className="border-b border-border/60 bg-surface-muted/60 py-6">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs uppercase tracking-wider text-muted-foreground">
-          <span className="font-medium">Covers</span>
-          {items.map((i) => (
-            <span key={i} className="font-display text-sm normal-case tracking-normal text-foreground/70">
-              {i}
-            </span>
+    <section className="border-b border-border/60 bg-surface/70 backdrop-blur-sm">
+      <div className="mx-auto max-w-6xl px-6 py-10 sm:py-12">
+        <p className="text-center text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+          Built for every BCA student in India
+        </p>
+        <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+          {items.map((it) => (
+            <div
+              key={it.label}
+              className="group flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-border/60 bg-background p-5 text-center transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/5"
+            >
+              <span className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                {it.value}
+              </span>
+              {it.sub ? <div className="mt-0.5">{it.sub}</div> : null}
+              <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                {it.label}
+              </span>
+            </div>
           ))}
         </div>
       </div>
