@@ -47,6 +47,7 @@ import { Route as AuthenticatedAdminSuperadminRouteRouteImport } from './routes/
 import { Route as CoursesCourseSlugSemesterNumberIndexRouteImport } from './routes/courses.$courseSlug.$semesterNumber.index'
 import { Route as AuthenticatedAdminSuperadminIndexRouteImport } from './routes/_authenticated/admin/superadmin/index'
 import { Route as CoursesCourseSlugSemesterNumberSubjectSlugRouteImport } from './routes/courses.$courseSlug.$semesterNumber.$subjectSlug'
+import { Route as AuthenticatedAdminSuperadminUsersRouteImport } from './routes/_authenticated/admin/superadmin/users'
 import { Route as AuthenticatedAdminSuperadminSeoRouteImport } from './routes/_authenticated/admin/superadmin/seo'
 import { Route as AuthenticatedAdminSuperadminBrandingRouteImport } from './routes/_authenticated/admin/superadmin/branding'
 import { Route as AuthenticatedAdminQuizzesQuizIdRouteImport } from './routes/_authenticated/admin/quizzes.$quizId'
@@ -253,6 +254,12 @@ const CoursesCourseSlugSemesterNumberSubjectSlugRoute =
     path: '/courses/$courseSlug/$semesterNumber/$subjectSlug',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminSuperadminUsersRoute =
+  AuthenticatedAdminSuperadminUsersRouteImport.update({
+    id: '/users',
+    path: '/users',
+    getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
+  } as any)
 const AuthenticatedAdminSuperadminSeoRoute =
   AuthenticatedAdminSuperadminSeoRouteImport.update({
     id: '/seo',
@@ -329,6 +336,7 @@ export interface FileRoutesByFullPath {
   '/admin/quizzes/$quizId': typeof AuthenticatedAdminQuizzesQuizIdRoute
   '/admin/superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
   '/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
+  '/admin/superadmin/users': typeof AuthenticatedAdminSuperadminUsersRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
   '/admin/superadmin/': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber/': typeof CoursesCourseSlugSemesterNumberIndexRoute
@@ -372,6 +380,7 @@ export interface FileRoutesByTo {
   '/admin/quizzes/$quizId': typeof AuthenticatedAdminQuizzesQuizIdRoute
   '/admin/superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
   '/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
+  '/admin/superadmin/users': typeof AuthenticatedAdminSuperadminUsersRoute
   '/admin/superadmin': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber': typeof CoursesCourseSlugSemesterNumberIndexRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber': typeof CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute
@@ -418,6 +427,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/quizzes/$quizId': typeof AuthenticatedAdminQuizzesQuizIdRoute
   '/_authenticated/admin/superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
   '/_authenticated/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
+  '/_authenticated/admin/superadmin/users': typeof AuthenticatedAdminSuperadminUsersRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
   '/_authenticated/admin/superadmin/': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber/': typeof CoursesCourseSlugSemesterNumberIndexRoute
@@ -465,6 +475,7 @@ export interface FileRouteTypes {
     | '/admin/quizzes/$quizId'
     | '/admin/superadmin/branding'
     | '/admin/superadmin/seo'
+    | '/admin/superadmin/users'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
     | '/admin/superadmin/'
     | '/courses/$courseSlug/$semesterNumber/'
@@ -508,6 +519,7 @@ export interface FileRouteTypes {
     | '/admin/quizzes/$quizId'
     | '/admin/superadmin/branding'
     | '/admin/superadmin/seo'
+    | '/admin/superadmin/users'
     | '/admin/superadmin'
     | '/courses/$courseSlug/$semesterNumber'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber'
@@ -553,6 +565,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/quizzes/$quizId'
     | '/_authenticated/admin/superadmin/branding'
     | '/_authenticated/admin/superadmin/seo'
+    | '/_authenticated/admin/superadmin/users'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
     | '/_authenticated/admin/superadmin/'
     | '/courses/$courseSlug/$semesterNumber/'
@@ -848,6 +861,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/superadmin/users': {
+      id: '/_authenticated/admin/superadmin/users'
+      path: '/users'
+      fullPath: '/admin/superadmin/users'
+      preLoaderRoute: typeof AuthenticatedAdminSuperadminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
+    }
     '/_authenticated/admin/superadmin/seo': {
       id: '/_authenticated/admin/superadmin/seo'
       path: '/seo'
@@ -896,6 +916,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminSuperadminRouteRouteChildren {
   AuthenticatedAdminSuperadminBrandingRoute: typeof AuthenticatedAdminSuperadminBrandingRoute
   AuthenticatedAdminSuperadminSeoRoute: typeof AuthenticatedAdminSuperadminSeoRoute
+  AuthenticatedAdminSuperadminUsersRoute: typeof AuthenticatedAdminSuperadminUsersRoute
   AuthenticatedAdminSuperadminIndexRoute: typeof AuthenticatedAdminSuperadminIndexRoute
 }
 
@@ -904,6 +925,8 @@ const AuthenticatedAdminSuperadminRouteRouteChildren: AuthenticatedAdminSuperadm
     AuthenticatedAdminSuperadminBrandingRoute:
       AuthenticatedAdminSuperadminBrandingRoute,
     AuthenticatedAdminSuperadminSeoRoute: AuthenticatedAdminSuperadminSeoRoute,
+    AuthenticatedAdminSuperadminUsersRoute:
+      AuthenticatedAdminSuperadminUsersRoute,
     AuthenticatedAdminSuperadminIndexRoute:
       AuthenticatedAdminSuperadminIndexRoute,
   }
