@@ -75,7 +75,9 @@ function Index() {
     <div className="min-h-screen bg-background">
       <SiteHeader user={user} loading={loading} />
       <main>
-        {showEmpty ? (
+        {isLoading ? (
+          <LandingSkeleton />
+        ) : showEmpty ? (
           <EmptyLanding user={user} loading={loading} />
         ) : (
           list.map((s) => {
@@ -109,6 +111,28 @@ function Index() {
         )}
       </main>
       <SiteFooter />
+    </div>
+  );
+}
+
+function LandingSkeleton() {
+  return (
+    <div className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+      <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+        <Skeleton className="mb-8 h-6 w-48 rounded-full" />
+        <Skeleton className="h-14 w-full max-w-2xl rounded-lg sm:h-20" />
+        <Skeleton className="mt-6 h-5 w-full max-w-xl rounded-lg" />
+        <Skeleton className="mt-6 h-5 w-5/6 max-w-lg rounded-lg" />
+        <div className="mt-9 flex gap-3">
+          <Skeleton className="h-12 w-40 rounded-xl" />
+          <Skeleton className="h-12 w-36 rounded-xl" />
+        </div>
+      </div>
+      <div className="mt-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <Skeleton className="h-48 rounded-2xl" />
+        <Skeleton className="h-48 rounded-2xl" />
+        <Skeleton className="h-48 rounded-2xl" />
+      </div>
     </div>
   );
 }
