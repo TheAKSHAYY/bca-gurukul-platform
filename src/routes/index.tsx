@@ -1033,6 +1033,7 @@ function SiteFooter() {
           <FooterCol
             title="Company"
             links={[
+              { label: "Developer", to: "/developer" },
               { label: "Contact", href: "#contact" },
               { label: "Privacy", to: "/privacy" },
               { label: "Terms", to: "/terms" },
