@@ -144,7 +144,7 @@ export function AppNavbar() {
     <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
         <Link to="/dashboard" className="flex items-center gap-2 font-display text-base font-semibold text-foreground">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary text-primary-foreground">B</span>
+          <BrandMark className="h-8 w-8" />
           <span className="hidden sm:inline">BCA Gurukul</span>
         </Link>
 
