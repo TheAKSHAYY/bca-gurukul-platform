@@ -148,7 +148,7 @@ function AdminDashboard() {
               title="Waiting on your first signal"
               description="Quiz attempts, paper downloads and note views appear here in real time as students engage with your content."
               tip="Share the public course link with your batch — activity usually starts within minutes."
-              primaryAction={{ label: "View public catalog", to: "/courses", icon: BookOpenIcon }}
+              primaryAction={{ label: "View public catalog", to: "/courses", icon: BookOpen }}
             />
           ) : (
             <ul className="divide-y divide-border/60">
