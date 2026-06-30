@@ -639,14 +639,37 @@ function Journey() {
 /* ──────────────────────────────────────────────────────────── Semesters */
 
 function Semesters() {
-  const semesters = [
-    { n: 1, focus: "Foundations: C, Maths, Digital Logic" },
-    { n: 2, focus: "Data Structures, OOP with C++" },
-    { n: 3, focus: "DBMS, Operating Systems, Java" },
-    { n: 4, focus: "Computer Networks, Web Tech, Stats" },
-    { n: 5, focus: "Software Engg, Python, .NET" },
-    { n: 6, focus: "Project, Cloud, AI Fundamentals" },
-  ];
+  const { data, isLoading } = useQuery({
+    queryKey: ["landing", "semesters"],
+    queryFn: async () => {
+      // Find the primary published course
+      const { data: courses, error: courseError } = await supabase
+        .from("courses")
+        .select("id, title")
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (courseError) throw courseError;
+      const courseId = courses?.[0]?.id;
+      if (!courseId) return [] as { id: string; number: number; title: string; description: string | null }[];
+
+      const { data: semesters, error: semError } = await supabase
+        .from("semesters")
+        .select("id, number, title, description")
+        .eq("course_id", courseId)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("number", { ascending: true });
+      if (semError) throw semError;
+      return (semesters ?? []) as { id: string; number: number; title: string; description: string | null }[];
+    },
+    staleTime: 60_000,
+  });
+
+  const list = data ?? [];
+
   return (
     <section
       id="semesters"
@@ -658,30 +681,44 @@ function Semesters() {
           title="Six semesters, one organised path"
           body="A bird's-eye view of what each semester covers in the typical BCA curriculum."
         />
-        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {semesters.map((s) => (
-            <Link
-              key={s.n}
-              to="/courses"
-              className="group rounded-2xl border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground">
-                    <span className="font-display text-base font-semibold">
-                      {s.n}
-                    </span>
+        {isLoading ? (
+          <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-28 rounded-2xl" />
+            ))}
+          </div>
+        ) : list.length === 0 ? (
+          <div className="mt-14 rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
+            <p className="text-sm text-muted-foreground">No published semesters yet.</p>
+          </div>
+        ) : (
+          <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {list.map((s) => (
+              <Link
+                key={s.id}
+                to="/courses"
+                className="group rounded-2xl border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground">
+                      <span className="font-display text-base font-semibold">
+                        {s.number}
+                      </span>
+                    </div>
+                    <div className="font-display text-base font-semibold text-foreground">
+                      Semester {s.number}
+                    </div>
                   </div>
-                  <div className="font-display text-base font-semibold text-foreground">
-                    Semester {s.n}
-                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                 </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
-              </div>
-              <p className="mt-3 text-sm text-muted-foreground">{s.focus}</p>
-            </Link>
-          ))}
-        </div>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {s.description || "No description yet"}
+                </p>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
