@@ -117,9 +117,7 @@ function AuthPage() {
             Back to home
           </Link>
           <Link to="/" className="flex items-center gap-2 lg:hidden">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
-              <span className="font-display text-sm font-semibold">ब</span>
-            </div>
+            <BrandMark className="h-8 w-8" />
             <span className="font-display text-sm font-semibold">BCA Gurukul</span>
           </Link>
         </div>
