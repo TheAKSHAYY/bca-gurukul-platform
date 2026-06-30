@@ -132,7 +132,14 @@ function SemesterCard({
   sem,
   onChange,
 }: {
-  sem: { id: string; number: number; title: string; status: Status; description: string | null };
+  sem: {
+    id: string;
+    course_id: string;
+    number: number;
+    title: string;
+    status: Status;
+    description: string | null;
+  };
   onChange: () => void;
 }) {
   const qc = useQueryClient();
@@ -227,7 +234,7 @@ function SemesterCard({
       <SemesterDialog
         open={editOpen}
         onOpenChange={setEditOpen}
-        courseId={sem.id}
+        courseId={sem.course_id}
         nextNumber={sem.number}
         semester={sem}
         onSaved={() => {
