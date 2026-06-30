@@ -499,7 +499,109 @@ function DashboardPage() {
             )}
           </div>
         </section>
+
+        {/* Notifications */}
+        <section className="mt-12">
+          <div className="rounded-2xl border border-border bg-surface p-6">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Bell className="h-4.5 w-4.5" />
+                  {unreadCount > 0 && (
+                    <span
+                      aria-hidden
+                      className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground"
+                    >
+                      {unreadCount}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-foreground">
+                    Notifications
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Updates relevant to you, from new content to quiz results.
+                  </p>
+                </div>
+              </div>
+              {unreadCount > 0 && (
+                <Button variant="ghost" size="sm" onClick={markAllRead}>
+                  Mark all read
+                </Button>
+              )}
+            </div>
+
+            {notificationsQuery.isLoading ? (
+              <p className="mt-6 text-sm text-muted-foreground">Loading notifications…</p>
+            ) : notificationsQuery.isError ? (
+              <p className="mt-6 text-sm text-destructive">Could not load notifications.</p>
+            ) : notifications.length === 0 ? (
+              <div className="mt-5 rounded-xl border border-dashed border-border bg-surface-muted/40 p-5 text-center">
+                <p className="text-sm font-medium text-foreground">You're all caught up</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  We'll let you know here when there's something new for you.
+                </p>
+              </div>
+            ) : (
+              <ul className="mt-5 space-y-2.5">
+                {notifications.map((n) => {
+                  const isUnread = !n.read_at;
+                  const content = (
+                    <div
+                      className={`flex items-start justify-between gap-3 rounded-xl border px-4 py-3 transition-colors ${
+                        isUnread
+                          ? "border-primary/30 bg-primary/5"
+                          : "border-border/60 bg-background"
+                      }`}
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          {isUnread && (
+                            <span
+                              aria-hidden
+                              className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                            />
+                          )}
+                          <p className="truncate text-sm font-medium text-foreground">
+                            {n.title}
+                          </p>
+                        </div>
+                        {n.body && (
+                          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                            {n.body}
+                          </p>
+                        )}
+                        <p className="mt-1.5 text-[11px] uppercase tracking-wide text-muted-foreground">
+                          {n.kind}
+                          {n.published_at
+                            ? ` · ${new Date(n.published_at).toLocaleDateString()}`
+                            : ""}
+                        </p>
+                      </div>
+                      {n.link && (
+                        <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      )}
+                    </div>
+                  );
+                  return (
+                    <li key={n.id}>
+                      {n.link ? (
+                        <a href={n.link} className="block">
+                          {content}
+                        </a>
+                      ) : (
+                        content
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </section>
       </main>
+
     </div>
   );
 }
