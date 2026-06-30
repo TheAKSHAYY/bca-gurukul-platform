@@ -40,6 +40,41 @@ function DashboardPage() {
   const fullName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? "there";
   const firstName = fullName.split(" ")[0];
 
+  const bookmarksQuery = useQuery({
+    queryKey: ["student-bookmarks", user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("student_bookmarks", { _limit: 6 });
+      if (error) throw error;
+      return (data ?? []) as Array<{
+        id: string;
+        kind: "note" | "paper" | "quiz" | "unit";
+        ref_id: string;
+        title: string | null;
+        created_at: string;
+      }>;
+    },
+  });
+
+  const progressQuery = useQuery({
+    queryKey: ["student-progress", user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("student_progress", { _limit: 5 });
+      if (error) throw error;
+      return (data ?? []) as Array<{
+        id: string;
+        unit_id: string;
+        unit_title: string | null;
+        subject_title: string | null;
+        status: "not_started" | "in_progress" | "completed";
+        progress_pct: number;
+        last_activity_at: string;
+      }>;
+    },
+  });
+
+  const bookmarks = bookmarksQuery.data ?? [];
+  const progress = progressQuery.data ?? [];
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-md">
