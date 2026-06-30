@@ -39,13 +39,14 @@ function HomepageEditor() {
   });
 
   const mutate = useMutation({
-    mutationFn: async (patch: { id: string; updates: Partial<Section> }) => {
+    mutationFn: async (patch: { id: string; updates: Record<string, unknown> }) => {
       const { error } = await supabase
         .from("homepage_sections")
-        .update(patch.updates)
+        .update(patch.updates as never)
         .eq("id", patch.id);
       if (error) throw error;
     },
+
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "homepage_sections"] });
       qc.invalidateQueries({ queryKey: ["homepage_sections", "public"] });
