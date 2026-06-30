@@ -18,6 +18,7 @@ import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as QuizzesQuizIdRouteImport } from './routes/quizzes.$quizId'
 import { Route as PapersPaperIdRouteImport } from './routes/papers.$paperId'
 import { Route as NotesNoteIdRouteImport } from './routes/notes.$noteId'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -86,6 +87,11 @@ const NotesNoteIdRoute = NotesNoteIdRouteImport.update({
   id: '/notes/$noteId',
   path: '/notes/$noteId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
@@ -222,7 +228,7 @@ const CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/search': typeof AuthenticatedSearchRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/notes/$noteId': typeof NotesNoteIdRoute
   '/papers/$paperId': typeof PapersPaperIdRoute
   '/quizzes/$quizId': typeof QuizzesQuizIdRoute
@@ -256,7 +263,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
   '/bookmarks': typeof AuthenticatedBookmarksRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/search': typeof AuthenticatedSearchRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/notes/$noteId': typeof NotesNoteIdRoute
   '/papers/$paperId': typeof PapersPaperIdRoute
   '/quizzes/$quizId': typeof QuizzesQuizIdRoute
@@ -290,7 +298,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/setup': typeof SetupRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/search': typeof AuthenticatedSearchRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/notes/$noteId': typeof NotesNoteIdRoute
   '/papers/$paperId': typeof PapersPaperIdRoute
   '/quizzes/$quizId': typeof QuizzesQuizIdRoute
@@ -336,6 +345,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/search'
     | '/settings'
+    | '/auth/callback'
     | '/notes/$noteId'
     | '/papers/$paperId'
     | '/quizzes/$quizId'
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/search'
     | '/settings'
+    | '/auth/callback'
     | '/notes/$noteId'
     | '/papers/$paperId'
     | '/quizzes/$quizId'
@@ -403,6 +414,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/search'
     | '/_authenticated/settings'
+    | '/auth/callback'
     | '/notes/$noteId'
     | '/papers/$paperId'
     | '/quizzes/$quizId'
@@ -429,7 +441,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SetupRoute: typeof SetupRoute
   NotesNoteIdRoute: typeof NotesNoteIdRoute
@@ -505,6 +517,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/notes/$noteId'
       preLoaderRoute: typeof NotesNoteIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
@@ -778,6 +797,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 interface CoursesCourseSlugSemesterNumberSubjectSlugRouteChildren {
   CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute: typeof CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute
 }
@@ -796,7 +825,7 @@ const CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SetupRoute: SetupRoute,
   NotesNoteIdRoute: NotesNoteIdRoute,
