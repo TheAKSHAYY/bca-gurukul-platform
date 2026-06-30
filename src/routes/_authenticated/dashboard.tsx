@@ -432,22 +432,25 @@ function DashboardPage() {
             {progressQuery.isLoading ? (
               <p className="mt-6 text-sm text-muted-foreground">Loading your progress…</p>
             ) : progress.length === 0 ? (
-              <div className="mt-5 rounded-xl border border-dashed border-border bg-surface-muted/40 p-5">
-                <div className="grid h-9 w-9 place-items-center rounded-lg bg-accent/20 text-accent-foreground">
-                  <Compass className="h-4.5 w-4.5" />
-                </div>
-                <p className="mt-3 text-sm font-medium text-foreground">
-                  No units in progress yet
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Open a unit from any subject and your progress will appear here.
-                </p>
-                <Button asChild className="mt-4" size="sm">
-                  <Link to="/courses">
-                    Explore courses
-                    <ArrowRight className="ml-1.5 h-4 w-4" />
-                  </Link>
-                </Button>
+              <div className="mt-5">
+                <EmptyState
+                  icon={Compass}
+                  tone="accent"
+                  variant="panel"
+                  title="Start your first unit"
+                  description="Open any unit from your semester — your progress, bookmarks and quiz attempts will land here automatically."
+                  tip="Aim for one unit a day. Six small wins beats one long binge."
+                  primaryAction={{
+                    label: "Explore courses",
+                    to: "/courses",
+                    icon: ArrowRight,
+                  }}
+                  secondaryAction={{
+                    label: "Try a quick MCQ",
+                    to: "/search",
+                    icon: ListChecks,
+                  }}
+                />
               </div>
             ) : (
               <ul className="mt-5 space-y-4">
