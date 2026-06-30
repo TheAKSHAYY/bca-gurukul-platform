@@ -712,9 +712,11 @@ function Semesters() {
                   </div>
                   <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                 </div>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {s.description || "No description yet"}
-                </p>
+                {s.description ? (
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    {s.description}
+                  </p>
+                ) : null}
               </Link>
             ))}
           </div>
