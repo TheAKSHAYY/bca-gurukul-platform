@@ -34,10 +34,14 @@ function AdminHome() {
         </p>
 
         <section className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <Tile icon={<BookOpen className="h-5 w-5" />} title="Courses & content" body="Course tree, units, notes, papers — Phase 6+." />
+          <Link to="/admin/courses" className="block">
+            <Tile icon={<BookOpen className="h-5 w-5" />} title="Courses & academic tree" body="Manage courses, semesters, subjects and units." />
+          </Link>
           <Tile icon={<FlaskConical className="h-5 w-5" />} title="Quizzes & analytics" body="MCQ banks and student performance — Phase 10, 18." />
           {isSuperAdmin && (
-            <Tile icon={<Shield className="h-5 w-5" />} title="Super admin" body="System health, backups, feature flags — Phase 19." />
+            <Link to="/super-admin" className="block">
+              <Tile icon={<Shield className="h-5 w-5" />} title="Super admin" body="System health, backups, feature flags, branding." />
+            </Link>
           )}
         </section>
       </main>

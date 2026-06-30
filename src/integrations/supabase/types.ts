@@ -131,6 +131,54 @@ export type Database = {
         }
         Relationships: []
       }
+      courses: {
+        Row: {
+          code: string
+          cover_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          duration_years: number | null
+          id: string
+          slug: string
+          sort_order: number
+          status: string
+          title: string
+          total_semesters: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          duration_years?: number | null
+          id?: string
+          slug: string
+          sort_order?: number
+          status?: string
+          title: string
+          total_semesters?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          duration_years?: number | null
+          id?: string
+          slug?: string
+          sort_order?: number
+          status?: string
+          title?: string
+          total_semesters?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           audience: Json
@@ -313,6 +361,147 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "permissions"
             referencedColumns: ["key"]
+          },
+        ]
+      }
+      semesters: {
+        Row: {
+          course_id: string
+          created_at: string
+          description: string | null
+          id: string
+          number: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          number: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          number?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "semesters_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subjects: {
+        Row: {
+          code: string
+          cover_url: string | null
+          created_at: string
+          credits: number | null
+          description: string | null
+          id: string
+          instructor_id: string | null
+          semester_id: string
+          slug: string
+          sort_order: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          cover_url?: string | null
+          created_at?: string
+          credits?: number | null
+          description?: string | null
+          id?: string
+          instructor_id?: string | null
+          semester_id: string
+          slug: string
+          sort_order?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          cover_url?: string | null
+          created_at?: string
+          credits?: number | null
+          description?: string | null
+          id?: string
+          instructor_id?: string | null
+          semester_id?: string
+          slug?: string
+          sort_order?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subjects_semester_id_fkey"
+            columns: ["semester_id"]
+            isOneToOne: false
+            referencedRelation: "semesters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      units: {
+        Row: {
+          created_at: string
+          id: string
+          number: number
+          sort_order: number
+          status: string
+          subject_id: string
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          number: number
+          sort_order?: number
+          status?: string
+          subject_id: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          number?: number
+          sort_order?: number
+          status?: string
+          subject_id?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "units_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
           },
         ]
       }
