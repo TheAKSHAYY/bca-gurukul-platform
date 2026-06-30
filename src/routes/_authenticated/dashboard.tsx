@@ -303,7 +303,7 @@ function DashboardPage() {
             {searchHits.filter((h) => h.kind === "note").length > 0 && (
               <ResultGroup label="Notes" icon={<FileText className="h-3.5 w-3.5" />}>
                 {searchHits.filter((h) => h.kind === "note").map((n) => (
-                  <Link key={n.id} to="/notes/$noteSlug" params={{ noteSlug: n.slug ?? n.id }} className={resultLinkClass}>
+                  <Link key={n.id} to="/notes/$noteId" params={{ noteId: n.id }} className={resultLinkClass}>
                     {n.title}
                   </Link>
                 ))}
@@ -321,7 +321,7 @@ function DashboardPage() {
             {searchHits.filter((h) => h.kind === "quiz").length > 0 && (
               <ResultGroup label="Quizzes" icon={<ListChecks className="h-3.5 w-3.5" />}>
                 {searchHits.filter((h) => h.kind === "quiz").map((q) => (
-                  <Link key={q.id} to="/quizzes/$quizSlug" params={{ quizSlug: q.slug ?? q.id }} className={resultLinkClass}>
+                  <Link key={q.id} to="/quizzes/$quizId" params={{ quizId: q.id }} className={resultLinkClass}>
                     {q.title}
                   </Link>
                 ))}
