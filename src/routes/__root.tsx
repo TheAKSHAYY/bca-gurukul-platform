@@ -146,11 +146,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MaintenanceGate>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </MaintenanceGate>
-      <Toaster richColors position="top-center" />
+      <ThemeProvider>
+        <MaintenanceGate>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </MaintenanceGate>
+        <Toaster richColors position="top-center" />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
+
