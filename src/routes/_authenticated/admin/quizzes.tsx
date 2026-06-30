@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, FlaskConical, Plus, Pencil, Trash2, ExternalLink, Wrench } from "lucide-react";
+import { ArrowLeft, FlaskConical, Plus, Pencil, Trash2, ExternalLink, Wrench, Sparkles } from "lucide-react";
+
+import { EmptyState } from "@/components/ui/empty-state";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
