@@ -14,6 +14,10 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/_admin/route'
+import { Route as AuthenticatedAdminAdminRouteImport } from './routes/_authenticated/_admin/admin'
+import { Route as AuthenticatedAdminSuperadminRouteRouteImport } from './routes/_authenticated/_admin/_superadmin/route'
+import { Route as AuthenticatedAdminSuperadminSuperAdminRouteImport } from './routes/_authenticated/_admin/_superadmin/super-admin'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -39,18 +43,42 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/_admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminAdminRoute = AuthenticatedAdminAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminSuperadminRouteRoute =
+  AuthenticatedAdminSuperadminRouteRouteImport.update({
+    id: '/_superadmin',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminSuperadminSuperAdminRoute =
+  AuthenticatedAdminSuperadminSuperAdminRouteImport.update({
+    id: '/super-admin',
+    path: '/super-admin',
+    getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin': typeof AuthenticatedAdminAdminRoute
+  '/super-admin': typeof AuthenticatedAdminSuperadminSuperAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin': typeof AuthenticatedAdminAdminRoute
+  '/super-admin': typeof AuthenticatedAdminSuperadminSuperAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -58,20 +86,40 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/_admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/_admin/_superadmin': typeof AuthenticatedAdminSuperadminRouteRouteWithChildren
+  '/_authenticated/_admin/admin': typeof AuthenticatedAdminAdminRoute
+  '/_authenticated/_admin/_superadmin/super-admin': typeof AuthenticatedAdminSuperadminSuperAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/reset-password' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/admin'
+    | '/super-admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/reset-password' | '/dashboard'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/admin'
+    | '/super-admin'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/_admin'
     | '/_authenticated/dashboard'
+    | '/_authenticated/_admin/_superadmin'
+    | '/_authenticated/_admin/admin'
+    | '/_authenticated/_admin/_superadmin/super-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -118,14 +166,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/_admin': {
+      id: '/_authenticated/_admin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/_admin/admin': {
+      id: '/_authenticated/_admin/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminAdminRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/_admin/_superadmin': {
+      id: '/_authenticated/_admin/_superadmin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedAdminSuperadminRouteRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/_admin/_superadmin/super-admin': {
+      id: '/_authenticated/_admin/_superadmin/super-admin'
+      path: '/super-admin'
+      fullPath: '/super-admin'
+      preLoaderRoute: typeof AuthenticatedAdminSuperadminSuperAdminRouteImport
+      parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
+    }
   }
 }
 
+interface AuthenticatedAdminSuperadminRouteRouteChildren {
+  AuthenticatedAdminSuperadminSuperAdminRoute: typeof AuthenticatedAdminSuperadminSuperAdminRoute
+}
+
+const AuthenticatedAdminSuperadminRouteRouteChildren: AuthenticatedAdminSuperadminRouteRouteChildren =
+  {
+    AuthenticatedAdminSuperadminSuperAdminRoute:
+      AuthenticatedAdminSuperadminSuperAdminRoute,
+  }
+
+const AuthenticatedAdminSuperadminRouteRouteWithChildren =
+  AuthenticatedAdminSuperadminRouteRoute._addFileChildren(
+    AuthenticatedAdminSuperadminRouteRouteChildren,
+  )
+
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminSuperadminRouteRoute: typeof AuthenticatedAdminSuperadminRouteRouteWithChildren
+  AuthenticatedAdminAdminRoute: typeof AuthenticatedAdminAdminRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminSuperadminRouteRoute:
+      AuthenticatedAdminSuperadminRouteRouteWithChildren,
+    AuthenticatedAdminAdminRoute: AuthenticatedAdminAdminRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
 }
 
