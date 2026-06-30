@@ -217,6 +217,12 @@ function SiteHeader({ user, loading }: { user: unknown; loading: boolean }) {
           >
             FAQ
           </a>
+          <Link
+            to="/developer"
+            className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Developer
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
