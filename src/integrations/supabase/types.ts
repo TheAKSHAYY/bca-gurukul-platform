@@ -281,6 +281,78 @@ export type Database = {
         }
         Relationships: []
       }
+      homepage_sections: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: string
+          position: number
+          props: Json
+          type: Database["public"]["Enums"]["homepage_section_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          position: number
+          props?: Json
+          type: Database["public"]["Enums"]["homepage_section_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          position?: number
+          props?: Json
+          type?: Database["public"]["Enums"]["homepage_section_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      homepage_testimonials: {
+        Row: {
+          author_name: string
+          author_role: string | null
+          avatar_url: string | null
+          created_at: string
+          enabled: boolean
+          id: string
+          position: number
+          quote: string
+          rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          author_name: string
+          author_role?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          position?: number
+          quote: string
+          rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          author_name?: string
+          author_role?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          position?: number
+          quote?: string
+          rating?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       maintenance: {
         Row: {
           allowed_roles: Database["public"]["Enums"]["app_role"][]
@@ -1321,6 +1393,18 @@ export type Database = {
     }
     Enums: {
       app_role: "super_admin" | "admin" | "instructor" | "student"
+      homepage_section_type:
+        | "hero"
+        | "trust_bar"
+        | "features"
+        | "journey"
+        | "semester_overview"
+        | "benefits"
+        | "testimonials"
+        | "faq"
+        | "cta"
+        | "stats"
+        | "custom_richtext"
       media_kind: "image" | "pdf" | "video" | "audio" | "document" | "other"
       quiz_question_type: "single" | "multiple" | "true_false"
       quiz_status: "draft" | "published" | "archived"
@@ -1461,6 +1545,19 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "admin", "instructor", "student"],
+      homepage_section_type: [
+        "hero",
+        "trust_bar",
+        "features",
+        "journey",
+        "semester_overview",
+        "benefits",
+        "testimonials",
+        "faq",
+        "cta",
+        "stats",
+        "custom_richtext",
+      ],
       media_kind: ["image", "pdf", "video", "audio", "document", "other"],
       quiz_question_type: ["single", "multiple", "true_false"],
       quiz_status: ["draft", "published", "archived"],
