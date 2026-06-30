@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
+  ArrowUpRight,
   BookOpen,
   CheckCircle2,
   Compass,
@@ -13,6 +14,7 @@ import {
   Quote,
   ShieldCheck,
   Sparkles,
+  Star,
   Target,
   Zap,
 } from "lucide-react";
@@ -20,7 +22,6 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
   AccordionContent,
