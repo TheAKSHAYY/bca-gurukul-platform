@@ -40,6 +40,7 @@ import { Route as AuthenticatedAdminNotesRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/admin/media'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminExplorerRouteImport } from './routes/_authenticated/admin/explorer'
+import { Route as AuthenticatedAdminDeveloperRouteImport } from './routes/_authenticated/admin/developer'
 import { Route as AuthenticatedAdminCoursesRouteImport } from './routes/_authenticated/admin/courses'
 import { Route as AuthenticatedAdminSuperadminRouteRouteImport } from './routes/_authenticated/admin/superadmin/route'
 import { Route as CoursesCourseSlugSemesterNumberIndexRouteImport } from './routes/courses.$courseSlug.$semesterNumber.index'
@@ -210,6 +211,12 @@ const AuthenticatedAdminExplorerRoute =
     path: '/explorer',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminDeveloperRoute =
+  AuthenticatedAdminDeveloperRouteImport.update({
+    id: '/developer',
+    path: '/developer',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminCoursesRoute =
   AuthenticatedAdminCoursesRouteImport.update({
     id: '/courses',
@@ -301,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/courses/': typeof CoursesIndexRoute
   '/admin/superadmin': typeof AuthenticatedAdminSuperadminRouteRouteWithChildren
   '/admin/courses': typeof AuthenticatedAdminCoursesRouteWithChildren
+  '/admin/developer': typeof AuthenticatedAdminDeveloperRoute
   '/admin/explorer': typeof AuthenticatedAdminExplorerRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
@@ -342,6 +350,7 @@ export interface FileRoutesByTo {
   '/quizzes/$quizId': typeof QuizzesQuizIdRoute
   '/courses': typeof CoursesIndexRoute
   '/admin/courses': typeof AuthenticatedAdminCoursesRouteWithChildren
+  '/admin/developer': typeof AuthenticatedAdminDeveloperRoute
   '/admin/explorer': typeof AuthenticatedAdminExplorerRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
@@ -386,6 +395,7 @@ export interface FileRoutesById {
   '/courses/': typeof CoursesIndexRoute
   '/_authenticated/admin/superadmin': typeof AuthenticatedAdminSuperadminRouteRouteWithChildren
   '/_authenticated/admin/courses': typeof AuthenticatedAdminCoursesRouteWithChildren
+  '/_authenticated/admin/developer': typeof AuthenticatedAdminDeveloperRoute
   '/_authenticated/admin/explorer': typeof AuthenticatedAdminExplorerRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/_authenticated/admin/media': typeof AuthenticatedAdminMediaRoute
@@ -431,6 +441,7 @@ export interface FileRouteTypes {
     | '/courses/'
     | '/admin/superadmin'
     | '/admin/courses'
+    | '/admin/developer'
     | '/admin/explorer'
     | '/admin/homepage'
     | '/admin/media'
@@ -472,6 +483,7 @@ export interface FileRouteTypes {
     | '/quizzes/$quizId'
     | '/courses'
     | '/admin/courses'
+    | '/admin/developer'
     | '/admin/explorer'
     | '/admin/homepage'
     | '/admin/media'
@@ -515,6 +527,7 @@ export interface FileRouteTypes {
     | '/courses/'
     | '/_authenticated/admin/superadmin'
     | '/_authenticated/admin/courses'
+    | '/_authenticated/admin/developer'
     | '/_authenticated/admin/explorer'
     | '/_authenticated/admin/homepage'
     | '/_authenticated/admin/media'
@@ -774,6 +787,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminExplorerRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/developer': {
+      id: '/_authenticated/admin/developer'
+      path: '/developer'
+      fullPath: '/admin/developer'
+      preLoaderRoute: typeof AuthenticatedAdminDeveloperRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/courses': {
       id: '/_authenticated/admin/courses'
       path: '/courses'
@@ -906,6 +926,7 @@ const AuthenticatedAdminQuizzesRouteWithChildren =
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminSuperadminRouteRoute: typeof AuthenticatedAdminSuperadminRouteRouteWithChildren
   AuthenticatedAdminCoursesRoute: typeof AuthenticatedAdminCoursesRouteWithChildren
+  AuthenticatedAdminDeveloperRoute: typeof AuthenticatedAdminDeveloperRoute
   AuthenticatedAdminExplorerRoute: typeof AuthenticatedAdminExplorerRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
   AuthenticatedAdminMediaRoute: typeof AuthenticatedAdminMediaRoute
@@ -921,6 +942,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminSuperadminRouteRoute:
       AuthenticatedAdminSuperadminRouteRouteWithChildren,
     AuthenticatedAdminCoursesRoute: AuthenticatedAdminCoursesRouteWithChildren,
+    AuthenticatedAdminDeveloperRoute: AuthenticatedAdminDeveloperRoute,
     AuthenticatedAdminExplorerRoute: AuthenticatedAdminExplorerRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
     AuthenticatedAdminMediaRoute: AuthenticatedAdminMediaRoute,

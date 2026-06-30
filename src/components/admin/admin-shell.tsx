@@ -14,6 +14,7 @@ import {
   Home,
   Layout,
   FolderTree,
+  UserCircle2,
 } from "lucide-react";
 
 
@@ -47,6 +48,7 @@ const NAV = [
   { label: "Media", to: "/admin/media", icon: ImageIcon },
   { label: "Tags", to: "/admin/tags", icon: TagIcon },
   { label: "Homepage", to: "/admin/homepage", icon: Layout },
+  { label: "Developer", to: "/admin/developer", icon: UserCircle2 },
 ];
 
 
