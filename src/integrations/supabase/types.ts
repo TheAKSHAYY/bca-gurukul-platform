@@ -74,6 +74,63 @@ export type Database = {
         }
         Relationships: []
       }
+      branding: {
+        Row: {
+          accent_color: string | null
+          created_at: string
+          favicon_url: string | null
+          footer_text: string | null
+          id: number
+          logo_url: string | null
+          og_image_url: string | null
+          primary_color: string | null
+          seo_description: string | null
+          seo_title: string | null
+          site_name: string
+          social_links: Json
+          support_email: string | null
+          tagline: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          accent_color?: string | null
+          created_at?: string
+          favicon_url?: string | null
+          footer_text?: string | null
+          id?: number
+          logo_url?: string | null
+          og_image_url?: string | null
+          primary_color?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_name?: string
+          social_links?: Json
+          support_email?: string | null
+          tagline?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          accent_color?: string | null
+          created_at?: string
+          favicon_url?: string | null
+          footer_text?: string | null
+          id?: number
+          logo_url?: string | null
+          og_image_url?: string | null
+          primary_color?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          site_name?: string
+          social_links?: Json
+          support_email?: string | null
+          tagline?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           audience: Json
