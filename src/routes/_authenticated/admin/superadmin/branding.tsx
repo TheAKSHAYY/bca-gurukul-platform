@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/admin/superadmin/branding"
 const schema = z.object({
   site_name: z.string().min(1, "Required").max(80),
   tagline: z.string().max(200).optional().nullable(),
+  logo_text: z.string().max(40).optional().nullable(),
   logo_url: z.string().url().optional().or(z.literal("")).nullable(),
   favicon_url: z.string().url().optional().or(z.literal("")).nullable(),
   support_email: z.string().email().optional().or(z.literal("")).nullable(),
@@ -28,6 +29,12 @@ const schema = z.object({
   seo_title: z.string().max(120).optional().nullable(),
   seo_description: z.string().max(300).optional().nullable(),
   og_image_url: z.string().url().optional().or(z.literal("")).nullable(),
+  primary_color: z.string().max(80).optional().nullable(),
+  secondary_color: z.string().max(80).optional().nullable(),
+  accent_color: z.string().max(80).optional().nullable(),
+  font_heading: z.string().max(60).optional().nullable(),
+  font_body: z.string().max(60).optional().nullable(),
+  radius_rem: z.coerce.number().min(0).max(2).optional().nullable(),
 });
 
 type FormValues = z.infer<typeof schema>;
