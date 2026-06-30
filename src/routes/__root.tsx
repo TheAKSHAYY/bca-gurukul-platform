@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { MaintenanceGate } from "@/components/maintenance-gate";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { BrandingApplier } from "@/components/branding/branding-applier";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -153,6 +154,7 @@ function RootComponent() {
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </MaintenanceGate>
+        <ScrollToTop />
         <Toaster richColors position="top-center" />
       </ThemeProvider>
     </QueryClientProvider>

@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ContactForm } from "@/components/developer/contact-form";
 
 export const Route = createFileRoute("/developer")({
   head: () => ({
@@ -588,21 +589,26 @@ function DeveloperPage() {
 
       {/* CONTACT */}
       <section id="contact" className="py-20">
-        <div className="mx-auto max-w-3xl px-6 text-center">
+        <div className="mx-auto max-w-3xl px-6">
           <SectionHeading eyebrow="Contact" title="Let's build something together" />
-          <p className="mt-4 text-muted-foreground">
+          <p className="mx-auto mt-4 max-w-xl text-center text-muted-foreground">
             Open to collaborations, feedback, and a friendly hello.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+
+          <div className="mt-10">
+            <ContactForm />
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
             {profile.email && (
-              <Button asChild size="lg">
+              <Button asChild variant="outline" size="sm">
                 <a href={`mailto:${profile.email}`}>
-                  <Mail className="mr-1.5 h-4 w-4" /> Email me
+                  <Mail className="mr-1.5 h-4 w-4" /> Email directly
                 </a>
               </Button>
             )}
             {profile.resume_url && (
-              <Button asChild variant="outline" size="lg">
+              <Button asChild variant="ghost" size="sm">
                 <a href={profile.resume_url} target="_blank" rel="noreferrer">
                   <Download className="mr-1.5 h-4 w-4" /> Resume
                 </a>
@@ -611,7 +617,7 @@ function DeveloperPage() {
             {socials.slice(0, 4).map((s) => {
               const Icon = platformIcon(s.platform);
               return (
-                <Button asChild key={s.id} variant="ghost" size="lg">
+                <Button asChild key={s.id} variant="ghost" size="sm">
                   <a href={s.url} target="_blank" rel="noreferrer">
                     <Icon className="mr-1.5 h-4 w-4" />
                     <span className="capitalize">{s.platform}</span>
