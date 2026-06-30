@@ -14,11 +14,13 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
+import { Route as PapersPaperIdRouteImport } from './routes/papers.$paperId'
 import { Route as NotesNoteIdRouteImport } from './routes/notes.$noteId'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/_admin/route'
 import { Route as CoursesCourseSlugIndexRouteImport } from './routes/courses.$courseSlug.index'
 import { Route as AuthenticatedAdminTagsRouteImport } from './routes/_authenticated/_admin/tags'
+import { Route as AuthenticatedAdminPapersRouteImport } from './routes/_authenticated/_admin/papers'
 import { Route as AuthenticatedAdminNotesRouteImport } from './routes/_authenticated/_admin/notes'
 import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/_admin/media'
 import { Route as AuthenticatedAdminCoursesRouteImport } from './routes/_authenticated/_admin/courses'
@@ -55,6 +57,11 @@ const CoursesIndexRoute = CoursesIndexRouteImport.update({
   path: '/courses/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PapersPaperIdRoute = PapersPaperIdRouteImport.update({
+  id: '/papers/$paperId',
+  path: '/papers/$paperId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NotesNoteIdRoute = NotesNoteIdRouteImport.update({
   id: '/notes/$noteId',
   path: '/notes/$noteId',
@@ -79,6 +86,12 @@ const AuthenticatedAdminTagsRoute = AuthenticatedAdminTagsRouteImport.update({
   path: '/tags',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminPapersRoute =
+  AuthenticatedAdminPapersRouteImport.update({
+    id: '/papers',
+    path: '/papers',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminNotesRoute = AuthenticatedAdminNotesRouteImport.update({
   id: '/notes',
   path: '/notes',
@@ -148,11 +161,13 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notes/$noteId': typeof NotesNoteIdRoute
+  '/papers/$paperId': typeof PapersPaperIdRoute
   '/courses/': typeof CoursesIndexRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
   '/courses': typeof AuthenticatedAdminCoursesRouteWithChildren
   '/media': typeof AuthenticatedAdminMediaRoute
   '/notes': typeof AuthenticatedAdminNotesRoute
+  '/papers': typeof AuthenticatedAdminPapersRoute
   '/tags': typeof AuthenticatedAdminTagsRoute
   '/courses/$courseSlug/': typeof CoursesCourseSlugIndexRoute
   '/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
@@ -168,10 +183,12 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notes/$noteId': typeof NotesNoteIdRoute
+  '/papers/$paperId': typeof PapersPaperIdRoute
   '/courses': typeof CoursesIndexRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
   '/media': typeof AuthenticatedAdminMediaRoute
   '/notes': typeof AuthenticatedAdminNotesRoute
+  '/papers': typeof AuthenticatedAdminPapersRoute
   '/tags': typeof AuthenticatedAdminTagsRoute
   '/courses/$courseSlug': typeof CoursesCourseSlugIndexRoute
   '/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
@@ -190,12 +207,14 @@ export interface FileRoutesById {
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/notes/$noteId': typeof NotesNoteIdRoute
+  '/papers/$paperId': typeof PapersPaperIdRoute
   '/courses/': typeof CoursesIndexRoute
   '/_authenticated/_admin/_superadmin': typeof AuthenticatedAdminSuperadminRouteRouteWithChildren
   '/_authenticated/_admin/admin': typeof AuthenticatedAdminAdminRoute
   '/_authenticated/_admin/courses': typeof AuthenticatedAdminCoursesRouteWithChildren
   '/_authenticated/_admin/media': typeof AuthenticatedAdminMediaRoute
   '/_authenticated/_admin/notes': typeof AuthenticatedAdminNotesRoute
+  '/_authenticated/_admin/papers': typeof AuthenticatedAdminPapersRoute
   '/_authenticated/_admin/tags': typeof AuthenticatedAdminTagsRoute
   '/courses/$courseSlug/': typeof CoursesCourseSlugIndexRoute
   '/_authenticated/_admin/_superadmin/branding': typeof AuthenticatedAdminSuperadminBrandingRoute
@@ -213,11 +232,13 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/notes/$noteId'
+    | '/papers/$paperId'
     | '/courses/'
     | '/admin'
     | '/courses'
     | '/media'
     | '/notes'
+    | '/papers'
     | '/tags'
     | '/courses/$courseSlug/'
     | '/branding'
@@ -233,10 +254,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/notes/$noteId'
+    | '/papers/$paperId'
     | '/courses'
     | '/admin'
     | '/media'
     | '/notes'
+    | '/papers'
     | '/tags'
     | '/courses/$courseSlug'
     | '/branding'
@@ -254,12 +277,14 @@ export interface FileRouteTypes {
     | '/_authenticated/_admin'
     | '/_authenticated/dashboard'
     | '/notes/$noteId'
+    | '/papers/$paperId'
     | '/courses/'
     | '/_authenticated/_admin/_superadmin'
     | '/_authenticated/_admin/admin'
     | '/_authenticated/_admin/courses'
     | '/_authenticated/_admin/media'
     | '/_authenticated/_admin/notes'
+    | '/_authenticated/_admin/papers'
     | '/_authenticated/_admin/tags'
     | '/courses/$courseSlug/'
     | '/_authenticated/_admin/_superadmin/branding'
@@ -276,6 +301,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   NotesNoteIdRoute: typeof NotesNoteIdRoute
+  PapersPaperIdRoute: typeof PapersPaperIdRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
   CoursesCourseSlugIndexRoute: typeof CoursesCourseSlugIndexRoute
   CoursesCourseSlugSemesterNumberSubjectSlugRoute: typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
@@ -319,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/papers/$paperId': {
+      id: '/papers/$paperId'
+      path: '/papers/$paperId'
+      fullPath: '/papers/$paperId'
+      preLoaderRoute: typeof PapersPaperIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notes/$noteId': {
       id: '/notes/$noteId'
       path: '/notes/$noteId'
@@ -352,6 +385,13 @@ declare module '@tanstack/react-router' {
       path: '/tags'
       fullPath: '/tags'
       preLoaderRoute: typeof AuthenticatedAdminTagsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/_admin/papers': {
+      id: '/_authenticated/_admin/papers'
+      path: '/papers'
+      fullPath: '/papers'
+      preLoaderRoute: typeof AuthenticatedAdminPapersRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/_admin/notes': {
@@ -473,6 +513,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminCoursesRoute: typeof AuthenticatedAdminCoursesRouteWithChildren
   AuthenticatedAdminMediaRoute: typeof AuthenticatedAdminMediaRoute
   AuthenticatedAdminNotesRoute: typeof AuthenticatedAdminNotesRoute
+  AuthenticatedAdminPapersRoute: typeof AuthenticatedAdminPapersRoute
   AuthenticatedAdminTagsRoute: typeof AuthenticatedAdminTagsRoute
 }
 
@@ -484,6 +525,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminCoursesRoute: AuthenticatedAdminCoursesRouteWithChildren,
     AuthenticatedAdminMediaRoute: AuthenticatedAdminMediaRoute,
     AuthenticatedAdminNotesRoute: AuthenticatedAdminNotesRoute,
+    AuthenticatedAdminPapersRoute: AuthenticatedAdminPapersRoute,
     AuthenticatedAdminTagsRoute: AuthenticatedAdminTagsRoute,
   }
 
@@ -526,6 +568,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   NotesNoteIdRoute: NotesNoteIdRoute,
+  PapersPaperIdRoute: PapersPaperIdRoute,
   CoursesIndexRoute: CoursesIndexRoute,
   CoursesCourseSlugIndexRoute: CoursesCourseSlugIndexRoute,
   CoursesCourseSlugSemesterNumberSubjectSlugRoute:
