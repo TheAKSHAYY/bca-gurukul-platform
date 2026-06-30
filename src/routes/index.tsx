@@ -230,8 +230,8 @@ function SiteHeader({ user, loading }: { user: unknown; loading: boolean }) {
           </Button>
           {loading ? null : user ? (
             <Button asChild size="sm">
-              <Link to="/dashboard">
-                Dashboard
+              <Link to="/developer">
+                Developer
                 <ArrowRight className="ml-1.5 h-4 w-4" />
               </Link>
             </Button>
