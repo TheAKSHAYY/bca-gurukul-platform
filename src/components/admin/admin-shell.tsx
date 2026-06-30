@@ -35,6 +35,8 @@ import { Input } from "@/components/ui/input";
 import { useRoles } from "@/hooks/use-roles";
 import { cn } from "@/lib/utils";
 
+import { BrandMark } from "@/components/brand-mark";
+
 import { ContentTree } from "./content-tree";
 import { CreateWizard } from "./create-wizard";
 
