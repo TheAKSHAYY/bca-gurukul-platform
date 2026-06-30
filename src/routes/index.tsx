@@ -22,6 +22,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { BrandMark } from "@/components/brand-mark";
 import {
   Accordion,
   AccordionContent,
@@ -156,10 +157,7 @@ function SiteHeader({ user, loading }: { user: unknown; loading: boolean }) {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link to="/" className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-
-            <span className="font-display text-lg font-semibold">ब</span>
-          </div>
+          <BrandMark className="h-10 w-10" />
           <div className="leading-tight">
             <div className="font-display text-lg font-semibold text-foreground">
               BCA Gurukul
@@ -936,9 +934,7 @@ function SiteFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Link to="/" className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-                <span className="font-display text-lg font-semibold">ब</span>
-              </div>
+              <BrandMark className="h-10 w-10" />
               <div className="font-display text-base font-semibold text-foreground">
                 BCA Gurukul
               </div>
