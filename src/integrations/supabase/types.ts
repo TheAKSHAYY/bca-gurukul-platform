@@ -197,6 +197,7 @@ export type Database = {
           cover_url: string | null
           created_at: string
           created_by: string | null
+          deleted_at: string | null
           description: string | null
           duration_years: number | null
           id: string
@@ -212,6 +213,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           description?: string | null
           duration_years?: number | null
           id?: string
@@ -227,6 +229,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           description?: string | null
           duration_years?: number | null
           id?: string
