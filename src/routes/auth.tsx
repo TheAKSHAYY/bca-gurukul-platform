@@ -217,13 +217,7 @@ function EmailSignInForm() {
       return;
     }
     setLoading(true);
-    if (!remember) {
-      try {
-        sessionStorage.setItem("sb-prefer-session-only", "1");
-      } catch {
-        /* ignore */
-      }
-    }
+    setRememberMe(remember);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
