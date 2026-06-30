@@ -300,6 +300,11 @@ export function AppNavbar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
+                <Link to="/developer">
+                  <Code2 className="mr-2 h-4 w-4" /> Developer
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link to="/help">
                   <HelpCircle className="mr-2 h-4 w-4" /> Help
                 </Link>
