@@ -1,8 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, FileText } from "lucide-react";
+import { ArrowLeft, FileText, Bookmark, BookOpen } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PublicHeader } from "./courses.index";
 
 export const Route = createFileRoute("/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber")({
