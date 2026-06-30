@@ -1049,7 +1049,7 @@ function SiteFooter() {
 }
 
 type FooterLink =
-  | { label: string; to: "/courses" | "/auth" | "/privacy" | "/terms"; search?: { mode: "signin" | "signup" | "forgot" }; href?: never }
+  | { label: string; to: "/courses" | "/auth" | "/privacy" | "/terms" | "/developer"; search?: { mode: "signin" | "signup" | "forgot" }; href?: never }
   | { label: string; href: string; to?: never; search?: never };
 
 function FooterCol({ title, links }: { title: string; links: FooterLink[] }) {
