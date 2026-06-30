@@ -205,6 +205,108 @@ function DashboardPage() {
           </div>
         </section>
 
+        {/* Search */}
+        <section className="mt-8">
+          <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+            <label htmlFor="dashboard-search" className="flex items-center gap-2.5">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                <Search className="h-4.5 w-4.5" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="font-display text-lg font-semibold text-foreground">
+                  Search the library
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  Find published courses, units, notes, papers and quizzes.
+                </p>
+              </div>
+            </label>
+
+            <div className="mt-4 relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="dashboard-search"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Try “data structures”, “DBMS 2023”, “OS quiz”…"
+                className="pl-9"
+                autoComplete="off"
+              />
+            </div>
+
+            {!searchEnabled ? (
+              <p className="mt-4 text-xs text-muted-foreground">
+                Type at least 2 characters to begin searching.
+              </p>
+            ) : searchQuery.isLoading ? (
+              <p className="mt-4 text-sm text-muted-foreground">Searching…</p>
+            ) : searchQuery.isError ? (
+              <p className="mt-4 text-sm text-destructive">
+                Something went wrong. Try again.
+              </p>
+            ) : totalResults === 0 ? (
+              <div className="mt-5 rounded-xl border border-dashed border-border bg-surface-muted/40 p-5 text-center">
+                <p className="text-sm font-medium text-foreground">
+                  No published matches for “{debouncedQuery}”
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  We only show content that has been published and is visible to you.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                <ResultGroup label="Courses" icon={<Compass className="h-3.5 w-3.5" />}>
+                  {searchResults!.courses.map((c) => (
+                    <ResultLink
+                      key={c.id}
+                      to="/courses/$courseSlug"
+                      params={{ courseSlug: c.slug }}
+                      title={c.title}
+                    />
+                  ))}
+                </ResultGroup>
+                <ResultGroup label="Units" icon={<BookOpen className="h-3.5 w-3.5" />}>
+                  {searchResults!.units.map((u) => (
+                    <ResultLink key={u.id} to="/courses" title={u.title} />
+                  ))}
+                </ResultGroup>
+                <ResultGroup label="Notes" icon={<FileText className="h-3.5 w-3.5" />}>
+                  {searchResults!.notes.map((n) => (
+                    <ResultLink
+                      key={n.id}
+                      to="/notes/$noteId"
+                      params={{ noteId: n.id }}
+                      title={n.title}
+                    />
+                  ))}
+                </ResultGroup>
+                <ResultGroup label="Papers" icon={<FileText className="h-3.5 w-3.5" />}>
+                  {searchResults!.papers.map((p) => (
+                    <ResultLink
+                      key={p.id}
+                      to="/papers/$paperId"
+                      params={{ paperId: p.id }}
+                      title={p.title}
+                    />
+                  ))}
+                </ResultGroup>
+                <ResultGroup label="Quizzes" icon={<ListChecks className="h-3.5 w-3.5" />}>
+                  {searchResults!.quizzes.map((q) => (
+                    <ResultLink
+                      key={q.id}
+                      to="/quizzes/$quizId"
+                      params={{ quizId: q.id }}
+                      title={q.title}
+                    />
+                  ))}
+                </ResultGroup>
+              </div>
+            )}
+          </div>
+        </section>
+
+
+
         {/* Quick actions */}
         <section className="mt-10">
           <h2 className="font-display text-xl font-semibold text-foreground">
