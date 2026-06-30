@@ -172,7 +172,13 @@ function SignInForm() {
   const [method, setMethod] = useState<"email" | "phone">("email");
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      <div>
+        <h1 className="font-display text-3xl font-semibold text-foreground">Welcome back</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          Sign in with Google, your email, or your mobile number.
+        </p>
+      </div>
       <GoogleSignInButton redirect={redirect} />
       <OrDivider />
       <Tabs value={method} onValueChange={(v) => setMethod(v as "email" | "phone")}>
