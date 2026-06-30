@@ -474,6 +474,100 @@ export type Database = {
           },
         ]
       }
+      paper_downloads: {
+        Row: {
+          created_at: string
+          id: string
+          paper_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          paper_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          paper_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paper_downloads_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "papers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      papers: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          download_count: number
+          exam_type: string
+          file_bucket: string | null
+          file_mime: string | null
+          file_path: string | null
+          file_size_bytes: number | null
+          id: string
+          paper_number: string | null
+          status: string
+          subject_id: string
+          title: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          download_count?: number
+          exam_type?: string
+          file_bucket?: string | null
+          file_mime?: string | null
+          file_path?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          paper_number?: string | null
+          status?: string
+          subject_id: string
+          title: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          download_count?: number
+          exam_type?: string
+          file_bucket?: string | null
+          file_mime?: string | null
+          file_path?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          paper_number?: string | null
+          status?: string
+          subject_id?: string
+          title?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "papers_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permissions: {
         Row: {
           created_at: string
