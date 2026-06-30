@@ -1,0 +1,1 @@
+UPDATE public.developer_profile SET photo_url = '/__l5e/assets-v1/4ea13222-07c5-45ca-a2a7-9305366dbbcf/dev-avatar.jpg', updated_at = now() WHERE id = 1;
