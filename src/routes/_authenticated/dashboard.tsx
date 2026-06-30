@@ -77,8 +77,49 @@ function DashboardPage() {
     },
   });
 
+  const notificationsQuery = useQuery({
+    queryKey: ["student-notifications", user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("id, kind, title, body, link, read_at, published_at")
+        .eq("user_id", user.id)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .order("published_at", { ascending: false })
+        .limit(8);
+      if (error) throw error;
+      return (data ?? []) as Array<{
+        id: string;
+        kind: "system" | "content" | "quiz" | "announcement";
+        title: string;
+        body: string | null;
+        link: string | null;
+        read_at: string | null;
+        published_at: string | null;
+      }>;
+    },
+  });
+
   const bookmarks = bookmarksQuery.data ?? [];
   const progress = progressQuery.data ?? [];
+  const notifications = notificationsQuery.data ?? [];
+  const unreadCount = notifications.filter((n) => !n.read_at).length;
+
+  async function markAllRead() {
+    if (unreadCount === 0) return;
+    const ids = notifications.filter((n) => !n.read_at).map((n) => n.id);
+    const { error } = await supabase
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .in("id", ids);
+    if (error) {
+      toast.error("Could not update notifications");
+      return;
+    }
+    await queryClient.invalidateQueries({ queryKey: ["student-notifications", user.id] });
+  }
+
 
   const [searchInput, setSearchInput] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
