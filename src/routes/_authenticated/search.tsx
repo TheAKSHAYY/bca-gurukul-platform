@@ -131,10 +131,11 @@ function SearchPage() {
             body={`Nothing found for "${debounced}". Try a different keyword.`}
           />
         ) : (
-          <div className="space-y-8">
+        <div className="space-y-8">
             <Group icon={GraduationCap} title="Courses" items={query.data!.courses} render={(c) => (
               <Link to="/courses/$courseSlug" params={{ courseSlug: c.slug ?? c.id }} className={linkClass}>
                 {c.title}
+                {c.description ? <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{c.description}</p> : null}
               </Link>
             )} />
             <Group icon={Layers} title="Semesters" items={query.data!.semesters} render={(s) => (
