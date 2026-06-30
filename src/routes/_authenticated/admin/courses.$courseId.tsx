@@ -391,37 +391,71 @@ function SemesterDialog({
   onOpenChange,
   courseId,
   nextNumber,
+  semester,
   onSaved,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   courseId: string;
   nextNumber: number;
+  semester?: {
+    id: string;
+    course_id: string;
+    number: number;
+    title: string;
+    status: Status;
+    description: string | null;
+  };
   onSaved: () => void;
 }) {
-  const [number, setNumber] = useState(nextNumber);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<Status>("draft");
+  const isEditing = Boolean(semester);
+  const [number, setNumber] = useState(semester?.number ?? nextNumber);
+  const [title, setTitle] = useState(semester?.title ?? "");
+  const [description, setDescription] = useState(semester?.description ?? "");
+  const [status, setStatus] = useState<Status>(semester?.status ?? "draft");
+
+  const reset = () => {
+    if (semester) {
+      setNumber(semester.number);
+      setTitle(semester.title);
+      setDescription(semester.description ?? "");
+      setStatus(semester.status);
+    } else {
+      setNumber(nextNumber);
+      setTitle("");
+      setDescription("");
+      setStatus("draft");
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("semesters").insert({
-        course_id: courseId,
+      const payload = {
         number,
         title: title.trim(),
         description: description.trim() || null,
         status,
-      });
-      if (error) throw error;
+      };
+      if (semester) {
+        const { error } = await supabase.from("semesters").update(payload).eq("id", semester.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("semesters").insert({
+          course_id: courseId,
+          ...payload,
+        });
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
-      toast.success("Semester added");
+      toast.success(isEditing ? "Semester updated" : "Semester added");
       onSaved();
       onOpenChange(false);
-      setTitle("");
-      setDescription("");
-      setStatus("draft");
+      if (!semester) {
+        setTitle("");
+        setDescription("");
+        setStatus("draft");
+      }
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -431,12 +465,12 @@ function SemesterDialog({
       open={open}
       onOpenChange={(v) => {
         onOpenChange(v);
-        if (v) setNumber(nextNumber);
+        if (v) reset();
       }}
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add semester</DialogTitle>
+          <DialogTitle>{isEditing ? "Edit semester" : "Add semester"}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-3">
           <div className="grid grid-cols-3 gap-3">
@@ -451,7 +485,12 @@ function SemesterDialog({
           </div>
           <div className="grid gap-1.5">
             <Label>Description</Label>
-            <Textarea rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
+            <Textarea
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Foundations: C, Maths, Digital Logic"
+            />
           </div>
           <div className="grid gap-1.5">
             <Label>Status</Label>
@@ -472,7 +511,7 @@ function SemesterDialog({
             Cancel
           </Button>
           <Button onClick={() => mutation.mutate()} disabled={!title || mutation.isPending}>
-            {mutation.isPending ? "Saving…" : "Add"}
+            {mutation.isPending ? "Saving…" : isEditing ? "Save" : "Add"}
           </Button>
         </DialogFooter>
       </DialogContent>
