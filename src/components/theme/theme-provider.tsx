@@ -1,6 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark" | "system";
+type Theme =
+  | "light"
+  | "dark"
+  | "midnight"
+  | "ocean"
+  | "emerald"
+  | "purple"
+  | "high-contrast"
+  | "system";
 
 type ThemeContextValue = {
   theme: Theme;
@@ -10,17 +18,35 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 const STORAGE_KEY = "bca-theme";
+const THEME_CLASSES: Exclude<Theme, "system" | "dark">[] = [
+  "light",
+  "midnight",
+  "ocean",
+  "emerald",
+  "purple",
+  "high-contrast",
+];
 
 function getSystemTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "light";
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+function isDarkMode(theme: Theme): boolean {
+  if (theme === "system") return getSystemTheme() === "dark";
+  return theme !== "light";
+}
+
 function applyTheme(theme: Theme): "light" | "dark" {
   const resolved = theme === "system" ? getSystemTheme() : theme;
   const root = document.documentElement;
-  root.classList.toggle("dark", resolved === "dark");
-  root.style.colorScheme = resolved;
+  root.dataset.theme = theme;
+  THEME_CLASSES.forEach((value) => root.classList.remove(value));
+  root.classList.toggle("dark", isDarkMode(theme));
+  if (theme !== "system" && theme !== "light") {
+    root.classList.add(theme);
+  }
+  root.style.colorScheme = isDarkMode(theme) ? "dark" : "light";
   return resolved;
 }
 

@@ -18,7 +18,7 @@ import { ScrollToTop } from "@/components/scroll-to-top";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
-const THEME_INIT_SCRIPT = `(function(){try{var k='bca-theme';var s=localStorage.getItem(k)||'system';var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;if(d)r.classList.add('dark');r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
+const THEME_INIT_SCRIPT = `(function(){try{var k='bca-theme';var s=localStorage.getItem(k)||'system';var r=document.documentElement;var isDark=function(t){if(t==='system'){return matchMedia('(prefers-color-scheme: dark)').matches;}return t!=='light';};var dark=isDark(s);if(dark)r.classList.add('dark');if(s!=='system'&&s!=='light'){r.classList.add(s);}r.dataset.theme=s;r.style.colorScheme=dark?'dark':'light';}catch(e){}})();`;
 
 
 function NotFoundComponent() {

@@ -96,6 +96,42 @@ function QuizEditor() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  if (quizQ.isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b border-border/60">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+            <Link to="/admin/quizzes" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="h-4 w-4" /> Back to quizzes
+            </Link>
+          </div>
+        </header>
+        <main className="mx-auto max-w-5xl px-6 py-10">
+          <div className="rounded-2xl border border-border bg-surface p-8 text-sm text-muted-foreground">Loading quiz…</div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!quizQ.data) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b border-border/60">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+            <Link to="/admin/quizzes" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="h-4 w-4" /> Back to quizzes
+            </Link>
+          </div>
+        </header>
+        <main className="mx-auto max-w-5xl px-6 py-10">
+          <div className="rounded-2xl border border-destructive bg-destructive/5 p-8 text-sm text-destructive">
+            Quiz not found. Return to the quiz list and pick a valid quiz to upload MCQs.
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">

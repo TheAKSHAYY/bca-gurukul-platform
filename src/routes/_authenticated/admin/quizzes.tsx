@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, FlaskConical, Plus, Pencil, Trash2, ExternalLink, Wrench, Sparkles } from "lucide-react";
+import { ArrowLeft, FlaskConical, Plus, Pencil, Trash2, ExternalLink, Upload, Sparkles } from "lucide-react";
 
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -149,7 +149,7 @@ function AdminQuizzesPage() {
                   tone="success"
                   title="No quizzes for this unit yet"
                   description="Add 8–10 conceptual MCQs to lock in the unit. Students get instant scoring with per-question explanations, and you'll see attempt analytics roll in on the dashboard."
-                  tip="Mix one easy recall question for every two application questions to keep momentum high."
+                  tip="Create a quiz first, then click Upload MCQs to paste questions in bulk or add them one by one."
                   primaryAction={{
                     label: "Create the first quiz",
                     icon: Sparkles,
@@ -171,7 +171,7 @@ function AdminQuizzesPage() {
                   <div className="flex items-center gap-2">
                     <Link to="/admin/quizzes/$quizId" params={{ quizId: q.id }}>
                       <Button variant="outline" size="sm">
-                        <Wrench className="mr-2 h-3.5 w-3.5" /> Questions
+                        <Upload className="mr-2 h-3.5 w-3.5" /> Upload MCQs
                       </Button>
                     </Link>
                     <Link to="/quizzes/$quizId" params={{ quizId: q.id }}>
