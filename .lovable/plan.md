@@ -1,78 +1,96 @@
-# BCA Gurukul → Enterprise No-Code CMS
+# Production MCQ System — Build Plan
 
-This is a multi-week build. To keep your app stable, I'll ship it in **10 sequenced phases**, each independently usable. Existing design system, routes, auth, and DB stay intact — we only extend.
+This is a large scope. Existing project already has `quizzes`, `quiz_questions`, `quiz_options`, `quiz_attempts`, `quiz_attempt_answers`, `bookmarks`, and the Course→Semester→Subject→Unit tree. I'll **extend** that, not replace it, and ship in phases so each is usable end-to-end.
 
-I'll wait for your approval on this plan, then execute phase by phase (asking before starting each new phase so you can re-prioritize).
+## Approach
 
----
+- Reuse `quizzes` table as "Tests". Add missing columns (negative_marking, randomize, schedule, public/private, passing_marks).
+- Reuse `quiz_questions` + `quiz_options` for the question bank. Add: difficulty, marks, negative_marks, tags, year, exam_name, image_url, university.
+- Add new tables only where existing ones don't fit: `question_reports`, `wrong_questions` (view), `daily_quiz`, `leaderboard_snapshots`, `student_stats` (materialized).
+- Extend `bookmarks` (already exists) to cover questions.
+- Server-side scoring already exists (`submit_quiz_attempt` RPC) — extend for negative marking, skipped tracking, and resume.
 
-## Phase 1 — Homepage Section Builder (WordPress-style)
-Goal: every landing-page section editable, reorderable, toggleable from `/admin/homepage`.
+## Phased Delivery
 
-- Extend `homepage_sections` with: `kind` (hero|about|features|why_us|universities|courses|categories|stats|testimonials|faculty|process|faq|blog|footer|contact|newsletter|cta), `content jsonb` (typed per kind), `style jsonb` (bg, gradient, colors), `visible`, `order_index`, `status` (draft|published), `published_content jsonb`.
-- Admin UI: section list with drag-reorder, add/duplicate/delete/hide, per-kind form (title, subtitle, description, images, buttons, links, bg/gradient), Save Draft / Publish / Preview (renders `/` with draft overlay).
-- Rewrite `src/routes/index.tsx` to render sections from DB in order; remove hardcoded copy.
+### Phase 1 — Data model + admin bulk tools  (foundation)
+- Migration: add columns to `quiz_questions` (difficulty, marks, negative_marks, tags text[], year, exam_name, university, image_url).
+- Migration: add columns to `quizzes` (negative_marking, randomize_questions, randomize_options, is_public, start_date, end_date, passing_marks).
+- New table: `question_reports` (user_id, question_id, reason, status).
+- New table: `daily_quiz` (date unique, question_id).
+- Extend `submit_quiz_attempt` RPC: negative marking, skipped count, resume support.
+- Admin: **Bulk MCQ paste/import** (paste 20 questions in a textbox → parse → preview → import). CSV import.
+- Admin: question editor with image upload, difficulty, tags, explanation, year, exam.
 
-## Phase 2 — Branding, Theme & SEO Manager
-- Extend `branding`: logo, logo_text, favicon, primary/secondary/accent colors, font_heading, font_body, radius, dark/light overrides.
-- `/admin/theme`: live color pickers writing CSS variables; font picker (Google Fonts allow-list); radius slider.
-- `/admin/seo`: per-route SEO table (`seo_meta`: path, title, description, keywords, og_image, twitter, robots, canonical). Root route reads it via server fn.
-- Auto-generated `sitemap.xml` + `robots.txt` server routes.
+### Phase 2 — Student practice mode
+- `/practice` route: pick Subject → Unit → filters (difficulty, count, timed/untimed, random).
+- Question UI: bookmark, report, palette, timer, prev/next, dark mode already supported.
+- Instant feedback mode (show correct + explanation after each answer).
+- Wrong-question auto-save (derived view over `quiz_attempt_answers`).
 
-## Phase 3 — Course Tree CMS (VS Code explorer)
-- Add `topics` table (under `units`) and `learning_contents` (typed: note|mcq|quiz|paper|assignment|video|pdf|download|flashcard|resource).
-- New `/admin/content` page: left tree (Course→Sem→Subject→Unit→Topic→Content) with create/rename/delete/duplicate/move/archive/publish, right pane = editor for selected node.
-- Keyboard nav, context menu, search-in-tree, bulk actions.
+### Phase 3 — Mock test mode
+- `/tests` list: filter by subject, semester, public/scheduled.
+- Real exam UI: fullscreen, autosave to `quiz_attempts.answers_draft`, resume, submit-confirm, auto-submit on timeout.
+- Result page: score, %, accuracy, time, topic breakdown, strong/weak areas, retake, share, PDF download (client-side via `jspdf`).
 
-## Phase 4 — Notion-style Notes Editor
-- Replace current note editor with **Tiptap** + extensions: headings, bold/italic/underline, highlight, image, video embed, PDF embed, tables, code blocks (lowlight syntax highlight), math (KaTeX), callouts, lists, checklists, links.
-- Autosave (debounced server fn), version history table `note_versions` with restore.
+### Phase 4 — PYQs + Search + Bookmarks
+- `/pyqs` filtered browser (year, exam, university, subject, unit).
+- Global question search with FTS index on question text + tags.
+- `/bookmarks/questions` — practice from bookmarks only.
+- `/wrong-questions` — retry only previously wrong ones.
 
-## Phase 5 — MCQ & Quiz Builder Pro
-- Manual builder (already partly done) + bulk import: CSV / JSON / XLSX parsers client-side, preview + commit.
-- Per-question: difficulty, tags, topic, negative marks, timer, explanation (rich), image, code block, shuffle flag.
-- Export (CSV/JSON), duplicate, import library.
+### Phase 5 — Analytics + Leaderboard
+- Student dashboard widgets: solved, accuracy, streak (already), avg score, weekly progress chart, weak subjects.
+- `/leaderboard` — weekly / monthly / all-time via SQL views.
+- Admin analytics: hardest questions, lowest-accuracy topics, most-active students, completion rate. Charts with Recharts.
 
-## Phase 6 — Media Library + Video Manager + PYQ
-- `/admin/media`: grid view of `media_assets` with folders (`media_folders`), search, rename, delete, multi-upload, drag-drop, type filters.
-- Video manager: source = youtube|vimeo|upload; thumbnail, duration, captions (vtt), description, attached resources.
-- PYQ upload form: year, university, course, semester, subject, unit, description, PDF preview & download tracker (already partial).
+### Phase 6 — Gamification + Daily Quiz
+- Daily Quiz card on dashboard.
+- Achievements table + badges (streak, 100 solved, first perfect score).
+- XP / level system derived from attempts.
 
-## Phase 7 — User & Role Management Console
-- `/admin/users`: list with filter by role, search, invite, change role (super_admin only), ban/suspend (`status` on profiles), soft-delete, activity timeline (from `audit_logs`+`user_sessions`).
-- Permissions matrix view (role × permission) backed by existing `role_permissions`.
+## Technical Details
 
-## Phase 8 — Global Search + Analytics Dashboard
-- Postgres FTS materialized view `search_index` over courses/subjects/units/topics/notes/papers/quizzes/users.
-- `/admin/search` + ⌘K everywhere (already partial — extend to all entities).
-- `/admin/analytics`: KPIs, most-viewed notes, most-attempted quizzes, downloads, traffic (from `user_sessions`), engagement funnels. Charts via `recharts`.
+**Reuse over rebuild.** Don't create parallel `subjects`, `units`, `questions`, `tests`, `attempts`, `answers` tables — the project already has them under different names. Duplicating would fork the whole app.
 
-## Phase 9 — Import / Export / Backup
-- Per-entity CSV/Excel/JSON export buttons.
-- Zip backup: server fn dumps selected tables to JSON + media manifest → downloadable zip.
-- Restore: upload zip → preview diff → commit (super_admin only).
+**RLS pattern (already in place):**
+- Students: read published quizzes/questions; write own attempts/answers/bookmarks/reports.
+- Admins: full CRUD via `has_role(auth.uid(), 'admin')`.
 
-## Phase 10 — AI-Ready Hooks + Polish
-- Buttons (disabled stubs wired to Lovable AI Gateway later): Generate Notes / MCQ / Quiz / Flashcards / Summary from a topic.
-- Performance pass: route-level code splitting, `React.lazy` for admin, virtualized tables (`@tanstack/react-virtual`) for long lists, image `loading="lazy"`, query caching tuning.
-- UX pass: skeletons, empty states, error states across every admin page; a11y audit; mobile admin layout.
+**Scoring stays server-side** (`submit_quiz_attempt` RPC). Client never sees `is_correct` for unsubmitted attempts (already enforced via `get_quiz_options` RPC).
 
----
+**Bulk paste parser** — accepts formats like:
+```
+Q: What is 2+2?
+A) 3
+B) 4 *
+C) 5
+D) 6
+E: Basic arithmetic.
+```
+The `*` marks correct answer. Parse client-side, preview table, insert in one transaction.
 
-## Cross-cutting rules I'll keep
+**Folder structure:**
+```
+src/routes/_authenticated/
+  practice.tsx, practice.$subjectId.tsx
+  tests.index.tsx, tests.$testId.tsx, tests.$testId.result.tsx
+  pyqs.tsx, leaderboard.tsx, wrong-questions.tsx
+  admin/questions.tsx, admin/questions.import.tsx, admin/test-builder.tsx
+src/components/mcq/
+  question-card.tsx, question-palette.tsx, exam-timer.tsx,
+  result-summary.tsx, difficulty-badge.tsx, bulk-paste-parser.tsx
+src/lib/mcq/
+  scoring.ts, parser.ts, analytics.functions.ts
+```
 
-- No hardcoded copy or colors in components — everything via DB + CSS tokens.
-- Every new table: GRANTs + RLS + `deleted_at` + audit trigger.
-- Draft/Publish on every content entity (`status` + `published_*` snapshot).
-- All writes go through `createServerFn` with `requireSupabaseAuth` + role check.
-- Existing routes, auth flow, design system untouched.
+## Estimated Scope
 
----
+~20 files per phase, ~6 migrations total, ~4-6 phases. Full build is roughly a week of dedicated work in one shot. Each phase is independently shippable.
 
-## What I need from you
+## Question for You
 
-1. **Approve the phase order** (or reshuffle — e.g., if you want Course Tree before Homepage Builder).
-2. Confirm I should **start with Phase 1 (Homepage Section Builder)** right after approval.
-3. Any section kinds I missed for Phase 1?
+1. **Start with Phase 1** (bulk import + expanded question editor) so you can actually upload MCQs faster right now? That's what your last message was about.
+2. Or start with a different phase?
+3. Any features to drop (e.g., PDF result, leaderboard, gamification) to keep scope tight?
 
-Reply "go" to start Phase 1, or tell me what to change.
+Reply with the phase order you want and I'll start.
