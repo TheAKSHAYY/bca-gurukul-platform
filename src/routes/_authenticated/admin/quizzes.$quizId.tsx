@@ -132,10 +132,22 @@ function QuizEditor() {
           )}
         </div>
 
-        <Button className="mt-6" onClick={() => addQuestion.mutate()}>
-          <Plus className="mr-2 h-4 w-4" /> Add question
-        </Button>
+        <div className="mt-6 flex flex-wrap gap-2">
+          <Button onClick={() => addQuestion.mutate()}>
+            <Plus className="mr-2 h-4 w-4" /> Add question
+          </Button>
+          <Button variant="outline" onClick={() => setBulkOpen(true)}>
+            <Sparkles className="mr-2 h-4 w-4" /> Bulk import
+          </Button>
+        </div>
       </main>
+
+      <BulkImportDialog
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        quizId={quizId}
+        onImported={() => qc.invalidateQueries({ queryKey: ["admin-quiz-questions", quizId] })}
+      />
     </div>
   );
 }
