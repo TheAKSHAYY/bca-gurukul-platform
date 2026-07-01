@@ -1,9 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  Shield, Palette, Search, Users, ScrollText, Flag, Activity, Database,
-} from "lucide-react";
+import { Shield, Palette, Search, Users, ScrollText, Flag, Activity, Database } from "lucide-react";
 
 import { getPlatformStats } from "@/lib/superadmin.functions";
 
@@ -13,11 +11,36 @@ export const Route = createFileRoute("/_authenticated/admin/superadmin/")({
 });
 
 const TILES = [
-  { to: "/admin/superadmin/users", icon: Users, title: "Users & Roles", desc: "Grant or revoke admin, instructor, and super admin access." },
-  { to: "/admin/superadmin/audit", icon: ScrollText, title: "Audit Log", desc: "Every privileged action, who did it, when, and from where." },
-  { to: "/admin/superadmin/flags", icon: Flag, title: "Feature Flags", desc: "Enable, disable, or kill-switch modules without redeploys." },
-  { to: "/admin/superadmin/branding", icon: Palette, title: "Branding & Theme", desc: "Logo, colors, typography, radius, and maintenance mode." },
-  { to: "/admin/superadmin/seo", icon: Search, title: "SEO Manager", desc: "Per-route titles, descriptions, Open Graph and robots rules." },
+  {
+    to: "/admin/superadmin/users",
+    icon: Users,
+    title: "Users & Roles",
+    desc: "Grant or revoke admin, instructor, and super admin access.",
+  },
+  {
+    to: "/admin/superadmin/audit",
+    icon: ScrollText,
+    title: "Audit Log",
+    desc: "Every privileged action, who did it, when, and from where.",
+  },
+  {
+    to: "/admin/superadmin/flags",
+    icon: Flag,
+    title: "Feature Flags",
+    desc: "Enable, disable, or kill-switch modules without redeploys.",
+  },
+  {
+    to: "/admin/superadmin/branding",
+    icon: Palette,
+    title: "Branding & Theme",
+    desc: "Logo, colors, typography, radius, and maintenance mode.",
+  },
+  {
+    to: "/admin/superadmin/seo",
+    icon: Search,
+    title: "SEO Manager",
+    desc: "Per-route titles, descriptions, Open Graph and robots rules.",
+  },
 ] as const;
 
 function SuperAdminHome() {
@@ -60,7 +83,9 @@ function SuperAdminHome() {
               <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
                 <m.icon className="h-3.5 w-3.5" /> {m.label}
               </div>
-              <div className="mt-2 font-display text-2xl font-semibold text-foreground">{m.value}</div>
+              <div className="mt-2 font-display text-2xl font-semibold text-foreground">
+                {m.value}
+              </div>
             </div>
           ))}
         </div>

@@ -76,8 +76,7 @@ function ProfilePage() {
   }
 
   const role = isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Student";
-  const initials =
-    (fullName || displayName || user?.email || "U").trim().slice(0, 2).toUpperCase();
+  const initials = (fullName || displayName || user?.email || "U").trim().slice(0, 2).toUpperCase();
 
   if (profile.isLoading) {
     return (
@@ -104,7 +103,9 @@ function ProfilePage() {
           </h1>
           <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
             <span>{user?.email}</span>
-            <Badge variant="secondary" className="text-[10px]">{role}</Badge>
+            <Badge variant="secondary" className="text-[10px]">
+              {role}
+            </Badge>
           </div>
         </div>
       </div>

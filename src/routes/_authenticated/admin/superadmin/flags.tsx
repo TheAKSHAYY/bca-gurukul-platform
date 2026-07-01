@@ -24,7 +24,8 @@ function FlagsPage() {
   });
 
   const updateMut = useMutation({
-    mutationFn: (vars: { key: string; enabled?: boolean; kill_switch?: boolean }) => update({ data: vars }),
+    mutationFn: (vars: { key: string; enabled?: boolean; kill_switch?: boolean }) =>
+      update({ data: vars }),
     onSuccess: () => {
       toast.success("Flag updated");
       qc.invalidateQueries({ queryKey: ["superadmin", "flags"] });
@@ -42,7 +43,10 @@ function FlagsPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin/superadmin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/admin/superadmin"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" /> Back to Super Admin
           </Link>
         </div>
@@ -55,7 +59,9 @@ function FlagsPage() {
         </p>
 
         {isLoading ? (
-          <div className="mt-8 rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted-foreground">Loading…</div>
+          <div className="mt-8 rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted-foreground">
+            Loading…
+          </div>
         ) : (flags ?? []).length === 0 ? (
           <div className="mt-8 rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted-foreground">
             No feature flags configured yet.
@@ -64,16 +70,23 @@ function FlagsPage() {
           <div className="mt-8 space-y-8">
             {Object.entries(grouped).map(([module, items]) => (
               <section key={module}>
-                <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-muted-foreground">{module}</h2>
+                <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  {module}
+                </h2>
                 <div className="mt-3 divide-y divide-border rounded-2xl border border-border bg-surface">
                   {(items ?? []).map((f) => (
                     <div key={f.key} className="flex items-start justify-between gap-4 p-4">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <Flag className="h-4 w-4 text-muted-foreground" />
-                          <code className="font-mono text-sm font-semibold text-foreground">{f.key}</code>
+                          <code className="font-mono text-sm font-semibold text-foreground">
+                            {f.key}
+                          </code>
                           {f.kill_switch && (
-                            <Badge variant="outline" className="border-destructive/40 bg-destructive/10 text-destructive">
+                            <Badge
+                              variant="outline"
+                              className="border-destructive/40 bg-destructive/10 text-destructive"
+                            >
                               <AlertTriangle className="mr-1 h-3 w-3" /> Killed
                             </Badge>
                           )}
@@ -96,7 +109,9 @@ function FlagsPage() {
                           <Switch
                             checked={f.kill_switch}
                             disabled={updateMut.isPending}
-                            onCheckedChange={(v) => updateMut.mutate({ key: f.key, kill_switch: v })}
+                            onCheckedChange={(v) =>
+                              updateMut.mutate({ key: f.key, kill_switch: v })
+                            }
                           />
                         </label>
                       </div>

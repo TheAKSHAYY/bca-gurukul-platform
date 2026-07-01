@@ -6,7 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PublicHeader } from "./courses.index";
 
-export const Route = createFileRoute("/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber")({
+export const Route = createFileRoute(
+  "/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber",
+)({
   head: () => ({ meta: [{ title: "Unit · BCA Gurukul" }] }),
   component: UnitDetail,
 });
@@ -18,19 +20,39 @@ function UnitDetail() {
     queryKey: ["public", "unit", courseSlug, semesterNumber, subjectSlug, unitNumber],
     queryFn: async () => {
       const { data: course } = await supabase
-        .from("courses").select("id, title").eq("slug", courseSlug).eq("status", "published").is("deleted_at", null).maybeSingle();
+        .from("courses")
+        .select("id, title")
+        .eq("slug", courseSlug)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .maybeSingle();
       if (!course) throw notFound();
       const { data: sem } = await supabase
-        .from("semesters").select("id, number, title").eq("course_id", course.id)
-        .eq("number", Number(semesterNumber)).eq("status", "published").is("deleted_at", null).maybeSingle();
+        .from("semesters")
+        .select("id, number, title")
+        .eq("course_id", course.id)
+        .eq("number", Number(semesterNumber))
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .maybeSingle();
       if (!sem) throw notFound();
       const { data: subject } = await supabase
-        .from("subjects").select("id, code, title").eq("semester_id", sem.id)
-        .eq("slug", subjectSlug).eq("status", "published").is("deleted_at", null).maybeSingle();
+        .from("subjects")
+        .select("id, code, title")
+        .eq("semester_id", sem.id)
+        .eq("slug", subjectSlug)
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .maybeSingle();
       if (!subject) throw notFound();
       const { data: unit } = await supabase
-        .from("units").select("id, number, title, summary").eq("subject_id", subject.id)
-        .eq("number", Number(unitNumber)).eq("status", "published").is("deleted_at", null).maybeSingle();
+        .from("units")
+        .select("id, number, title, summary")
+        .eq("subject_id", subject.id)
+        .eq("number", Number(unitNumber))
+        .eq("status", "published")
+        .is("deleted_at", null)
+        .maybeSingle();
       if (!unit) throw notFound();
 
       const { data: notes } = await supabase
@@ -86,11 +108,12 @@ function UnitDetail() {
                   {dataQuery.data.unit.title}
                 </h1>
                 {dataQuery.data.unit.summary && (
-                  <p className="mt-2 max-w-3xl text-muted-foreground">{dataQuery.data.unit.summary}</p>
+                  <p className="mt-2 max-w-3xl text-muted-foreground">
+                    {dataQuery.data.unit.summary}
+                  </p>
                 )}
               </div>
             </div>
-
 
             <section className="mt-10">
               <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-foreground">
@@ -125,7 +148,9 @@ function UnitDetail() {
                   >
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-primary" />
-                      <h3 className="font-display text-base font-semibold text-foreground">{n.title}</h3>
+                      <h3 className="font-display text-base font-semibold text-foreground">
+                        {n.title}
+                      </h3>
                       {n.file_path && <span className="text-xs text-muted-foreground">· PDF</span>}
                     </div>
                     {n.summary && <p className="mt-1 text-sm text-muted-foreground">{n.summary}</p>}

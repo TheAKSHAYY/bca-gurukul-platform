@@ -2,7 +2,16 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, FileText, Plus, Trash2, Upload, Pencil, ExternalLink, FilePlus } from "lucide-react";
+import {
+  ArrowLeft,
+  FileText,
+  Plus,
+  Trash2,
+  Upload,
+  Pencil,
+  ExternalLink,
+  FilePlus,
+} from "lucide-react";
 
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -56,10 +65,7 @@ function AdminNotesPage() {
   const coursesQuery = useQuery({
     queryKey: ["admin", "notes", "courses"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("courses")
-        .select("id, title")
-        .order("title");
+      const { data, error } = await supabase.from("courses").select("id, title").order("title");
       if (error) throw error;
       return data ?? [];
     },
@@ -151,7 +157,10 @@ function AdminNotesPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" /> Back to admin
           </Link>
         </div>
@@ -160,30 +169,71 @@ function AdminNotesPage() {
       <main className="mx-auto max-w-6xl px-6 py-10">
         <div className="flex items-center gap-3">
           <FileText className="h-6 w-6 text-primary" />
-          <h1 className="font-display text-3xl font-semibold text-foreground">Notes & study materials</h1>
+          <h1 className="font-display text-3xl font-semibold text-foreground">
+            Notes & study materials
+          </h1>
         </div>
         <p className="mt-2 max-w-2xl text-muted-foreground">
           Pick a unit, then upload PDFs and author rich notes for students.
         </p>
 
         <section className="mt-8 grid gap-4 rounded-2xl border border-border bg-surface p-5 sm:grid-cols-4">
-          <Picker label="Course" value={courseId} onChange={(v) => { setCourseId(v); setSemesterId(""); setSubjectId(""); setUnitId(""); }}
-            options={(coursesQuery.data ?? []).map((c) => ({ value: c.id, label: c.title }))} />
-          <Picker label="Semester" value={semesterId} onChange={(v) => { setSemesterId(v); setSubjectId(""); setUnitId(""); }}
+          <Picker
+            label="Course"
+            value={courseId}
+            onChange={(v) => {
+              setCourseId(v);
+              setSemesterId("");
+              setSubjectId("");
+              setUnitId("");
+            }}
+            options={(coursesQuery.data ?? []).map((c) => ({ value: c.id, label: c.title }))}
+          />
+          <Picker
+            label="Semester"
+            value={semesterId}
+            onChange={(v) => {
+              setSemesterId(v);
+              setSubjectId("");
+              setUnitId("");
+            }}
             disabled={!courseId}
-            options={(semestersQuery.data ?? []).map((s) => ({ value: s.id, label: `S${s.number} · ${s.title}` }))} />
-          <Picker label="Subject" value={subjectId} onChange={(v) => { setSubjectId(v); setUnitId(""); }}
+            options={(semestersQuery.data ?? []).map((s) => ({
+              value: s.id,
+              label: `S${s.number} · ${s.title}`,
+            }))}
+          />
+          <Picker
+            label="Subject"
+            value={subjectId}
+            onChange={(v) => {
+              setSubjectId(v);
+              setUnitId("");
+            }}
             disabled={!semesterId}
-            options={(subjectsQuery.data ?? []).map((s) => ({ value: s.id, label: `${s.code} · ${s.title}` }))} />
-          <Picker label="Unit" value={unitId} onChange={setUnitId}
+            options={(subjectsQuery.data ?? []).map((s) => ({
+              value: s.id,
+              label: `${s.code} · ${s.title}`,
+            }))}
+          />
+          <Picker
+            label="Unit"
+            value={unitId}
+            onChange={setUnitId}
             disabled={!subjectId}
-            options={(unitsQuery.data ?? []).map((u) => ({ value: u.id, label: `U${u.number} · ${u.title}` }))} />
+            options={(unitsQuery.data ?? []).map((u) => ({
+              value: u.id,
+              label: `U${u.number} · ${u.title}`,
+            }))}
+          />
         </section>
 
         {unitId && (
           <section className="mt-8">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl font-semibold text-foreground">Notes in this unit</h2>
+              <h2 className="font-display text-xl font-semibold text-foreground">
+                Notes in this unit
+              </h2>
               <Button onClick={openCreate}>
                 <Plus className="mr-2 h-4 w-4" /> New note
               </Button>
@@ -205,15 +255,24 @@ function AdminNotesPage() {
                 />
               )}
               {(notesQuery.data ?? []).map((n) => (
-                <div key={n.id} className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-border bg-surface p-4">
+                <div
+                  key={n.id}
+                  className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-border bg-surface p-4"
+                >
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-display text-base font-semibold text-foreground">{n.title}</h3>
-                      <Badge variant={n.status === "published" ? "default" : "secondary"}>{n.status}</Badge>
+                      <h3 className="font-display text-base font-semibold text-foreground">
+                        {n.title}
+                      </h3>
+                      <Badge variant={n.status === "published" ? "default" : "secondary"}>
+                        {n.status}
+                      </Badge>
                       <Badge variant="outline">{n.visibility}</Badge>
                       {n.file_path && <Badge variant="outline">PDF</Badge>}
                     </div>
-                    {n.summary && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{n.summary}</p>}
+                    {n.summary && (
+                      <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{n.summary}</p>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <Link to="/notes/$noteId" params={{ noteId: n.id }}>
@@ -269,7 +328,11 @@ type NoteRow = {
 };
 
 function Picker({
-  label, value, onChange, options, disabled,
+  label,
+  value,
+  onChange,
+  options,
+  disabled,
 }: {
   label: string;
   value: string;
@@ -286,7 +349,9 @@ function Picker({
         </SelectTrigger>
         <SelectContent>
           {options.map((o) => (
-            <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -295,7 +360,11 @@ function Picker({
 }
 
 function NoteDialog({
-  open, onOpenChange, unitId, editing, onSaved,
+  open,
+  onOpenChange,
+  unitId,
+  editing,
+  onSaved,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -370,7 +439,9 @@ function NoteDialog({
         toast.success("Note updated");
       } else {
         const { data: u } = await supabase.auth.getUser();
-        const { error } = await supabase.from("notes").insert({ ...payload, created_by: u.user?.id });
+        const { error } = await supabase
+          .from("notes")
+          .insert({ ...payload, created_by: u.user?.id });
         if (error) throw error;
         toast.success("Note created");
       }
@@ -392,10 +463,13 @@ function NoteDialog({
         <div className="grid gap-4">
           <div>
             <Label>Title</Label>
-            <Input value={title} onChange={(e) => {
-              setTitle(e.target.value);
-              if (!editing && !slug) setSlug(slugify(e.target.value));
-            }} />
+            <Input
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (!editing && !slug) setSlug(slugify(e.target.value));
+              }}
+            />
           </div>
           <div>
             <Label>Slug</Label>
@@ -413,7 +487,9 @@ function NoteDialog({
             <div>
               <Label>Status</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as Status)}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="draft">Draft</SelectItem>
                   <SelectItem value="published">Published</SelectItem>
@@ -424,7 +500,9 @@ function NoteDialog({
             <div>
               <Label>Visibility</Label>
               <Select value={visibility} onValueChange={(v) => setVisibility(v as Visibility)}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="public">Public</SelectItem>
                   <SelectItem value="authenticated">Signed-in only</SelectItem>
@@ -434,15 +512,28 @@ function NoteDialog({
             </div>
           </div>
           <div>
-            <Label>Attach PDF {editing?.file_path && <span className="text-xs text-muted-foreground">(replaces existing)</span>}</Label>
-            <Input type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            <Label>
+              Attach PDF{" "}
+              {editing?.file_path && (
+                <span className="text-xs text-muted-foreground">(replaces existing)</span>
+              )}
+            </Label>
+            <Input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
             {editing?.file_path && !file && (
-              <p className="mt-1 text-xs text-muted-foreground">Current: {editing.file_path.split("/").pop()}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Current: {editing.file_path.split("/").pop()}
+              </p>
             )}
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
           <Button onClick={save} disabled={uploading}>
             <Upload className="mr-2 h-4 w-4" />
             {uploading ? "Saving…" : "Save note"}
@@ -452,4 +543,3 @@ function NoteDialog({
     </Dialog>
   );
 }
-

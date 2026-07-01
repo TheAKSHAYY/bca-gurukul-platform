@@ -68,7 +68,11 @@ export const getContentTree = createServerFn({ method: "GET" })
     const sb = context.supabase;
     const [coursesRes, semestersRes, subjectsRes, unitsRes] = await Promise.all([
       sb.from("courses").select("id,title,sort_order").is("deleted_at", null).order("sort_order"),
-      sb.from("semesters").select("id,title,number,course_id").is("deleted_at", null).order("number"),
+      sb
+        .from("semesters")
+        .select("id,title,number,course_id")
+        .is("deleted_at", null)
+        .order("number"),
       sb.from("subjects").select("id,title,semester_id").is("deleted_at", null).order("title"),
       sb.from("units").select("id,title,subject_id").is("deleted_at", null).order("title"),
     ]);

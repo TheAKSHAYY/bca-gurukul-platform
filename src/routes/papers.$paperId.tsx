@@ -40,14 +40,18 @@ function PaperViewer() {
         .createSignedUrl(paperQuery.data!.file_path!, 60 * 60);
       if (!error && active) setPdfUrl(data?.signedUrl ?? null);
     })();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [paperQuery.data?.file_path, paperQuery.data?.file_bucket]);
 
   const recordDownload = async () => {
     if (!paperQuery.data?.id) return;
     const { data: u } = await supabase.auth.getUser();
     if (u.user) {
-      await supabase.from("paper_downloads").insert({ paper_id: paperQuery.data.id, user_id: u.user.id });
+      await supabase
+        .from("paper_downloads")
+        .insert({ paper_id: paperQuery.data.id, user_id: u.user.id });
     }
   };
 
@@ -55,7 +59,10 @@ function PaperViewer() {
     <div className="min-h-screen bg-background">
       <PublicHeader />
       <main className="mx-auto max-w-5xl px-6 py-10">
-        <Link to="/courses" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/courses"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to catalog
         </Link>
 
@@ -64,11 +71,15 @@ function PaperViewer() {
             <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
               <FileStack className="h-3.5 w-3.5" /> Previous-year paper
             </div>
-            <h1 className="mt-2 font-display text-4xl font-semibold text-foreground">{paperQuery.data.title}</h1>
+            <h1 className="mt-2 font-display text-4xl font-semibold text-foreground">
+              {paperQuery.data.title}
+            </h1>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <Badge>{paperQuery.data.year}</Badge>
               <Badge variant="outline">{paperQuery.data.exam_type.replace("_", " ")}</Badge>
-              {paperQuery.data.paper_number && <Badge variant="outline">#{paperQuery.data.paper_number}</Badge>}
+              {paperQuery.data.paper_number && (
+                <Badge variant="outline">#{paperQuery.data.paper_number}</Badge>
+              )}
             </div>
             {paperQuery.data.description && (
               <p className="mt-4 max-w-3xl text-muted-foreground">{paperQuery.data.description}</p>

@@ -11,7 +11,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/_authenticated/admin/quizzes/$quizId")({
   head: () => ({ meta: [{ title: "Quiz editor · Admin · BCA Gurukul" }] }),
@@ -47,7 +53,11 @@ function QuizEditor() {
   const quizQ = useQuery({
     queryKey: ["admin-quiz", quizId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("quizzes").select("*").eq("id", quizId).maybeSingle();
+      const { data, error } = await supabase
+        .from("quizzes")
+        .select("*")
+        .eq("id", quizId)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -57,11 +67,19 @@ function QuizEditor() {
     queryKey: ["admin-quiz-questions", quizId],
     queryFn: async () => {
       const { data: qs, error } = await supabase
-        .from("quiz_questions").select("*").eq("quiz_id", quizId).order("order_index").order("created_at");
+        .from("quiz_questions")
+        .select("*")
+        .eq("quiz_id", quizId)
+        .order("order_index")
+        .order("created_at");
       if (error) throw error;
       const ids = (qs ?? []).map((q) => q.id);
       const { data: opts, error: e2 } = ids.length
-        ? await supabase.from("quiz_options").select("*").in("question_id", ids).order("order_index")
+        ? await supabase
+            .from("quiz_options")
+            .select("*")
+            .in("question_id", ids)
+            .order("order_index")
         : { data: [], error: null };
       if (e2) throw e2;
       const byQ: Record<string, OptionRow[]> = {};
@@ -73,9 +91,16 @@ function QuizEditor() {
   const addQuestion = useMutation({
     mutationFn: async () => {
       const order_index = (questionsQ.data?.length ?? 0) + 1;
-      const { data, error } = await supabase.from("quiz_questions").insert({
-        quiz_id: quizId, prompt: "New question", type: "single", order_index,
-      }).select("id").single();
+      const { data, error } = await supabase
+        .from("quiz_questions")
+        .insert({
+          quiz_id: quizId,
+          prompt: "New question",
+          type: "single",
+          order_index,
+        })
+        .select("id")
+        .single();
       if (error) throw error;
       // seed two empty options
       await supabase.from("quiz_options").insert([
@@ -100,11 +125,18 @@ function QuizEditor() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-          <Link to="/admin/quizzes" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/admin/quizzes"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" /> Back to quizzes
           </Link>
           {quizQ.data && (
-            <Link to="/quizzes/$quizId" params={{ quizId }} className="text-sm text-muted-foreground hover:text-foreground">
+            <Link
+              to="/quizzes/$quizId"
+              params={{ quizId }}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
               Open student view →
             </Link>
           )}
@@ -113,17 +145,31 @@ function QuizEditor() {
       <main className="mx-auto max-w-5xl px-6 py-10">
         {quizQ.data && (
           <>
-            <h1 className="font-display text-3xl font-semibold text-foreground">{quizQ.data.title}</h1>
+            <h1 className="font-display text-3xl font-semibold text-foreground">
+              {quizQ.data.title}
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              <Badge variant={quizQ.data.status === "published" ? "default" : "secondary"}>{quizQ.data.status}</Badge>{" "}
-              · Pass {quizQ.data.passing_pct}% · {quizQ.data.time_limit_minutes ? `${quizQ.data.time_limit_minutes} min` : "no time limit"}
+              <Badge variant={quizQ.data.status === "published" ? "default" : "secondary"}>
+                {quizQ.data.status}
+              </Badge>{" "}
+              · Pass {quizQ.data.passing_pct}% ·{" "}
+              {quizQ.data.time_limit_minutes
+                ? `${quizQ.data.time_limit_minutes} min`
+                : "no time limit"}
             </p>
           </>
         )}
 
         <div className="mt-8 space-y-5">
           {(questionsQ.data ?? []).map((q, idx) => (
-            <QuestionCard key={q.id} index={idx + 1} question={q} onDelete={() => { if (confirm("Delete question?")) delQuestion.mutate(q.id); }} />
+            <QuestionCard
+              key={q.id}
+              index={idx + 1}
+              question={q}
+              onDelete={() => {
+                if (confirm("Delete question?")) delQuestion.mutate(q.id);
+              }}
+            />
           ))}
           {(questionsQ.data ?? []).length === 0 && (
             <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-sm text-muted-foreground">
@@ -152,7 +198,15 @@ function QuizEditor() {
   );
 }
 
-function QuestionCard({ index, question, onDelete }: { index: number; question: QuestionRow; onDelete: () => void }) {
+function QuestionCard({
+  index,
+  question,
+  onDelete,
+}: {
+  index: number;
+  question: QuestionRow;
+  onDelete: () => void;
+}) {
   const qc = useQueryClient();
   const [prompt, setPrompt] = useState(question.prompt);
   const [explanation, setExplanation] = useState(question.explanation ?? "");
@@ -172,25 +226,36 @@ function QuestionCard({ index, question, onDelete }: { index: number; question: 
   const saveQuestion = async () => {
     setSavingQ(true);
     try {
-      const { error } = await supabase.from("quiz_questions").update({
-        prompt: prompt.trim(),
-        explanation: explanation.trim() || null,
-        type,
-        points: Number(points) || 1,
-      }).eq("id", question.id);
+      const { error } = await supabase
+        .from("quiz_questions")
+        .update({
+          prompt: prompt.trim(),
+          explanation: explanation.trim() || null,
+          type,
+          points: Number(points) || 1,
+        })
+        .eq("id", question.id);
       if (error) throw error;
 
       // Persist all options
       for (const o of options) {
         if (o.id.startsWith("new-")) {
           const { error: e } = await supabase.from("quiz_options").insert({
-            question_id: question.id, text: o.text, is_correct: o.is_correct, order_index: o.order_index,
+            question_id: question.id,
+            text: o.text,
+            is_correct: o.is_correct,
+            order_index: o.order_index,
           });
           if (e) throw e;
         } else {
-          const { error: e } = await supabase.from("quiz_options").update({
-            text: o.text, is_correct: o.is_correct, order_index: o.order_index,
-          }).eq("id", o.id);
+          const { error: e } = await supabase
+            .from("quiz_options")
+            .update({
+              text: o.text,
+              is_correct: o.is_correct,
+              order_index: o.order_index,
+            })
+            .eq("id", o.id);
           if (e) throw e;
         }
       }
@@ -206,7 +271,13 @@ function QuestionCard({ index, question, onDelete }: { index: number; question: 
   const addOption = () => {
     setOptions((prev) => [
       ...prev,
-      { id: `new-${Math.random().toString(36).slice(2)}`, question_id: question.id, text: `Option ${prev.length + 1}`, is_correct: false, order_index: prev.length + 1 },
+      {
+        id: `new-${Math.random().toString(36).slice(2)}`,
+        question_id: question.id,
+        text: `Option ${prev.length + 1}`,
+        is_correct: false,
+        order_index: prev.length + 1,
+      },
     ]);
   };
 
@@ -219,12 +290,14 @@ function QuestionCard({ index, question, onDelete }: { index: number; question: 
   };
 
   const toggleCorrect = (o: OptionRow) => {
-    setOptions((prev) => prev.map((p) => {
-      if (type === "single" || type === "true_false") {
-        return { ...p, is_correct: p.id === o.id };
-      }
-      return p.id === o.id ? { ...p, is_correct: !p.is_correct } : p;
-    }));
+    setOptions((prev) =>
+      prev.map((p) => {
+        if (type === "single" || type === "true_false") {
+          return { ...p, is_correct: p.id === o.id };
+        }
+        return p.id === o.id ? { ...p, is_correct: !p.is_correct } : p;
+      }),
+    );
   };
 
   return (
@@ -245,7 +318,9 @@ function QuestionCard({ index, question, onDelete }: { index: number; question: 
           <div>
             <Label>Type</Label>
             <Select value={type} onValueChange={(v) => setType(v as QuestionType)}>
-              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="single">Single choice</SelectItem>
                 <SelectItem value="multiple">Multiple choice</SelectItem>
@@ -255,7 +330,13 @@ function QuestionCard({ index, question, onDelete }: { index: number; question: 
           </div>
           <div>
             <Label>Points</Label>
-            <Input type="number" min={0} step="0.5" value={points} onChange={(e) => setPoints(e.target.value)} />
+            <Input
+              type="number"
+              min={0}
+              step="0.5"
+              value={points}
+              onChange={(e) => setPoints(e.target.value)}
+            />
           </div>
         </div>
 
@@ -275,7 +356,11 @@ function QuestionCard({ index, question, onDelete }: { index: number; question: 
                 </Button>
                 <Input
                   value={o.text}
-                  onChange={(e) => setOptions((prev) => prev.map((p) => p.id === o.id ? { ...p, text: e.target.value } : p))}
+                  onChange={(e) =>
+                    setOptions((prev) =>
+                      prev.map((p) => (p.id === o.id ? { ...p, text: e.target.value } : p)),
+                    )
+                  }
                 />
                 <Button variant="outline" size="sm" onClick={() => removeOption(o)}>
                   <Trash2 className="h-3.5 w-3.5" />

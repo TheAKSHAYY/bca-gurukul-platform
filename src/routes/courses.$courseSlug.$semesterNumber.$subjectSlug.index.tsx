@@ -130,8 +130,12 @@ function SubjectDetail() {
                           {u.number}
                         </span>
                         <div>
-                          <h3 className="font-display text-lg font-semibold text-foreground">{u.title}</h3>
-                          {u.summary && <p className="mt-1 text-sm text-muted-foreground">{u.summary}</p>}
+                          <h3 className="font-display text-lg font-semibold text-foreground">
+                            {u.title}
+                          </h3>
+                          {u.summary && (
+                            <p className="mt-1 text-sm text-muted-foreground">{u.summary}</p>
+                          )}
                           <p className="mt-3 text-xs text-primary">Open unit →</p>
                         </div>
                       </div>
@@ -159,7 +163,9 @@ function SubjectDetail() {
                     className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface p-4 transition hover:border-primary"
                   >
                     <div>
-                      <div className="font-display text-base font-semibold text-foreground">{p.title}</div>
+                      <div className="font-display text-base font-semibold text-foreground">
+                        {p.title}
+                      </div>
                       <div className="mt-1 flex flex-wrap items-center gap-2">
                         <Badge>{p.year}</Badge>
                         <Badge variant="outline">{p.exam_type.replace("_", " ")}</Badge>

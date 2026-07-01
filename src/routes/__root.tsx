@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { MaintenanceGate } from "@/components/maintenance-gate";
@@ -19,7 +20,6 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const THEME_INIT_SCRIPT = `(function(){try{var k='bca-theme';var s=localStorage.getItem(k)||'system';var d=s==='dark'||(s==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;if(d)r.classList.add('dark');r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
-
 
 function NotFoundComponent() {
   return (
@@ -128,7 +128,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap",
       },
     ],
-
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -175,8 +174,8 @@ function RootComponent() {
         </MaintenanceGate>
         <ScrollToTop />
         <Toaster richColors position="top-center" />
+        <Analytics />
       </ThemeProvider>
     </QueryClientProvider>
   );
 }
-

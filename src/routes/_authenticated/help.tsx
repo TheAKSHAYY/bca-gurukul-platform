@@ -17,9 +17,24 @@ function HelpPage() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Card icon={HelpCircle} title="Getting started" body="Tour the dashboard, search and your bookmarks." to="/dashboard" />
-        <Card icon={MessageCircle} title="Contact a teacher" body="Reach out from any unit page." to="/courses" />
-        <Card icon={Mail} title="Email support" body="We'll get back within 1 business day." href="mailto:support@bcagurukul.app" />
+        <Card
+          icon={HelpCircle}
+          title="Getting started"
+          body="Tour the dashboard, search and your bookmarks."
+          to="/dashboard"
+        />
+        <Card
+          icon={MessageCircle}
+          title="Contact a teacher"
+          body="Reach out from any unit page."
+          to="/courses"
+        />
+        <Card
+          icon={Mail}
+          title="Email support"
+          body="We'll get back within 1 business day."
+          href="mailto:support@bcagurukul.app"
+        />
       </div>
     </div>
   );

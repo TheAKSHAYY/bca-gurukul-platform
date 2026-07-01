@@ -2,7 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
-import { BookOpen, FileText, GraduationCap, Layers, ListChecks, Loader2, Search } from "lucide-react";
+import {
+  BookOpen,
+  FileText,
+  GraduationCap,
+  Layers,
+  ListChecks,
+  Loader2,
+  Search,
+} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -77,7 +85,7 @@ function SearchPage() {
           if (hit.kind === "quiz") acc.quizzes.push(hit);
           return acc;
         },
-        { courses: [], semesters: [], subjects: [], units: [], notes: [], papers: [], quizzes: [] }
+        { courses: [], semesters: [], subjects: [], units: [], notes: [], papers: [], quizzes: [] },
       );
     },
   });
@@ -131,31 +139,86 @@ function SearchPage() {
             body={`Nothing found for "${debounced}". Try a different keyword.`}
           />
         ) : (
-        <div className="space-y-8">
-            <Group icon={GraduationCap} title="Courses" items={query.data!.courses} render={(c) => (
-              <Link to="/courses/$courseSlug" params={{ courseSlug: c.slug ?? c.id }} className={linkClass}>
-                {c.title}
-                {c.description ? <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{c.description}</p> : null}
-              </Link>
-            )} />
-            <Group icon={Layers} title="Semesters" items={query.data!.semesters} render={(s) => (
-              <Link to="/courses" className={linkClass}>{s.title}</Link>
-            )} />
-            <Group icon={BookOpen} title="Subjects" items={query.data!.subjects} render={(s) => (
-              <Link to="/courses" className={linkClass}>{s.title}</Link>
-            )} />
-            <Group icon={Layers} title="Units" items={query.data!.units} render={(u) => (
-              <Link to="/courses" className={linkClass}>{u.title}</Link>
-            )} />
-            <Group icon={FileText} title="Notes" items={query.data!.notes} render={(n) => (
-              <Link to="/notes/$noteId" params={{ noteId: n.id }} className={linkClass}>{n.title}</Link>
-            )} />
-            <Group icon={FileText} title="Papers" items={query.data!.papers} render={(p) => (
-              <Link to="/papers/$paperId" params={{ paperId: p.id }} className={linkClass}>{p.title}</Link>
-            )} />
-            <Group icon={ListChecks} title="Quizzes" items={query.data!.quizzes} render={(q) => (
-              <Link to="/quizzes/$quizId" params={{ quizId: q.id }} className={linkClass}>{q.title}</Link>
-            )} />
+          <div className="space-y-8">
+            <Group
+              icon={GraduationCap}
+              title="Courses"
+              items={query.data!.courses}
+              render={(c) => (
+                <Link
+                  to="/courses/$courseSlug"
+                  params={{ courseSlug: c.slug ?? c.id }}
+                  className={linkClass}
+                >
+                  {c.title}
+                  {c.description ? (
+                    <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+                      {c.description}
+                    </p>
+                  ) : null}
+                </Link>
+              )}
+            />
+            <Group
+              icon={Layers}
+              title="Semesters"
+              items={query.data!.semesters}
+              render={(s) => (
+                <Link to="/courses" className={linkClass}>
+                  {s.title}
+                </Link>
+              )}
+            />
+            <Group
+              icon={BookOpen}
+              title="Subjects"
+              items={query.data!.subjects}
+              render={(s) => (
+                <Link to="/courses" className={linkClass}>
+                  {s.title}
+                </Link>
+              )}
+            />
+            <Group
+              icon={Layers}
+              title="Units"
+              items={query.data!.units}
+              render={(u) => (
+                <Link to="/courses" className={linkClass}>
+                  {u.title}
+                </Link>
+              )}
+            />
+            <Group
+              icon={FileText}
+              title="Notes"
+              items={query.data!.notes}
+              render={(n) => (
+                <Link to="/notes/$noteId" params={{ noteId: n.id }} className={linkClass}>
+                  {n.title}
+                </Link>
+              )}
+            />
+            <Group
+              icon={FileText}
+              title="Papers"
+              items={query.data!.papers}
+              render={(p) => (
+                <Link to="/papers/$paperId" params={{ paperId: p.id }} className={linkClass}>
+                  {p.title}
+                </Link>
+              )}
+            />
+            <Group
+              icon={ListChecks}
+              title="Quizzes"
+              items={query.data!.quizzes}
+              render={(q) => (
+                <Link to="/quizzes/$quizId" params={{ quizId: q.id }} className={linkClass}>
+                  {q.title}
+                </Link>
+              )}
+            />
           </div>
         )}
       </div>
@@ -181,7 +244,8 @@ function Group<T extends SearchHit>({
   return (
     <section>
       <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        <Icon className="h-3.5 w-3.5" /> {title} <span className="text-muted-foreground/70">({items.length})</span>
+        <Icon className="h-3.5 w-3.5" /> {title}{" "}
+        <span className="text-muted-foreground/70">({items.length})</span>
       </h2>
       <div className="grid gap-2 sm:grid-cols-2">
         {items.map((it) => (

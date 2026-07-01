@@ -141,14 +141,19 @@ function BrandingPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-5">
-          <Link to="/admin/superadmin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/admin/superadmin"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" /> Super Admin
           </Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-6 py-10">
-        <h1 className="font-display text-3xl font-semibold text-foreground">Branding & Site Settings</h1>
+        <h1 className="font-display text-3xl font-semibold text-foreground">
+          Branding & Site Settings
+        </h1>
         <p className="mt-2 text-muted-foreground">
           The identity students see across the platform, emails, and shareable links.
         </p>
@@ -180,7 +185,10 @@ function BrandingPage() {
             <Input {...form.register("site_name")} />
           </Field>
           <Field label="Tagline" error={form.formState.errors.tagline?.message}>
-            <Input {...form.register("tagline")} placeholder="Short one-liner shown on the landing page" />
+            <Input
+              {...form.register("tagline")}
+              placeholder="Short one-liner shown on the landing page"
+            />
           </Field>
           <Field label="Logo wordmark" error={form.formState.errors.logo_text?.message}>
             <Input {...form.register("logo_text")} placeholder="Shown next to the logo mark" />
@@ -202,7 +210,8 @@ function BrandingPage() {
 
           <h2 className="pt-4 font-display text-lg font-semibold">Theme</h2>
           <p className="-mt-3 text-xs text-muted-foreground">
-            Colors accept any CSS value (oklch, hsl, hex). Leave blank to use the design-system default.
+            Colors accept any CSS value (oklch, hsl, hex). Leave blank to use the design-system
+            default.
           </p>
           <div className="grid gap-5 sm:grid-cols-3">
             <Field label="Primary" error={form.formState.errors.primary_color?.message}>
@@ -223,13 +232,7 @@ function BrandingPage() {
               <Input {...form.register("font_body")} placeholder="Inter" />
             </Field>
             <Field label="Radius (rem)" error={form.formState.errors.radius_rem?.message}>
-              <Input
-                type="number"
-                step="0.05"
-                min="0"
-                max="2"
-                {...form.register("radius_rem")}
-              />
+              <Input type="number" step="0.05" min="0" max="2" {...form.register("radius_rem")} />
             </Field>
           </div>
 

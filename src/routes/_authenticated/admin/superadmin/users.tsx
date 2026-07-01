@@ -16,10 +16,26 @@ export const Route = createFileRoute("/_authenticated/admin/superadmin/users")({
 });
 
 const ROLE_META: Record<AppRole, { label: string; icon: typeof Shield; tone: string }> = {
-  super_admin: { label: "Super admin", icon: ShieldCheck, tone: "bg-primary/10 text-primary border-primary/30" },
-  admin: { label: "Admin", icon: Shield, tone: "bg-accent/15 text-accent-foreground border-accent/30" },
-  instructor: { label: "Instructor", icon: UserCog, tone: "bg-muted text-foreground border-border" },
-  student: { label: "Student", icon: GraduationCap, tone: "bg-muted/60 text-muted-foreground border-border" },
+  super_admin: {
+    label: "Super admin",
+    icon: ShieldCheck,
+    tone: "bg-primary/10 text-primary border-primary/30",
+  },
+  admin: {
+    label: "Admin",
+    icon: Shield,
+    tone: "bg-accent/15 text-accent-foreground border-accent/30",
+  },
+  instructor: {
+    label: "Instructor",
+    icon: UserCog,
+    tone: "bg-muted text-foreground border-border",
+  },
+  student: {
+    label: "Student",
+    icon: GraduationCap,
+    tone: "bg-muted/60 text-muted-foreground border-border",
+  },
 };
 
 const ASSIGNABLE: AppRole[] = ["admin", "instructor", "super_admin"];
@@ -65,7 +81,10 @@ function UsersPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin/superadmin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/admin/superadmin"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" /> Back to Super Admin
           </Link>
         </div>
@@ -74,7 +93,8 @@ function UsersPage() {
       <main className="mx-auto max-w-6xl px-6 py-10">
         <h1 className="font-display text-3xl font-semibold text-foreground">Users &amp; Roles</h1>
         <p className="mt-2 text-muted-foreground">
-          Grant or revoke admin, instructor, and super admin access. Every change is recorded in the audit log.
+          Grant or revoke admin, instructor, and super admin access. Every change is recorded in the
+          audit log.
         </p>
 
         <div className="mt-6 flex items-center gap-3">
@@ -87,7 +107,9 @@ function UsersPage() {
               className="pl-9"
             />
           </div>
-          <div className="text-sm text-muted-foreground">{filtered.length} of {users?.length ?? 0}</div>
+          <div className="text-sm text-muted-foreground">
+            {filtered.length} of {users?.length ?? 0}
+          </div>
         </div>
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-surface">
@@ -110,11 +132,15 @@ function UsersPage() {
                   <tr key={u.user_id} className="border-b border-border/60 last:border-0">
                     <td className="px-4 py-3">
                       <div className="font-medium text-foreground">{u.full_name ?? "—"}</div>
-                      <div className="text-xs text-muted-foreground">{u.email ?? u.user_id.slice(0, 8)}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {u.email ?? u.user_id.slice(0, 8)}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1.5">
-                        {u.roles.length === 0 && <span className="text-xs text-muted-foreground">student</span>}
+                        {u.roles.length === 0 && (
+                          <span className="text-xs text-muted-foreground">student</span>
+                        )}
                         {u.roles.map((r) => {
                           const meta = ROLE_META[r];
                           const Icon = meta.icon;
@@ -145,7 +171,9 @@ function UsersPage() {
                                   : grantMut.mutate({ userId: u.user_id, role })
                               }
                             >
-                              {has ? `Revoke ${ROLE_META[role].label}` : `+ ${ROLE_META[role].label}`}
+                              {has
+                                ? `Revoke ${ROLE_META[role].label}`
+                                : `+ ${ROLE_META[role].label}`}
                             </Button>
                           );
                         })}

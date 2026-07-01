@@ -26,19 +26,19 @@ A production-grade, enterprise Learning Management System for BCA (Bachelor of C
 
 ## 🧱 Tech Stack
 
-| Layer | Choice |
-|---|---|
-| Framework | **TanStack Start v1** (React 19, SSR + server functions) |
-| Build | **Vite 7** |
-| Routing | **TanStack Router** (file-based, type-safe) |
-| Data | **TanStack Query v5** |
-| Forms | **React Hook Form + Zod** |
-| Styling | **Tailwind CSS v4** + semantic design tokens (`src/styles.css`) |
-| Components | **shadcn/ui** + Lucide icons |
-| Database | **PostgreSQL** (Supabase) — RLS, triggers, RPC, FTS |
-| Auth & Storage | **Supabase Auth** (email/OTP/Google), **Supabase Storage** |
-| Server | TanStack server functions on Cloudflare Workers (edge) |
-| Typography | **Fraunces** (display) + **Inter** (body) |
+| Layer          | Choice                                                          |
+| -------------- | --------------------------------------------------------------- |
+| Framework      | **TanStack Start v1** (React 19, SSR + server functions)        |
+| Build          | **Vite 7**                                                      |
+| Routing        | **TanStack Router** (file-based, type-safe)                     |
+| Data           | **TanStack Query v5**                                           |
+| Forms          | **React Hook Form + Zod**                                       |
+| Styling        | **Tailwind CSS v4** + semantic design tokens (`src/styles.css`) |
+| Components     | **shadcn/ui** + Lucide icons                                    |
+| Database       | **PostgreSQL** (Supabase) — RLS, triggers, RPC, FTS             |
+| Auth & Storage | **Supabase Auth** (email/OTP/Google), **Supabase Storage**      |
+| Server         | TanStack server functions on Cloudflare Workers (edge)          |
+| Typography     | **Fraunces** (display) + **Inter** (body)                       |
 
 ---
 
@@ -117,31 +117,31 @@ supabase/migrations/              # All schema changes (managed)
 
 Reachable from `/admin/superadmin`:
 
-| Module | What you can do |
-|---|---|
-| **Users & Roles** | Search every user, see their roles, grant/revoke admin / instructor / super admin. |
-| **Audit Log** | Filter by action, see actor email, IP, entity, metadata. |
-| **Feature Flags** | Per-module enable, rollout %, kill switch. |
-| **Branding & Theme** | Site name, logo, primary/accent colors, fonts, radius, maintenance mode. |
-| **SEO Manager** | Per-route titles, descriptions, OG, robots. |
-| **Homepage Builder** | Order, hide, and edit landing-page sections without touching code. |
-| **Developer CMS** | Portfolio profile, projects, skills, achievements, social links. |
-| **Inbox** | Contact-form messages with split-pane list/detail. |
-| **Explorer** | Hierarchical Course → Semester → Subject → Unit CRUD. |
+| Module               | What you can do                                                                    |
+| -------------------- | ---------------------------------------------------------------------------------- |
+| **Users & Roles**    | Search every user, see their roles, grant/revoke admin / instructor / super admin. |
+| **Audit Log**        | Filter by action, see actor email, IP, entity, metadata.                           |
+| **Feature Flags**    | Per-module enable, rollout %, kill switch.                                         |
+| **Branding & Theme** | Site name, logo, primary/accent colors, fonts, radius, maintenance mode.           |
+| **SEO Manager**      | Per-route titles, descriptions, OG, robots.                                        |
+| **Homepage Builder** | Order, hide, and edit landing-page sections without touching code.                 |
+| **Developer CMS**    | Portfolio profile, projects, skills, achievements, social links.                   |
+| **Inbox**            | Contact-form messages with split-pane list/detail.                                 |
+| **Explorer**         | Hierarchical Course → Semester → Subject → Unit CRUD.                              |
 
 ---
 
 ## 🧭 Routes cheat sheet
 
-| Path | Audience |
-|---|---|
-| `/` | Public — landing |
-| `/developer` | Public — developer portfolio |
-| `/auth`, `/setup` | Public — sign in / bootstrap |
-| `/dashboard`, `/search`, `/notes/*`, `/papers/*`, `/quizzes/*` | Authenticated students |
-| `/onboarding` | First sign-in flow |
-| `/admin/*` | `admin` or `super_admin` |
-| `/admin/superadmin/*` | `super_admin` only |
+| Path                                                           | Audience                     |
+| -------------------------------------------------------------- | ---------------------------- |
+| `/`                                                            | Public — landing             |
+| `/developer`                                                   | Public — developer portfolio |
+| `/auth`, `/setup`                                              | Public — sign in / bootstrap |
+| `/dashboard`, `/search`, `/notes/*`, `/papers/*`, `/quizzes/*` | Authenticated students       |
+| `/onboarding`                                                  | First sign-in flow           |
+| `/admin/*`                                                     | `admin` or `super_admin`     |
+| `/admin/superadmin/*`                                          | `super_admin` only           |
 
 ---
 

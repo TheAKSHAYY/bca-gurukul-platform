@@ -20,7 +20,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,9 +80,7 @@ function greeting() {
 
 function calcStreak(dates: string[]): number {
   if (!dates.length) return 0;
-  const days = new Set(
-    dates.map((d) => new Date(d).toISOString().slice(0, 10)),
-  );
+  const days = new Set(dates.map((d) => new Date(d).toISOString().slice(0, 10)));
   let streak = 0;
   const cursor = new Date();
   // allow today OR yesterday as the starting point
@@ -103,8 +100,7 @@ function DashboardPage() {
   const { user } = Route.useRouteContext();
   const queryClient = useQueryClient();
 
-  const fullName =
-    (user.user_metadata?.full_name as string | undefined) ?? user.email ?? "there";
+  const fullName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? "there";
   const firstName = fullName.split(" ")[0];
 
   // ---------- queries ----------
@@ -203,14 +199,21 @@ function DashboardPage() {
     await queryClient.invalidateQueries({ queryKey: ["student-notifications", user.id] });
   }
 
-
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
-
       <section className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary via-primary to-primary/85 p-8 text-primary-foreground sm:p-10">
-        <div aria-hidden className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-accent/35 blur-3xl" />
-        <div aria-hidden className="pointer-events-none absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-accent/15 blur-3xl" />
-        <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px]" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-accent/35 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-accent/15 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px]"
+        />
 
         <div className="relative">
           <div className="flex flex-wrap items-center gap-2">
@@ -251,7 +254,12 @@ function DashboardPage() {
                 </Link>
               </Button>
             )}
-            <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 bg-primary-foreground/5 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground">
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="border-primary-foreground/30 bg-primary-foreground/5 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
+            >
               <Link to="/search">
                 <Search className="mr-2 h-4 w-4" />
                 Quick search
@@ -286,7 +294,13 @@ function DashboardPage() {
           icon={<Award className="h-4 w-4" />}
           label="Avg quiz score"
           value={quizAttemptsQuery.isLoading ? null : avgScore !== null ? `${avgScore}%` : "—"}
-          hint={avgScore !== null ? (avgScore >= 70 ? "Great work" : "Room to climb") : "Take a quiz to begin"}
+          hint={
+            avgScore !== null
+              ? avgScore >= 70
+                ? "Great work"
+                : "Room to climb"
+              : "Take a quiz to begin"
+          }
           tone={avgScore !== null && avgScore >= 70 ? "success" : "default"}
         />
       </section>
@@ -327,7 +341,10 @@ function DashboardPage() {
               </div>
             </div>
             <div className="relative hidden bg-gradient-to-br from-primary/10 via-accent/10 to-transparent md:block">
-              <div aria-hidden className="absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,hsl(var(--primary)/0.12)_1px,transparent_0)] [background-size:18px_18px]" />
+              <div
+                aria-hidden
+                className="absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,hsl(var(--primary)/0.12)_1px,transparent_0)] [background-size:18px_18px]"
+              />
               <div className="relative grid h-full place-items-center p-6">
                 <BookOpen className="h-24 w-24 text-primary/30" strokeWidth={1.2} />
               </div>
@@ -343,10 +360,30 @@ function DashboardPage() {
           Jump straight into the part of the platform you need right now.
         </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <ActionCard to="/courses" icon={<BookOpen className="h-5 w-5" />} title="Notes" body="Read structured semester-wise notes." />
-          <ActionCard to="/courses" icon={<FileText className="h-5 w-5" />} title="Past papers" body="Practise with previous year question papers." />
-          <ActionCard to="/courses" icon={<PlayCircle className="h-5 w-5" />} title="Video lectures" body="Watch curated lectures alongside the syllabus." />
-          <ActionCard to="/courses" icon={<ListChecks className="h-5 w-5" />} title="MCQ practice" body="Take timed quizzes with explanations." />
+          <ActionCard
+            to="/courses"
+            icon={<BookOpen className="h-5 w-5" />}
+            title="Notes"
+            body="Read structured semester-wise notes."
+          />
+          <ActionCard
+            to="/courses"
+            icon={<FileText className="h-5 w-5" />}
+            title="Past papers"
+            body="Practise with previous year question papers."
+          />
+          <ActionCard
+            to="/courses"
+            icon={<PlayCircle className="h-5 w-5" />}
+            title="Video lectures"
+            body="Watch curated lectures alongside the syllabus."
+          />
+          <ActionCard
+            to="/courses"
+            icon={<ListChecks className="h-5 w-5" />}
+            title="MCQ practice"
+            body="Take timed quizzes with explanations."
+          />
         </div>
       </section>
 
@@ -356,7 +393,13 @@ function DashboardPage() {
           <CardHeader
             icon={<TrendingUp className="h-4 w-4" />}
             title="Continue learning"
-            action={progress.length > 0 ? <Link to="/courses" className="text-xs font-medium text-primary hover:underline">Browse all →</Link> : null}
+            action={
+              progress.length > 0 ? (
+                <Link to="/courses" className="text-xs font-medium text-primary hover:underline">
+                  Browse all →
+                </Link>
+              ) : null
+            }
           />
 
           {progressQuery.isLoading ? (
@@ -380,18 +423,29 @@ function DashboardPage() {
           ) : (
             <ul className="mt-5 space-y-3">
               {progress.map((p) => (
-                <li key={p.id} className="group rounded-xl border border-border/70 p-4 transition-colors hover:border-primary/30 hover:bg-surface-muted/40">
+                <li
+                  key={p.id}
+                  className="group rounded-xl border border-border/70 p-4 transition-colors hover:border-primary/30 hover:bg-surface-muted/40"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">{p.unit_title ?? "Untitled unit"}</p>
-                      <p className="mt-0.5 truncate text-xs text-muted-foreground">{p.subject_title ?? "—"}</p>
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {p.unit_title ?? "Untitled unit"}
+                      </p>
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                        {p.subject_title ?? "—"}
+                      </p>
                     </div>
-                    <span className={cn(
-                      "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium",
-                      p.status === "completed" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                        : p.status === "in_progress" ? "bg-primary/10 text-primary"
-                        : "bg-muted text-muted-foreground",
-                    )}>
+                    <span
+                      className={cn(
+                        "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium",
+                        p.status === "completed"
+                          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                          : p.status === "in_progress"
+                            ? "bg-primary/10 text-primary"
+                            : "bg-muted text-muted-foreground",
+                      )}
+                    >
                       {Math.round(Number(p.progress_pct))}%
                     </span>
                   </div>
@@ -407,7 +461,13 @@ function DashboardPage() {
             icon={<Bookmark className="h-4 w-4" />}
             title="Bookmarks"
             tone="accent"
-            action={bookmarks.length > 0 ? <Link to="/bookmarks" className="text-xs font-medium text-primary hover:underline">All →</Link> : null}
+            action={
+              bookmarks.length > 0 ? (
+                <Link to="/bookmarks" className="text-xs font-medium text-primary hover:underline">
+                  All →
+                </Link>
+              ) : null
+            }
           />
 
           {bookmarksQuery.isLoading ? (
@@ -438,7 +498,13 @@ function DashboardPage() {
           <CardHeader
             icon={<Trophy className="h-4 w-4" />}
             title="Recent quiz attempts"
-            action={attempts.length > 0 ? <Link to="/quizzes" className="text-xs font-medium text-primary hover:underline">All quizzes →</Link> : null}
+            action={
+              attempts.length > 0 ? (
+                <Link to="/quizzes" className="text-xs font-medium text-primary hover:underline">
+                  All quizzes →
+                </Link>
+              ) : null
+            }
           />
 
           {quizAttemptsQuery.isLoading ? (
@@ -461,12 +527,19 @@ function DashboardPage() {
               {attempts.slice(0, 6).map((a) => {
                 const pct = typeof a.pct === "number" ? Math.round(a.pct) : null;
                 return (
-                  <li key={a.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                  <li
+                    key={a.id}
+                    className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                  >
                     <div className="min-w-0 flex items-center gap-3">
-                      <div className={cn(
-                        "grid h-9 w-9 shrink-0 place-items-center rounded-lg text-xs font-semibold",
-                        a.passed ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-destructive/10 text-destructive",
-                      )}>
+                      <div
+                        className={cn(
+                          "grid h-9 w-9 shrink-0 place-items-center rounded-lg text-xs font-semibold",
+                          a.passed
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                            : "bg-destructive/10 text-destructive",
+                        )}
+                      >
                         {pct !== null ? `${pct}` : "–"}
                       </div>
                       <div className="min-w-0">
@@ -474,7 +547,12 @@ function DashboardPage() {
                           {a.quizzes?.title ?? "Quiz"}
                         </p>
                         <p className="text-[11px] text-muted-foreground">
-                          {a.submitted_at ? new Date(a.submitted_at).toLocaleDateString(undefined, { day: "numeric", month: "short" }) : ""}
+                          {a.submitted_at
+                            ? new Date(a.submitted_at).toLocaleDateString(undefined, {
+                                day: "numeric",
+                                month: "short",
+                              })
+                            : ""}
                           {" · "}
                           {a.passed ? "Passed" : "Did not pass"}
                         </p>
@@ -500,49 +578,77 @@ function DashboardPage() {
               <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
                 <Bell className="h-4 w-4" />
                 {unreadCount > 0 && (
-                  <span aria-hidden className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground">
+                  <span
+                    aria-hidden
+                    className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground"
+                  >
                     {unreadCount}
                   </span>
                 )}
               </div>
-              <h3 className="font-display text-base font-semibold text-foreground">Notifications</h3>
+              <h3 className="font-display text-base font-semibold text-foreground">
+                Notifications
+              </h3>
             </div>
             {unreadCount > 0 && (
-              <button onClick={markAllRead} className="text-[11px] font-medium text-primary hover:underline">
+              <button
+                onClick={markAllRead}
+                className="text-[11px] font-medium text-primary hover:underline"
+              >
                 Mark all read
               </button>
             )}
           </div>
 
           {notificationsQuery.isLoading ? (
-            <div className="mt-4 space-y-2"><Skeleton className="h-14 rounded-xl" /><Skeleton className="h-14 rounded-xl" /></div>
+            <div className="mt-4 space-y-2">
+              <Skeleton className="h-14 rounded-xl" />
+              <Skeleton className="h-14 rounded-xl" />
+            </div>
           ) : notifications.length === 0 ? (
             <div className="mt-4 rounded-xl border border-dashed border-border bg-surface-muted/40 p-4 text-center">
               <p className="text-sm font-medium text-foreground">You're all caught up</p>
-              <p className="mt-1 text-xs text-muted-foreground">We'll let you know when something new arrives.</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                We'll let you know when something new arrives.
+              </p>
             </div>
           ) : (
             <ul className="mt-4 space-y-2">
               {notifications.slice(0, 5).map((n) => {
                 const isUnread = !n.read_at;
                 const inner = (
-                  <div className={cn(
-                    "rounded-xl border px-3.5 py-3 transition-colors",
-                    isUnread ? "border-primary/30 bg-primary/5" : "border-border/60 bg-background hover:bg-surface-muted/40",
-                  )}>
+                  <div
+                    className={cn(
+                      "rounded-xl border px-3.5 py-3 transition-colors",
+                      isUnread
+                        ? "border-primary/30 bg-primary/5"
+                        : "border-border/60 bg-background hover:bg-surface-muted/40",
+                    )}
+                  >
                     <div className="flex items-center gap-2">
-                      {isUnread && <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />}
+                      {isUnread && (
+                        <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                      )}
                       <p className="truncate text-sm font-medium text-foreground">{n.title}</p>
                     </div>
-                    {n.body && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{n.body}</p>}
+                    {n.body && (
+                      <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{n.body}</p>
+                    )}
                     <p className="mt-1.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                      {n.kind}{n.published_at ? ` · ${new Date(n.published_at).toLocaleDateString()}` : ""}
+                      {n.kind}
+                      {n.published_at ? ` · ${new Date(n.published_at).toLocaleDateString()}` : ""}
                     </p>
                   </div>
                 );
                 return (
                   <li key={n.id}>
-                    {n.link ? <a href={n.link} className="block">{inner}</a> : inner}
+                    {n.link ? (
+                      <a href={n.link} className="block">
+                        {inner}
+                      </a>
+                    ) : (
+                      inner
+                    )}
                   </li>
                 );
               })}
@@ -578,8 +684,12 @@ function StatCard({
   return (
     <div className="rounded-2xl border border-border bg-surface p-4 transition-colors hover:border-primary/25">
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
-        <span className={cn("grid h-7 w-7 place-items-center rounded-lg ring-1", toneClass)}>{icon}</span>
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          {label}
+        </span>
+        <span className={cn("grid h-7 w-7 place-items-center rounded-lg ring-1", toneClass)}>
+          {icon}
+        </span>
       </div>
       <div className="mt-3 font-display text-2xl font-semibold text-foreground">
         {value === null ? <Skeleton className="h-7 w-16" /> : value}
@@ -603,10 +713,14 @@ function CardHeader({
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="flex items-center gap-2.5">
-        <div className={cn(
-          "grid h-9 w-9 place-items-center rounded-xl",
-          tone === "accent" ? "bg-accent/20 text-accent-foreground" : "bg-primary/10 text-primary",
-        )}>
+        <div
+          className={cn(
+            "grid h-9 w-9 place-items-center rounded-xl",
+            tone === "accent"
+              ? "bg-accent/20 text-accent-foreground"
+              : "bg-primary/10 text-primary",
+          )}
+        >
           {icon}
         </div>
         <h3 className="font-display text-base font-semibold text-foreground">{title}</h3>
@@ -626,7 +740,8 @@ function BookmarkLink({
   title: string | null;
 }) {
   const label = title ?? "Untitled";
-  const kindLabel = kind === "note" ? "Note" : kind === "paper" ? "Paper" : kind === "quiz" ? "Quiz" : "Unit";
+  const kindLabel =
+    kind === "note" ? "Note" : kind === "paper" ? "Paper" : kind === "quiz" ? "Quiz" : "Unit";
   const inner = (
     <div className="group flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-background px-3 py-2.5 transition-colors hover:border-primary/40 hover:bg-surface">
       <div className="min-w-0">
@@ -636,9 +751,24 @@ function BookmarkLink({
       <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
     </div>
   );
-  if (kind === "note") return <Link to="/notes/$noteId" params={{ noteId: refId }}>{inner}</Link>;
-  if (kind === "paper") return <Link to="/papers/$paperId" params={{ paperId: refId }}>{inner}</Link>;
-  if (kind === "quiz") return <Link to="/quizzes/$quizId" params={{ quizId: refId }}>{inner}</Link>;
+  if (kind === "note")
+    return (
+      <Link to="/notes/$noteId" params={{ noteId: refId }}>
+        {inner}
+      </Link>
+    );
+  if (kind === "paper")
+    return (
+      <Link to="/papers/$paperId" params={{ paperId: refId }}>
+        {inner}
+      </Link>
+    );
+  if (kind === "quiz")
+    return (
+      <Link to="/quizzes/$quizId" params={{ quizId: refId }}>
+        {inner}
+      </Link>
+    );
   return <Link to="/courses">{inner}</Link>;
 }
 
@@ -658,11 +788,16 @@ function ActionCard({
       to={to}
       className="group relative block overflow-hidden rounded-2xl border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
     >
-      <div aria-hidden className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100"
+      />
       <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
         {icon}
       </div>
-      <h3 className="relative mt-4 font-display text-base font-semibold text-foreground">{title}</h3>
+      <h3 className="relative mt-4 font-display text-base font-semibold text-foreground">
+        {title}
+      </h3>
       <p className="relative mt-1.5 text-sm text-muted-foreground">{body}</p>
       <div className="relative mt-4 inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
         Open
@@ -671,4 +806,3 @@ function ActionCard({
     </Link>
   );
 }
-

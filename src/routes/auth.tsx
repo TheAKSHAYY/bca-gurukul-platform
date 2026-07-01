@@ -17,7 +17,6 @@ import { GoogleSignInButton } from "@/components/auth/google-signin-button";
 import { resolvePostAuthRoute } from "@/lib/post-auth";
 import { BrandMark } from "@/components/brand-mark";
 
-
 const searchSchema = z.object({
   redirect: z.string().optional(),
   mode: z.enum(["signin", "signup", "forgot"]).optional(),
@@ -47,17 +46,13 @@ function AuthPage() {
     <div className="grid min-h-screen lg:grid-cols-2">
       {/* Left: brand panel */}
       <aside className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-        >
+        <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-accent/30 blur-3xl" />
           <div className="absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-accent/15 blur-3xl" />
           <div
             className="absolute inset-0 opacity-[0.06]"
             style={{
-              backgroundImage:
-                "radial-gradient(currentColor 1px, transparent 1px)",
+              backgroundImage: "radial-gradient(currentColor 1px, transparent 1px)",
               backgroundSize: "24px 24px",
               color: "currentColor",
             }}
@@ -78,11 +73,13 @@ function AuthPage() {
           <div>
             <Sparkles className="h-8 w-8 text-accent" />
             <h2 className="mt-5 max-w-md font-display text-4xl font-semibold leading-tight">
-              Your syllabus, organised.<br />Your time, respected.
+              Your syllabus, organised.
+              <br />
+              Your time, respected.
             </h2>
             <p className="mt-4 max-w-md text-sm text-primary-foreground/80">
-              Join thousands of BCA students using notes, past papers, video
-              lectures and MCQ practice — all in one place.
+              Join thousands of BCA students using notes, past papers, video lectures and MCQ
+              practice — all in one place.
             </p>
           </div>
 
@@ -261,9 +258,7 @@ function EmailSignInForm() {
           onCapsLockChange={setCapsOn}
           required
         />
-        {capsOn && (
-          <p className="text-xs font-medium text-accent-foreground">Caps Lock is on</p>
-        )}
+        {capsOn && <p className="text-xs font-medium text-accent-foreground">Caps Lock is on</p>}
       </div>
       <label className="flex items-center gap-2 text-sm text-muted-foreground">
         <Checkbox
@@ -388,9 +383,7 @@ function SignUpForm() {
             onCapsLockChange={setCapsOn}
             required
           />
-          {capsOn && (
-            <p className="text-xs font-medium text-accent-foreground">Caps Lock is on</p>
-          )}
+          {capsOn && <p className="text-xs font-medium text-accent-foreground">Caps Lock is on</p>}
           <PasswordStrengthMeter password={password} />
         </div>
         <Button type="submit" size="lg" className="w-full" disabled={loading}>
@@ -411,8 +404,6 @@ function SignUpForm() {
     </div>
   );
 }
-
-
 
 function ForgotForm() {
   const [email, setEmail] = useState("");
@@ -447,7 +438,8 @@ function ForgotForm() {
         </div>
         <h2 className="font-display text-lg font-semibold text-foreground">Check your inbox</h2>
         <p className="text-muted-foreground">
-          We sent a password reset link to <span className="font-medium text-foreground">{email}</span>. The link expires in 1 hour.
+          We sent a password reset link to{" "}
+          <span className="font-medium text-foreground">{email}</span>. The link expires in 1 hour.
         </p>
       </div>
     );
@@ -463,7 +455,15 @@ function ForgotForm() {
       </div>
       <div className="space-y-2">
         <Label htmlFor="forgot-email">Email</Label>
-        <Input id="forgot-email" type="email" autoComplete="email" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <Input
+          id="forgot-email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
       </div>
       <Button type="submit" size="lg" className="w-full" disabled={loading}>
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -25,7 +25,10 @@ function AuditPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin/superadmin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/admin/superadmin"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" /> Back to Super Admin
           </Link>
         </div>
@@ -34,7 +37,8 @@ function AuditPage() {
       <main className="mx-auto max-w-6xl px-6 py-10">
         <h1 className="font-display text-3xl font-semibold text-foreground">Audit Log</h1>
         <p className="mt-2 text-muted-foreground">
-          Tamper-evident timeline of every privileged action. Filter by action prefix (e.g. <code>role.</code>, <code>flag.</code>).
+          Tamper-evident timeline of every privileged action. Filter by action prefix (e.g.{" "}
+          <code>role.</code>, <code>flag.</code>).
         </p>
 
         <div className="mt-6 relative max-w-md">
@@ -51,7 +55,9 @@ function AuditPage() {
           {isLoading ? (
             <div className="p-10 text-center text-sm text-muted-foreground">Loading…</div>
           ) : (logs ?? []).length === 0 ? (
-            <div className="p-10 text-center text-sm text-muted-foreground">No audit events found.</div>
+            <div className="p-10 text-center text-sm text-muted-foreground">
+              No audit events found.
+            </div>
           ) : (
             <table className="w-full text-sm">
               <thead className="border-b border-border bg-muted/30 text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -70,15 +76,21 @@ function AuditPage() {
                       {new Date(row.created_at).toLocaleString()}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-foreground">{row.actor_email ?? "system"}</div>
+                      <div className="font-medium text-foreground">
+                        {row.actor_email ?? "system"}
+                      </div>
                       {row.ip && <div className="text-xs text-muted-foreground">{row.ip}</div>}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant="outline" className="font-mono text-[11px]">{row.action}</Badge>
+                      <Badge variant="outline" className="font-mono text-[11px]">
+                        {row.action}
+                      </Badge>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {row.entity_type && <div className="text-xs">{row.entity_type}</div>}
-                      {row.entity_id && <div className="font-mono text-[11px]">{row.entity_id.slice(0, 18)}…</div>}
+                      {row.entity_id && (
+                        <div className="font-mono text-[11px]">{row.entity_id.slice(0, 18)}…</div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       {row.metadata && (

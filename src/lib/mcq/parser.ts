@@ -61,9 +61,15 @@ export function parseMcqBulk(input: string): ParsedQuestion[] {
         else if (key === "D") {
           const d = val.toLowerCase();
           if (d === "easy" || d === "medium" || d === "hard") q.difficulty = d;
-        } else if (key === "T") q.tags = val.split(",").map((t) => t.trim()).filter(Boolean);
-        else if (key === "Y") { const n = parseInt(val, 10); if (!isNaN(n)) q.year = n; }
-        else if (key === "X") q.exam_name = val;
+        } else if (key === "T")
+          q.tags = val
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean);
+        else if (key === "Y") {
+          const n = parseInt(val, 10);
+          if (!isNaN(n)) q.year = n;
+        } else if (key === "X") q.exam_name = val;
         continue;
       }
 

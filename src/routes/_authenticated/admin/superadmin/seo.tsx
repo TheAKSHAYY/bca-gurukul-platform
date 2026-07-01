@@ -36,10 +36,7 @@ function SeoPage() {
   const list = useQuery({
     queryKey: ["seo-meta"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("seo_meta")
-        .select("*")
-        .order("path");
+      const { data, error } = await supabase.from("seo_meta").select("*").order("path");
       if (error) throw error;
       return (data ?? []) as Row[];
     },
@@ -181,8 +178,10 @@ function SeoForm({
     canonical: row.canonical ?? "",
   });
 
-  const f = <K extends keyof typeof form>(k: K) => (v: string) =>
-    setForm((prev) => ({ ...prev, [k]: v }));
+  const f =
+    <K extends keyof typeof form>(k: K) =>
+    (v: string) =>
+      setForm((prev) => ({ ...prev, [k]: v }));
 
   return (
     <div className="space-y-5">

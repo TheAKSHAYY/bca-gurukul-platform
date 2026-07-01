@@ -77,7 +77,9 @@ function CourseDetail() {
                 {courseQuery.data.title}
               </h1>
               {courseQuery.data.description && (
-                <p className="mt-3 max-w-3xl text-muted-foreground">{courseQuery.data.description}</p>
+                <p className="mt-3 max-w-3xl text-muted-foreground">
+                  {courseQuery.data.description}
+                </p>
               )}
             </div>
           </div>
@@ -105,8 +107,12 @@ function CourseDetail() {
                     {s.number}
                   </span>
                   <div>
-                    <div className="font-display text-base font-semibold text-foreground">{s.title}</div>
-                    {s.description && <div className="text-xs text-muted-foreground">{s.description}</div>}
+                    <div className="font-display text-base font-semibold text-foreground">
+                      {s.title}
+                    </div>
+                    {s.description && (
+                      <div className="text-xs text-muted-foreground">{s.description}</div>
+                    )}
                   </div>
                 </div>
               </Link>

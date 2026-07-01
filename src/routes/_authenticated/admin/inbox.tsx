@@ -45,10 +45,7 @@ function InboxPage() {
 
   const statusMut = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from("contact_messages")
-        .update({ status })
-        .eq("id", id);
+      const { error } = await supabase.from("contact_messages").update({ status }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-contact-messages"] }),
@@ -81,9 +78,7 @@ function InboxPage() {
             Messages from the developer page contact form.
           </p>
         </div>
-        {unread > 0 && (
-          <Badge className="bg-accent text-accent-foreground">{unread} new</Badge>
-        )}
+        {unread > 0 && <Badge className="bg-accent text-accent-foreground">{unread} new</Badge>}
       </div>
 
       {listQ.isLoading ? (
@@ -154,7 +149,9 @@ function InboxPage() {
                 </div>
                 <div className="flex gap-2">
                   <Button asChild size="sm" variant="outline">
-                    <a href={`mailto:${selected.email}?subject=Re:${encodeURIComponent(selected.subject || "your message")}`}>
+                    <a
+                      href={`mailto:${selected.email}?subject=Re:${encodeURIComponent(selected.subject || "your message")}`}
+                    >
                       <Mail className="mr-1.5 h-4 w-4" /> Reply
                     </a>
                   </Button>

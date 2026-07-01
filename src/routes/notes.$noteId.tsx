@@ -48,7 +48,9 @@ function NoteViewer() {
         .createSignedUrl(noteQuery.data!.file_path!, 60 * 60);
       if (!error && active) setPdfUrl(data?.signedUrl ?? null);
     })();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [noteQuery.data?.file_path, noteQuery.data?.file_bucket]);
 
   // record view (best-effort, signed-in users only)
@@ -81,7 +83,10 @@ function NoteViewer() {
     <div className="min-h-screen bg-background">
       <PublicHeader />
       <main className="mx-auto max-w-5xl px-6 py-10">
-        <Link to="/courses" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/courses"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to catalog
         </Link>
 
@@ -133,7 +138,9 @@ function NoteViewer() {
             {pdfUrl && (
               <section className="mt-8">
                 <div className="mb-3 flex items-center justify-between">
-                  <h2 className="font-display text-xl font-semibold text-foreground">PDF preview</h2>
+                  <h2 className="font-display text-xl font-semibold text-foreground">
+                    PDF preview
+                  </h2>
                   <a href={pdfUrl} target="_blank" rel="noreferrer" onClick={recordDownload}>
                     <Button variant="outline" size="sm">
                       <Download className="mr-2 h-4 w-4" /> Download

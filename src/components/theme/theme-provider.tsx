@@ -30,8 +30,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored =
-      (typeof window !== "undefined" &&
-        (localStorage.getItem(STORAGE_KEY) as Theme | null)) ||
+      (typeof window !== "undefined" && (localStorage.getItem(STORAGE_KEY) as Theme | null)) ||
       "system";
     setThemeState(stored);
     setResolved(applyTheme(stored));
@@ -56,9 +55,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, resolved, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={{ theme, resolved, setTheme }}>{children}</ThemeContext.Provider>
   );
 }
 

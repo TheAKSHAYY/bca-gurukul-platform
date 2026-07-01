@@ -43,7 +43,11 @@ function QuizPage() {
   const quizQ = useQuery({
     queryKey: ["public-quiz", quizId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("quizzes").select("*").eq("id", quizId).maybeSingle();
+      const { data, error } = await supabase
+        .from("quizzes")
+        .select("*")
+        .eq("id", quizId)
+        .maybeSingle();
       if (error) throw error;
       if (!data || data.status !== "published") throw notFound();
       return data;
@@ -54,7 +58,10 @@ function QuizPage() {
     queryKey: ["public-quiz-questions", quizId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("quiz_questions").select("*").eq("quiz_id", quizId).order("order_index");
+        .from("quiz_questions")
+        .select("*")
+        .eq("quiz_id", quizId)
+        .order("order_index");
       if (error) throw error;
       return (data ?? []) as Question[];
     },
@@ -74,7 +81,11 @@ function QuizPage() {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("quiz_attempts").select("*").eq("quiz_id", quizId).eq("user_id", user!.id).order("created_at", { ascending: false });
+        .from("quiz_attempts")
+        .select("*")
+        .eq("quiz_id", quizId)
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Attempt[];
     },
@@ -83,13 +94,18 @@ function QuizPage() {
   const [activeAttempt, setActiveAttempt] = useState<Attempt | null>(null);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [result, setResult] = useState<Attempt | null>(null);
-  const [resultAnswers, setResultAnswers] = useState<Record<string, { selected: string[]; is_correct: boolean | null }>>({});
+  const [resultAnswers, setResultAnswers] = useState<
+    Record<string, { selected: string[]; is_correct: boolean | null }>
+  >({});
 
   const startMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Sign in to take this quiz");
       const { data, error } = await supabase
-        .from("quiz_attempts").insert({ quiz_id: quizId, user_id: user.id }).select("*").single();
+        .from("quiz_attempts")
+        .insert({ quiz_id: quizId, user_id: user.id })
+        .select("*")
+        .single();
       if (error) throw error;
       return data as Attempt;
     },
@@ -117,9 +133,12 @@ function QuizPage() {
       setResult(a);
       setActiveAttempt(null);
       const { data: ans } = await supabase
-        .from("quiz_attempt_answers").select("question_id, selected_option_ids, is_correct").eq("attempt_id", a.id);
+        .from("quiz_attempt_answers")
+        .select("question_id, selected_option_ids, is_correct")
+        .eq("attempt_id", a.id);
       const map: Record<string, { selected: string[]; is_correct: boolean | null }> = {};
-      for (const r of ans ?? []) map[r.question_id] = { selected: r.selected_option_ids ?? [], is_correct: r.is_correct };
+      for (const r of ans ?? [])
+        map[r.question_id] = { selected: r.selected_option_ids ?? [], is_correct: r.is_correct };
       setResultAnswers(map);
       qc.invalidateQueries({ queryKey: ["public-quiz-attempts", quizId, user?.id] });
       toast.success(`Submitted — ${a.pct}%`);
@@ -137,7 +156,10 @@ function QuizPage() {
     <div className="min-h-screen bg-background">
       <PublicHeader />
       <main className="mx-auto max-w-3xl px-6 py-12">
-        <Link to="/courses" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/courses"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="h-4 w-4" /> All courses
         </Link>
 
@@ -145,23 +167,34 @@ function QuizPage() {
           <header className="mt-6">
             <div className="flex items-center gap-2">
               <FlaskConical className="h-6 w-6 text-primary" />
-              <h1 className="font-display text-3xl font-semibold text-foreground">{quizQ.data.title}</h1>
+              <h1 className="font-display text-3xl font-semibold text-foreground">
+                {quizQ.data.title}
+              </h1>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <Badge variant="outline">Pass {quizQ.data.passing_pct}%</Badge>
               {quizQ.data.time_limit_minutes && (
-                <Badge variant="outline"><Clock className="mr-1 h-3 w-3" />{quizQ.data.time_limit_minutes} min</Badge>
+                <Badge variant="outline">
+                  <Clock className="mr-1 h-3 w-3" />
+                  {quizQ.data.time_limit_minutes} min
+                </Badge>
               )}
               <Badge variant="outline">{(questionsQ.data ?? []).length} questions</Badge>
             </div>
-            {quizQ.data.description && <p className="mt-3 text-muted-foreground">{quizQ.data.description}</p>}
+            {quizQ.data.description && (
+              <p className="mt-3 text-muted-foreground">{quizQ.data.description}</p>
+            )}
           </header>
         )}
 
         {!user && (
           <div className="mt-8 rounded-xl border border-border bg-surface p-6 text-center">
-            <p className="text-muted-foreground">Sign in to take this quiz and track your results.</p>
-            <Link to="/auth" className="mt-3 inline-block"><Button>Sign in</Button></Link>
+            <p className="text-muted-foreground">
+              Sign in to take this quiz and track your results.
+            </p>
+            <Link to="/auth" className="mt-3 inline-block">
+              <Button>Sign in</Button>
+            </Link>
           </div>
         )}
 
@@ -178,14 +211,23 @@ function QuizPage() {
 
             {(myAttemptsQ.data ?? []).filter((a) => a.submitted_at).length > 0 && (
               <div className="mt-6">
-                <h2 className="font-display text-lg font-semibold text-foreground">Your previous attempts</h2>
+                <h2 className="font-display text-lg font-semibold text-foreground">
+                  Your previous attempts
+                </h2>
                 <ul className="mt-2 space-y-2">
-                  {(myAttemptsQ.data ?? []).filter((a) => a.submitted_at).map((a) => (
-                    <li key={a.id} className="rounded-lg border border-border bg-surface px-4 py-3 text-sm">
-                      <span className="font-medium">{a.pct}%</span> · {a.score}/{a.max_score} ·{" "}
-                      <Badge variant={a.passed ? "default" : "secondary"}>{a.passed ? "Passed" : "Did not pass"}</Badge>
-                    </li>
-                  ))}
+                  {(myAttemptsQ.data ?? [])
+                    .filter((a) => a.submitted_at)
+                    .map((a) => (
+                      <li
+                        key={a.id}
+                        className="rounded-lg border border-border bg-surface px-4 py-3 text-sm"
+                      >
+                        <span className="font-medium">{a.pct}%</span> · {a.score}/{a.max_score} ·{" "}
+                        <Badge variant={a.passed ? "default" : "secondary"}>
+                          {a.passed ? "Passed" : "Did not pass"}
+                        </Badge>
+                      </li>
+                    ))}
                 </ul>
               </div>
             )}
@@ -213,10 +255,14 @@ function QuizPage() {
         {result && (
           <section className="mt-8 space-y-6">
             <div className="rounded-2xl border border-border bg-surface p-6">
-              <div className="font-display text-3xl font-semibold text-foreground">{result.pct}%</div>
+              <div className="font-display text-3xl font-semibold text-foreground">
+                {result.pct}%
+              </div>
               <p className="text-sm text-muted-foreground">
                 Score {result.score}/{result.max_score} ·{" "}
-                <Badge variant={result.passed ? "default" : "secondary"}>{result.passed ? "Passed" : "Did not pass"}</Badge>
+                <Badge variant={result.passed ? "default" : "secondary"}>
+                  {result.passed ? "Passed" : "Did not pass"}
+                </Badge>
               </p>
             </div>
 
@@ -240,8 +286,16 @@ function QuizPage() {
                     {opts.map((o) => {
                       const picked = r?.selected.includes(o.id);
                       return (
-                        <li key={o.id} className={`rounded-md border px-3 py-2 ${picked ? "border-primary bg-primary/5" : "border-border"}`}>
-                          {o.text} {picked && <span className="ml-2 text-xs text-muted-foreground">(your answer)</span>}
+                        <li
+                          key={o.id}
+                          className={`rounded-md border px-3 py-2 ${picked ? "border-primary bg-primary/5" : "border-border"}`}
+                        >
+                          {o.text}{" "}
+                          {picked && (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                              (your answer)
+                            </span>
+                          )}
                         </li>
                       );
                     })}
@@ -255,7 +309,15 @@ function QuizPage() {
               );
             })}
 
-            <Button variant="outline" onClick={() => { setResult(null); setResultAnswers({}); }}>Done</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setResult(null);
+                setResultAnswers({});
+              }}
+            >
+              Done
+            </Button>
           </section>
         )}
       </main>
@@ -263,7 +325,13 @@ function QuizPage() {
   );
 }
 
-function QuestionView({ index, question, options, selected, onChange }: {
+function QuestionView({
+  index,
+  question,
+  options,
+  selected,
+  onChange,
+}: {
   index: number;
   question: Question;
   options: Option[];
@@ -285,7 +353,9 @@ function QuestionView({ index, question, options, selected, onChange }: {
           const checked = selected.includes(o.id);
           return (
             <li key={o.id}>
-              <label className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 transition ${checked ? "border-primary bg-primary/5" : "border-border"}`}>
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 transition ${checked ? "border-primary bg-primary/5" : "border-border"}`}
+              >
                 {multi ? (
                   <Checkbox
                     checked={checked}

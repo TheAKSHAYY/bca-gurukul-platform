@@ -11,7 +11,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 const ICONS: Record<NodeType, typeof BookOpen> = {
@@ -65,19 +69,21 @@ export function ExplorerDetail({ node }: { node: ExplorerNode | null }) {
       if (!node || !form) return;
       const hasSlug = node.type === "course" || node.type === "subject";
       const hasNumber = node.type === "semester" || node.type === "unit";
-      await update({ data: {
-        type: node.type,
-        id: node.id,
-        patch: {
-          name: form.name,
-          status: form.status,
-          ...(node.type === "unit"
-            ? { summary: form.summary || null }
-            : { description: form.description || null }),
-          ...(hasSlug ? { slug: form.slug || null, code: form.code || null } : {}),
-          ...(hasNumber && form.number !== "" ? { number: Number(form.number) } : {}),
+      await update({
+        data: {
+          type: node.type,
+          id: node.id,
+          patch: {
+            name: form.name,
+            status: form.status,
+            ...(node.type === "unit"
+              ? { summary: form.summary || null }
+              : { description: form.description || null }),
+            ...(hasSlug ? { slug: form.slug || null, code: form.code || null } : {}),
+            ...(hasNumber && form.number !== "" ? { number: Number(form.number) } : {}),
+          },
         },
-      } });
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "explorer-tree"] });
@@ -95,7 +101,8 @@ export function ExplorerDetail({ node }: { node: ExplorerNode | null }) {
           </div>
           <h3 className="font-display text-lg font-medium">Select an item</h3>
           <p className="text-sm text-muted-foreground">
-            Pick a course, semester, subject, or unit from the tree on the left, or right-click to create a new one.
+            Pick a course, semester, subject, or unit from the tree on the left, or right-click to
+            create a new one.
           </p>
         </div>
       </div>
@@ -114,7 +121,10 @@ export function ExplorerDetail({ node }: { node: ExplorerNode | null }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>{TYPE_LABEL[node.type]}</span>
-            <Badge variant={node.status === "published" ? "default" : "outline"} className="h-4 px-1.5 text-[10px]">
+            <Badge
+              variant={node.status === "published" ? "default" : "outline"}
+              className="h-4 px-1.5 text-[10px]"
+            >
               {node.status}
             </Badge>
           </div>
@@ -144,7 +154,9 @@ export function ExplorerDetail({ node }: { node: ExplorerNode | null }) {
                 value={form.status}
                 onValueChange={(v) => setForm({ ...form, status: v as FormState["status"] })}
               >
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="draft">Draft</SelectItem>
                   <SelectItem value="published">Published</SelectItem>
@@ -162,7 +174,10 @@ export function ExplorerDetail({ node }: { node: ExplorerNode | null }) {
                   min={1}
                   value={form.number}
                   onChange={(e) =>
-                    setForm({ ...form, number: e.target.value === "" ? "" : Number(e.target.value) })
+                    setForm({
+                      ...form,
+                      number: e.target.value === "" ? "" : Number(e.target.value),
+                    })
                   }
                 />
               </div>
@@ -191,9 +206,7 @@ export function ExplorerDetail({ node }: { node: ExplorerNode | null }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="desc">
-              {node.type === "unit" ? "Summary" : "Description"}
-            </Label>
+            <Label htmlFor="desc">{node.type === "unit" ? "Summary" : "Description"}</Label>
             <Textarea
               id="desc"
               rows={6}
@@ -209,18 +222,18 @@ export function ExplorerDetail({ node }: { node: ExplorerNode | null }) {
                 node.type === "course"
                   ? "Tell students what this course covers…"
                   : node.type === "semester"
-                  ? "What this semester focuses on…"
-                  : node.type === "subject"
-                  ? "Subject scope, prerequisites, outcomes…"
-                  : "Short summary of this unit…"
+                    ? "What this semester focuses on…"
+                    : node.type === "subject"
+                      ? "Subject scope, prerequisites, outcomes…"
+                      : "Short summary of this unit…"
               }
             />
           </div>
 
           <div className="rounded-lg border border-border/60 bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
             <span className="font-medium text-foreground">{node.childCount}</span>{" "}
-            {node.type === "unit" ? "items" : "children"} ·
-            position <span className="font-medium text-foreground">{node.position}</span>
+            {node.type === "unit" ? "items" : "children"} · position{" "}
+            <span className="font-medium text-foreground">{node.position}</span>
           </div>
         </div>
       </div>

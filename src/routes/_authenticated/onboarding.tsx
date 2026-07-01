@@ -103,19 +103,17 @@ function OnboardingPage() {
       return;
     }
     setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(
-        {
-          user_id: user.id,
-          full_name: parsed.data.fullName,
-          display_name: parsed.data.fullName.split(" ")[0],
-          current_course_id: parsed.data.courseId,
-          current_semester_id: parsed.data.semesterId,
-          onboarded_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" },
-      );
+    const { error } = await supabase.from("profiles").upsert(
+      {
+        user_id: user.id,
+        full_name: parsed.data.fullName,
+        display_name: parsed.data.fullName.split(" ")[0],
+        current_course_id: parsed.data.courseId,
+        current_semester_id: parsed.data.semesterId,
+        onboarded_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
     setSaving(false);
     if (error) {
       toast.error(error.message);
@@ -147,7 +145,10 @@ function OnboardingPage() {
         </div>
       </div>
 
-      <form onSubmit={submit} className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <form
+        onSubmit={submit}
+        className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-sm"
+      >
         <div className="space-y-2">
           <Label htmlFor="full-name">Full name</Label>
           <Input
@@ -171,7 +172,9 @@ function OnboardingPage() {
             disabled={coursesQuery.isLoading}
           >
             <SelectTrigger id="course">
-              <SelectValue placeholder={coursesQuery.isLoading ? "Loading…" : "Choose your course"} />
+              <SelectValue
+                placeholder={coursesQuery.isLoading ? "Loading…" : "Choose your course"}
+              />
             </SelectTrigger>
             <SelectContent>
               {(coursesQuery.data ?? []).map((c) => (
@@ -198,7 +201,11 @@ function OnboardingPage() {
             <SelectTrigger id="semester">
               <SelectValue
                 placeholder={
-                  !courseId ? "Pick a course first" : semestersQuery.isLoading ? "Loading…" : "Choose your semester"
+                  !courseId
+                    ? "Pick a course first"
+                    : semestersQuery.isLoading
+                      ? "Loading…"
+                      : "Choose your semester"
                 }
               />
             </SelectTrigger>

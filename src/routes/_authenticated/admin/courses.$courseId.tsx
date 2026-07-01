@@ -45,7 +45,11 @@ function CourseTreePage() {
   const courseQuery = useQuery({
     queryKey: ["admin", "course", courseId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("courses").select("*").eq("id", courseId).single();
+      const { data, error } = await supabase
+        .from("courses")
+        .select("*")
+        .eq("id", courseId)
+        .single();
       if (error) throw error;
       return data;
     },
@@ -91,7 +95,9 @@ function CourseTreePage() {
           <div className="flex items-center gap-3">
             <Layers className="h-6 w-6 text-primary" />
             <div>
-              <h1 className="font-display text-3xl font-semibold text-foreground">{courseQuery.data.title}</h1>
+              <h1 className="font-display text-3xl font-semibold text-foreground">
+                {courseQuery.data.title}
+              </h1>
               <p className="text-sm text-muted-foreground">
                 <span className="font-mono uppercase">{courseQuery.data.code}</span> ·{" "}
                 {courseQuery.data.total_semesters} semesters
@@ -105,13 +111,19 @@ function CourseTreePage() {
           {semestersQuery.data && semestersQuery.data.length === 0 && (
             <div className="rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
               <p className="font-display text-lg text-foreground">No semesters yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">Add the first semester to begin structuring this course.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Add the first semester to begin structuring this course.
+              </p>
             </div>
           )}
 
           <Accordion type="multiple" className="space-y-3">
             {semestersQuery.data?.map((sem) => (
-              <SemesterCard key={sem.id} sem={{ ...sem, status: sem.status as Status }} onChange={invalidateAll} />
+              <SemesterCard
+                key={sem.id}
+                sem={{ ...sem, status: sem.status as Status }}
+                onChange={invalidateAll}
+              />
             ))}
           </Accordion>
         </section>
@@ -184,7 +196,9 @@ function SemesterCard({
           </div>
           <div className="text-left">
             <div className="font-display text-base font-semibold text-foreground">{sem.title}</div>
-            {sem.description && <div className="text-xs text-muted-foreground">{sem.description}</div>}
+            {sem.description && (
+              <div className="text-xs text-muted-foreground">{sem.description}</div>
+            )}
           </div>
           <Badge className="ml-auto" variant={sem.status === "published" ? "default" : "secondary"}>
             {sem.status}
@@ -205,7 +219,11 @@ function SemesterCard({
               size="sm"
               variant="ghost"
               onClick={() => {
-                if (confirm(`Delete semester ${sem.number}? Subjects and units inside will also be deleted.`)) {
+                if (
+                  confirm(
+                    `Delete semester ${sem.number}? Subjects and units inside will also be deleted.`,
+                  )
+                ) {
                   removeSem.mutate();
                 }
               }}
@@ -307,9 +325,14 @@ function SubjectRow({
         <BookText className="h-4 w-4 text-primary" />
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{sub.code}</span>
+            <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+              {sub.code}
+            </span>
             <span className="font-display text-sm font-semibold text-foreground">{sub.title}</span>
-            <Badge variant={sub.status === "published" ? "default" : "secondary"} className="text-[10px]">
+            <Badge
+              variant={sub.status === "published" ? "default" : "secondary"}
+              className="text-[10px]"
+            >
               {sub.status}
             </Badge>
           </div>
@@ -352,7 +375,10 @@ function SubjectRow({
                   {u.number}
                 </span>
                 <span className="flex-1 text-foreground">{u.title}</span>
-                <Badge variant={u.status === "published" ? "default" : "secondary"} className="text-[10px]">
+                <Badge
+                  variant={u.status === "published" ? "default" : "secondary"}
+                  className="text-[10px]"
+                >
                   {u.status}
                 </Badge>
                 <Button
@@ -476,11 +502,19 @@ function SemesterDialog({
           <div className="grid grid-cols-3 gap-3">
             <div className="grid gap-1.5">
               <Label>Number</Label>
-              <Input type="number" value={number} onChange={(e) => setNumber(Number(e.target.value))} />
+              <Input
+                type="number"
+                value={number}
+                onChange={(e) => setNumber(Number(e.target.value))}
+              />
             </div>
             <div className="col-span-2 grid gap-1.5">
               <Label>Title</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Semester I" />
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Semester I"
+              />
             </div>
           </div>
           <div className="grid gap-1.5">
@@ -542,7 +576,12 @@ function SubjectDialog({
         semester_id: semesterId,
         code: code.trim().toUpperCase(),
         title: title.trim(),
-        slug: slug.trim() || code.trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
+        slug:
+          slug.trim() ||
+          code
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9-]+/g, "-"),
         credits,
         status,
       });
@@ -578,7 +617,11 @@ function SubjectDialog({
           </div>
           <div className="grid gap-1.5">
             <Label>Title</Label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Programming in C" />
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Programming in C"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
@@ -608,7 +651,10 @@ function SubjectDialog({
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => mutation.mutate()} disabled={!code || !title || mutation.isPending}>
+          <Button
+            onClick={() => mutation.mutate()}
+            disabled={!code || !title || mutation.isPending}
+          >
             {mutation.isPending ? "Saving…" : "Add"}
           </Button>
         </DialogFooter>
@@ -672,11 +718,19 @@ function UnitDialog({
           <div className="grid grid-cols-3 gap-3">
             <div className="grid gap-1.5">
               <Label>Number</Label>
-              <Input type="number" value={number} onChange={(e) => setNumber(Number(e.target.value))} />
+              <Input
+                type="number"
+                value={number}
+                onChange={(e) => setNumber(Number(e.target.value))}
+              />
             </div>
             <div className="col-span-2 grid gap-1.5">
               <Label>Title</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Introduction to C" />
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Introduction to C"
+              />
             </div>
           </div>
           <div className="grid gap-1.5">

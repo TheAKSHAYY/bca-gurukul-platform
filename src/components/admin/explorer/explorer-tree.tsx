@@ -2,28 +2,55 @@ import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  ChevronRight, BookOpen, GraduationCap, Library, Layers,
-  MoreHorizontal, Plus, Trash2, Copy, ArrowUp, ArrowDown,
-  Eye, EyeOff, Pencil,
+  ChevronRight,
+  BookOpen,
+  GraduationCap,
+  Library,
+  Layers,
+  MoreHorizontal,
+  Plus,
+  Trash2,
+  Copy,
+  ArrowUp,
+  ArrowDown,
+  Eye,
+  EyeOff,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
-  getExplorerTree, createExplorerNode, updateExplorerNode,
-  deleteExplorerNode, duplicateExplorerNode, reorderExplorerNode,
-  type ExplorerNode, type NodeType,
+  getExplorerTree,
+  createExplorerNode,
+  updateExplorerNode,
+  deleteExplorerNode,
+  duplicateExplorerNode,
+  reorderExplorerNode,
+  type ExplorerNode,
+  type NodeType,
 } from "@/lib/explorer.functions";
 import {
-  ContextMenu, ContextMenuContent, ContextMenuItem,
-  ContextMenuSeparator, ContextMenuTrigger,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -97,7 +124,7 @@ export function ExplorerTree({ selectedId, onSelect }: Props) {
         </Button>
       </div>
       <div className="flex-1 overflow-auto py-1">
-        {(!data || data.length === 0) ? (
+        {!data || data.length === 0 ? (
           <div className="px-4 py-8 text-center text-xs text-muted-foreground">
             No courses yet.
             <div className="mt-2">
@@ -131,7 +158,10 @@ export function ExplorerTree({ selectedId, onSelect }: Props) {
 }
 
 function TreeRow({
-  node, depth, selectedId, onSelect,
+  node,
+  depth,
+  selectedId,
+  onSelect,
 }: {
   node: ExplorerNode;
   depth: number;
@@ -155,30 +185,46 @@ function TreeRow({
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "explorer-tree"] });
 
   const addChild = useMutation({
-    mutationFn: (name: string) =>
-      create({ data: { type: childType!, parentId: node.id, name } }),
-    onSuccess: () => { invalidate(); toast.success(`${CHILD_LABEL[node.type]} added`); setOpen(true); },
+    mutationFn: (name: string) => create({ data: { type: childType!, parentId: node.id, name } }),
+    onSuccess: () => {
+      invalidate();
+      toast.success(`${CHILD_LABEL[node.type]} added`);
+      setOpen(true);
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const togglePublish = useMutation({
-    mutationFn: () => update({ data: {
-      type: node.type, id: node.id,
-      patch: { status: node.status === "published" ? "draft" : "published" },
-    } }),
-    onSuccess: () => { invalidate(); toast.success(node.status === "published" ? "Moved to draft" : "Published"); },
+    mutationFn: () =>
+      update({
+        data: {
+          type: node.type,
+          id: node.id,
+          patch: { status: node.status === "published" ? "draft" : "published" },
+        },
+      }),
+    onSuccess: () => {
+      invalidate();
+      toast.success(node.status === "published" ? "Moved to draft" : "Published");
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const remove = useMutation({
     mutationFn: () => del({ data: { type: node.type, id: node.id } }),
-    onSuccess: () => { invalidate(); toast.success("Moved to trash"); },
+    onSuccess: () => {
+      invalidate();
+      toast.success("Moved to trash");
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const duplicate = useMutation({
     mutationFn: () => dup({ data: { type: node.type, id: node.id } }),
-    onSuccess: () => { invalidate(); toast.success("Duplicated"); },
+    onSuccess: () => {
+      invalidate();
+      toast.success("Duplicated");
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -235,7 +281,10 @@ function TreeRow({
                 <button
                   type="button"
                   className="grid h-5 w-5 place-items-center rounded text-muted-foreground hover:bg-background hover:text-foreground"
-                  onClick={(e) => { e.stopPropagation(); setAddOpen(true); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAddOpen(true);
+                  }}
                   aria-label={`Add ${CHILD_LABEL[node.type]}`}
                   title={`Add ${CHILD_LABEL[node.type]}`}
                 >
@@ -277,9 +326,15 @@ function TreeRow({
             <Pencil className="mr-2 h-4 w-4" /> Rename / edit
           </ContextMenuItem>
           <ContextMenuItem onSelect={() => togglePublish.mutate()}>
-            {node.status === "published"
-              ? <><EyeOff className="mr-2 h-4 w-4" /> Unpublish</>
-              : <><Eye className="mr-2 h-4 w-4" /> Publish</>}
+            {node.status === "published" ? (
+              <>
+                <EyeOff className="mr-2 h-4 w-4" /> Unpublish
+              </>
+            ) : (
+              <>
+                <Eye className="mr-2 h-4 w-4" /> Publish
+              </>
+            )}
           </ContextMenuItem>
           <ContextMenuItem onSelect={() => duplicate.mutate()}>
             <Copy className="mr-2 h-4 w-4" /> Duplicate
@@ -330,7 +385,8 @@ function TreeRow({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete “{node.name}”?</AlertDialogTitle>
             <AlertDialogDescription>
-              This moves the {node.type} (and its children) to trash. You can restore it later from the Trash view.
+              This moves the {node.type} (and its children) to trash. You can restore it later from
+              the Trash view.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -349,7 +405,14 @@ function TreeRow({
 }
 
 function NodeMenu({
-  node, onAddChild, onRename, onTogglePublish, onDuplicate, onMoveUp, onMoveDown, onDelete,
+  node,
+  onAddChild,
+  onRename,
+  onTogglePublish,
+  onDuplicate,
+  onMoveUp,
+  onMoveDown,
+  onDelete,
 }: {
   node: ExplorerNode;
   onAddChild?: () => void;
@@ -371,9 +434,15 @@ function NodeMenu({
         <Pencil className="mr-2 h-4 w-4" /> Rename / edit
       </DropdownMenuItem>
       <DropdownMenuItem onSelect={onTogglePublish}>
-        {node.status === "published"
-          ? <><EyeOff className="mr-2 h-4 w-4" /> Unpublish</>
-          : <><Eye className="mr-2 h-4 w-4" /> Publish</>}
+        {node.status === "published" ? (
+          <>
+            <EyeOff className="mr-2 h-4 w-4" /> Unpublish
+          </>
+        ) : (
+          <>
+            <Eye className="mr-2 h-4 w-4" /> Publish
+          </>
+        )}
       </DropdownMenuItem>
       <DropdownMenuItem onSelect={onDuplicate}>
         <Copy className="mr-2 h-4 w-4" /> Duplicate
@@ -386,10 +455,7 @@ function NodeMenu({
         <ArrowDown className="mr-2 h-4 w-4" /> Move down
       </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem
-        className="text-destructive focus:text-destructive"
-        onSelect={onDelete}
-      >
+      <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={onDelete}>
         <Trash2 className="mr-2 h-4 w-4" /> Delete
       </DropdownMenuItem>
     </DropdownMenuContent>
@@ -397,7 +463,11 @@ function NodeMenu({
 }
 
 function NamePromptDialog({
-  open, onOpenChange, title, placeholder, onSubmit,
+  open,
+  onOpenChange,
+  title,
+  placeholder,
+  onSubmit,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -437,7 +507,10 @@ function NamePromptDialog({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             disabled={!value.trim()}
-            onClick={() => { onSubmit(value.trim()); onOpenChange(false); }}
+            onClick={() => {
+              onSubmit(value.trim());
+              onOpenChange(false);
+            }}
           >
             Create
           </AlertDialogAction>

@@ -97,12 +97,18 @@ function SemesterDetail() {
                         <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
                           {s.code}
                         </div>
-                        <div className="font-display text-base font-semibold text-foreground">{s.title}</div>
+                        <div className="font-display text-base font-semibold text-foreground">
+                          {s.title}
+                        </div>
                         {s.description && (
-                          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{s.description}</p>
+                          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                            {s.description}
+                          </p>
                         )}
                         {s.credits != null && (
-                          <div className="mt-2 text-xs text-muted-foreground">{s.credits} credits</div>
+                          <div className="mt-2 text-xs text-muted-foreground">
+                            {s.credits} credits
+                          </div>
                         )}
                       </div>
                     </div>

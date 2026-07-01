@@ -2,7 +2,14 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, XCircle, Sparkles, Upload } from "lucide-react";
 
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -67,10 +74,16 @@ export function BulkImportDialog({
         _year: q.year ?? undefined,
         _exam_name: q.exam_name ?? undefined,
       });
-      if (error) { fail += 1; console.error(error); } else ok += 1;
+      if (error) {
+        fail += 1;
+        console.error(error);
+      } else ok += 1;
     }
     setImporting(false);
-    if (ok > 0) toast.success(`Imported ${ok} question${ok === 1 ? "" : "s"}${fail ? ` · ${fail} failed` : ""}`);
+    if (ok > 0)
+      toast.success(
+        `Imported ${ok} question${ok === 1 ? "" : "s"}${fail ? ` · ${fail} failed` : ""}`,
+      );
     else toast.error(`Import failed for all ${fail} questions`);
     if (ok > 0) {
       setText("");
@@ -118,7 +131,9 @@ export function BulkImportDialog({
               <label className="text-sm font-medium">Preview</label>
               <div className="flex gap-2 text-xs">
                 <Badge variant="default">{validCount} ready</Badge>
-                {invalidCount > 0 && <Badge variant="destructive">{invalidCount} with errors</Badge>}
+                {invalidCount > 0 && (
+                  <Badge variant="destructive">{invalidCount} with errors</Badge>
+                )}
               </div>
             </div>
             <div className="max-h-[420px] space-y-2 overflow-y-auto rounded-lg border border-border bg-muted/30 p-3">
@@ -149,7 +164,11 @@ export function BulkImportDialog({
                           {p.options.map((o, oi) => (
                             <li
                               key={oi}
-                              className={o.is_correct ? "text-emerald-700 dark:text-emerald-400" : "text-muted-foreground"}
+                              className={
+                                o.is_correct
+                                  ? "text-emerald-700 dark:text-emerald-400"
+                                  : "text-muted-foreground"
+                              }
                             >
                               {String.fromCharCode(65 + oi)}) {o.text} {o.is_correct && "✓"}
                             </li>
@@ -157,15 +176,27 @@ export function BulkImportDialog({
                         </ul>
                       )}
                       <div className="mt-1.5 flex flex-wrap gap-1">
-                        {p.difficulty && <Badge variant="outline" className="text-[10px]">{p.difficulty}</Badge>}
-                        {p.year && <Badge variant="outline" className="text-[10px]">{p.year}</Badge>}
+                        {p.difficulty && (
+                          <Badge variant="outline" className="text-[10px]">
+                            {p.difficulty}
+                          </Badge>
+                        )}
+                        {p.year && (
+                          <Badge variant="outline" className="text-[10px]">
+                            {p.year}
+                          </Badge>
+                        )}
                         {(p.tags ?? []).map((t) => (
-                          <Badge key={t} variant="secondary" className="text-[10px]">{t}</Badge>
+                          <Badge key={t} variant="secondary" className="text-[10px]">
+                            {t}
+                          </Badge>
                         ))}
                       </div>
                       {p.errors.length > 0 && (
                         <ul className="mt-1.5 text-xs text-destructive">
-                          {p.errors.map((e, ei) => <li key={ei}>· {e}</li>)}
+                          {p.errors.map((e, ei) => (
+                            <li key={ei}>· {e}</li>
+                          ))}
                         </ul>
                       )}
                     </div>
@@ -177,10 +208,14 @@ export function BulkImportDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
           <Button onClick={runImport} disabled={importing || validCount === 0}>
             <Upload className="mr-2 h-4 w-4" />
-            {importing ? "Importing…" : `Import ${validCount} question${validCount === 1 ? "" : "s"}`}
+            {importing
+              ? "Importing…"
+              : `Import ${validCount} question${validCount === 1 ? "" : "s"}`}
           </Button>
         </DialogFooter>
       </DialogContent>
