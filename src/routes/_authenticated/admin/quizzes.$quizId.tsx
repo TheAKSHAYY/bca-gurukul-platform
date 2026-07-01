@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Trash2, Save, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, CheckCircle2, Sparkles } from "lucide-react";
+import { BulkImportDialog } from "@/components/mcq/bulk-import-dialog";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ type QuestionRow = {
 function QuizEditor() {
   const { quizId } = Route.useParams();
   const qc = useQueryClient();
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   const quizQ = useQuery({
     queryKey: ["admin-quiz", quizId],
@@ -130,10 +132,22 @@ function QuizEditor() {
           )}
         </div>
 
-        <Button className="mt-6" onClick={() => addQuestion.mutate()}>
-          <Plus className="mr-2 h-4 w-4" /> Add question
-        </Button>
+        <div className="mt-6 flex flex-wrap gap-2">
+          <Button onClick={() => addQuestion.mutate()}>
+            <Plus className="mr-2 h-4 w-4" /> Add question
+          </Button>
+          <Button variant="outline" onClick={() => setBulkOpen(true)}>
+            <Sparkles className="mr-2 h-4 w-4" /> Bulk import
+          </Button>
+        </div>
       </main>
+
+      <BulkImportDialog
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        quizId={quizId}
+        onImported={() => qc.invalidateQueries({ queryKey: ["admin-quiz-questions", quizId] })}
+      />
     </div>
   );
 }

@@ -1282,36 +1282,57 @@ export type Database = {
       quiz_questions: {
         Row: {
           created_at: string
+          difficulty: string | null
+          exam_name: string | null
           explanation: string | null
           id: string
+          image_url: string | null
+          negative_marks: number
           order_index: number
           points: number
           prompt: string
           quiz_id: string
+          tags: string[]
           type: Database["public"]["Enums"]["quiz_question_type"]
+          university: string | null
           updated_at: string
+          year: number | null
         }
         Insert: {
           created_at?: string
+          difficulty?: string | null
+          exam_name?: string | null
           explanation?: string | null
           id?: string
+          image_url?: string | null
+          negative_marks?: number
           order_index?: number
           points?: number
           prompt: string
           quiz_id: string
+          tags?: string[]
           type?: Database["public"]["Enums"]["quiz_question_type"]
+          university?: string | null
           updated_at?: string
+          year?: number | null
         }
         Update: {
           created_at?: string
+          difficulty?: string | null
+          exam_name?: string | null
           explanation?: string | null
           id?: string
+          image_url?: string | null
+          negative_marks?: number
           order_index?: number
           points?: number
           prompt?: string
           quiz_id?: string
+          tags?: string[]
           type?: Database["public"]["Enums"]["quiz_question_type"]
+          university?: string | null
           updated_at?: string
+          year?: number | null
         }
         Relationships: [
           {
@@ -1329,15 +1350,20 @@ export type Database = {
           created_by: string | null
           deleted_at: string | null
           description: string | null
+          end_date: string | null
           id: string
           instructions: string | null
+          is_public: boolean
           max_attempts: number
+          negative_marking: boolean
           order_index: number
+          passing_marks: number | null
           passing_pct: number
           published_at: string | null
           shuffle_options: boolean
           shuffle_questions: boolean
           slug: string
+          start_date: string | null
           status: Database["public"]["Enums"]["quiz_status"]
           time_limit_minutes: number | null
           title: string
@@ -1349,15 +1375,20 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           description?: string | null
+          end_date?: string | null
           id?: string
           instructions?: string | null
+          is_public?: boolean
           max_attempts?: number
+          negative_marking?: boolean
           order_index?: number
+          passing_marks?: number | null
           passing_pct?: number
           published_at?: string | null
           shuffle_options?: boolean
           shuffle_questions?: boolean
           slug: string
+          start_date?: string | null
           status?: Database["public"]["Enums"]["quiz_status"]
           time_limit_minutes?: number | null
           title: string
@@ -1369,15 +1400,20 @@ export type Database = {
           created_by?: string | null
           deleted_at?: string | null
           description?: string | null
+          end_date?: string | null
           id?: string
           instructions?: string | null
+          is_public?: boolean
           max_attempts?: number
+          negative_marking?: boolean
           order_index?: number
+          passing_marks?: number | null
           passing_pct?: number
           published_at?: string | null
           shuffle_options?: boolean
           shuffle_questions?: boolean
           slug?: string
+          start_date?: string | null
           status?: Database["public"]["Enums"]["quiz_status"]
           time_limit_minutes?: number | null
           title?: string
@@ -1791,6 +1827,21 @@ export type Database = {
       }
     }
     Functions: {
+      admin_create_mcq: {
+        Args: {
+          _difficulty?: string
+          _exam_name?: string
+          _explanation?: string
+          _negative_marks?: number
+          _options: Json
+          _points?: number
+          _prompt: string
+          _quiz_id: string
+          _tags?: string[]
+          _year?: number
+        }
+        Returns: string
+      }
       admin_dashboard_stats: { Args: never; Returns: Json }
       admin_recent_activity: {
         Args: { _limit?: number }
