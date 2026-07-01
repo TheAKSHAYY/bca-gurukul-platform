@@ -26,9 +26,24 @@ function SettingsPage() {
           Choose how BCA Gurukul looks on this device.
         </p>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <ThemeChoice active={theme === "light"} onClick={() => setTheme("light")} icon={Sun} label="Light" />
-          <ThemeChoice active={theme === "dark"} onClick={() => setTheme("dark")} icon={Moon} label="Dark" />
-          <ThemeChoice active={theme === "system"} onClick={() => setTheme("system")} icon={Monitor} label="System" />
+          <ThemeChoice
+            active={theme === "light"}
+            onClick={() => setTheme("light")}
+            icon={Sun}
+            label="Light"
+          />
+          <ThemeChoice
+            active={theme === "dark"}
+            onClick={() => setTheme("dark")}
+            icon={Moon}
+            label="Dark"
+          />
+          <ThemeChoice
+            active={theme === "system"}
+            onClick={() => setTheme("system")}
+            icon={Monitor}
+            label="System"
+          />
         </div>
       </section>
 

@@ -12,7 +12,8 @@ export const Route = createFileRoute("/courses/")({
       { title: "Courses · BCA Gurukul" },
       {
         name: "description",
-        content: "Browse all programs offered on BCA Gurukul — structured semester-by-semester learning paths.",
+        content:
+          "Browse all programs offered on BCA Gurukul — structured semester-by-semester learning paths.",
       },
     ],
   }),
@@ -74,7 +75,9 @@ function CoursesIndex() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <BookOpen className="h-5 w-5" />
               </div>
-              <div className="mt-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">{c.code}</div>
+              <div className="mt-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                {c.code}
+              </div>
               <h3 className="mt-1 font-display text-xl font-semibold text-foreground">{c.title}</h3>
               {c.description && (
                 <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{c.description}</p>
@@ -107,7 +110,11 @@ export function PublicHeader() {
           <span className="font-display text-lg font-semibold text-foreground">BCA Gurukul</span>
         </Link>
         <nav className="flex items-center gap-5 text-sm">
-          <Link to="/courses" className="text-foreground hover:text-primary" activeProps={{ className: "text-primary" }}>
+          <Link
+            to="/courses"
+            className="text-foreground hover:text-primary"
+            activeProps={{ className: "text-primary" }}
+          >
             Courses
           </Link>
           {!loading && user ? (

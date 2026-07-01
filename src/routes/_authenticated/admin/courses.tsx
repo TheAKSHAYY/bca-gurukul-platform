@@ -95,7 +95,10 @@ function CoursesAdmin() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" /> Back to admin
           </Link>
           <Button
@@ -115,7 +118,8 @@ function CoursesAdmin() {
           <h1 className="font-display text-3xl font-semibold text-foreground">Courses</h1>
         </div>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Programs offered on the platform. Open a course to manage its semesters, subjects, and units.
+          Programs offered on the platform. Open a course to manage its semesters, subjects, and
+          units.
         </p>
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -123,23 +127,32 @@ function CoursesAdmin() {
           {!isLoading && data && data.length === 0 && (
             <div className="col-span-full rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
               <p className="font-display text-lg text-foreground">No courses yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">Create your first program to get started.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Create your first program to get started.
+              </p>
             </div>
           )}
           {data?.map((c) => (
             <article key={c.id} className="rounded-2xl border border-border bg-surface p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{c.code}</div>
-                  <h3 className="mt-1 font-display text-lg font-semibold text-foreground">{c.title}</h3>
+                  <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                    {c.code}
+                  </div>
+                  <h3 className="mt-1 font-display text-lg font-semibold text-foreground">
+                    {c.title}
+                  </h3>
                 </div>
-                <Badge variant={c.status === "published" ? "default" : "secondary"}>{c.status}</Badge>
+                <Badge variant={c.status === "published" ? "default" : "secondary"}>
+                  {c.status}
+                </Badge>
               </div>
               {c.description && (
                 <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{c.description}</p>
               )}
               <div className="mt-3 text-xs text-muted-foreground">
-                {c.total_semesters} semesters{c.duration_years ? ` · ${c.duration_years} years` : ""}
+                {c.total_semesters} semesters
+                {c.duration_years ? ` · ${c.duration_years} years` : ""}
               </div>
               <div className="mt-4 flex items-center gap-2">
                 <Button asChild size="sm" variant="outline">
@@ -161,7 +174,9 @@ function CoursesAdmin() {
                   size="sm"
                   variant="ghost"
                   onClick={() => {
-                    if (confirm(`Delete ${c.title}? This removes all semesters, subjects and units.`)) {
+                    if (
+                      confirm(`Delete ${c.title}? This removes all semesters, subjects and units.`)
+                    ) {
                       removeMutation.mutate(c.id);
                     }
                   }}
@@ -253,10 +268,7 @@ function CourseDialog({
           <DialogTitle>{editing ? "Edit course" : "New course"}</DialogTitle>
           <DialogDescription>Programs students can enroll in.</DialogDescription>
         </DialogHeader>
-        <form
-          onSubmit={form.handleSubmit((v) => mutation.mutate(v))}
-          className="grid gap-4"
-        >
+        <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="grid gap-4">
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
               <Label htmlFor="code">Code</Label>
@@ -275,7 +287,11 @@ function CourseDialog({
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" placeholder="Bachelor of Computer Applications" {...form.register("title")} />
+            <Input
+              id="title"
+              placeholder="Bachelor of Computer Applications"
+              {...form.register("title")}
+            />
             {form.formState.errors.title && (
               <p className="text-xs text-destructive">{form.formState.errors.title.message}</p>
             )}
@@ -287,7 +303,12 @@ function CourseDialog({
           <div className="grid grid-cols-3 gap-3">
             <div className="grid gap-1.5">
               <Label htmlFor="duration_years">Years</Label>
-              <Input id="duration_years" type="number" step="0.5" {...form.register("duration_years")} />
+              <Input
+                id="duration_years"
+                type="number"
+                step="0.5"
+                {...form.register("duration_years")}
+              />
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="total_semesters">Semesters</Label>

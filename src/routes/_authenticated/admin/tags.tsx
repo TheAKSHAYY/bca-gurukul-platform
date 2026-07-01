@@ -34,11 +34,7 @@ const tagSchema = z.object({
     .max(60)
     .regex(/^[a-z0-9-]+$/, "lowercase letters, numbers and hyphens only"),
   description: z.string().max(500).optional().or(z.literal("")),
-  color: z
-    .string()
-    .max(20)
-    .optional()
-    .or(z.literal("")),
+  color: z.string().max(20).optional().or(z.literal("")),
 });
 type TagInput = z.infer<typeof tagSchema>;
 
@@ -84,7 +80,10 @@ function TagsAdmin() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-          <Link to="/admin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" /> Back to admin
           </Link>
           <Button
@@ -104,7 +103,8 @@ function TagsAdmin() {
           <h1 className="font-display text-3xl font-semibold text-foreground">Tags</h1>
         </div>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Reusable labels for notes, papers, videos, quizzes and assignments. Helps students search and filter.
+          Reusable labels for notes, papers, videos, quizzes and assignments. Helps students search
+          and filter.
         </p>
 
         <section className="mt-8 rounded-2xl border border-border bg-surface">
@@ -112,7 +112,9 @@ function TagsAdmin() {
           {!isLoading && data && data.length === 0 && (
             <div className="p-10 text-center">
               <p className="font-display text-lg text-foreground">No tags yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">Create your first tag to start labelling content.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Create your first tag to start labelling content.
+              </p>
             </div>
           )}
           {data && data.length > 0 && (
@@ -220,7 +222,9 @@ function TagDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{editing ? "Edit tag" : "New tag"}</DialogTitle>
-          <DialogDescription>Labels appear across notes, videos and other content.</DialogDescription>
+          <DialogDescription>
+            Labels appear across notes, videos and other content.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit((v) => mutation.mutate(v))} className="grid gap-4">
           <div className="grid grid-cols-2 gap-3">

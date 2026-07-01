@@ -119,8 +119,8 @@ function SetupPage() {
             Create the first Super Admin
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            This page is only available until the first Super Admin is created. After
-            that, it is disabled forever.
+            This page is only available until the first Super Admin is created. After that, it is
+            disabled forever.
           </p>
         </div>
 
@@ -150,9 +150,7 @@ function SetupPage() {
               {...register("email")}
               aria-invalid={Boolean(errors.email)}
             />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
@@ -175,9 +173,7 @@ function SetupPage() {
                 {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {capsOn && (
-              <p className="text-xs text-accent-foreground">Caps Lock is on</p>
-            )}
+            {capsOn && <p className="text-xs text-accent-foreground">Caps Lock is on</p>}
             {errors.password && (
               <p className="text-xs text-destructive">{errors.password.message}</p>
             )}
@@ -192,9 +188,7 @@ function SetupPage() {
               {...register("confirm")}
               aria-invalid={Boolean(errors.confirm)}
             />
-            {errors.confirm && (
-              <p className="text-xs text-destructive">{errors.confirm.message}</p>
-            )}
+            {errors.confirm && <p className="text-xs text-destructive">{errors.confirm.message}</p>}
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>

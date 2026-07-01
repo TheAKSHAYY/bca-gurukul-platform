@@ -18,7 +18,6 @@ import {
   Inbox,
 } from "lucide-react";
 
-
 import {
   Sidebar,
   SidebarContent,
@@ -54,8 +53,6 @@ const NAV = [
   { label: "Developer", to: "/admin/developer", icon: UserCircle2 },
   { label: "Inbox", to: "/admin/inbox", icon: Inbox },
 ];
-
-
 
 export function AdminShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -93,7 +90,10 @@ export function AdminShell() {
                   })}
                   {isSuperAdmin && (
                     <SidebarMenuItem>
-                      <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/superadmin")}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname.startsWith("/admin/superadmin")}
+                      >
                         <Link to="/admin/superadmin" className="flex items-center gap-2">
                           <Shield className="h-4 w-4" />
                           <span>Super admin</span>
@@ -129,7 +129,9 @@ export function AdminShell() {
             </div>
             <div className="ml-auto flex items-center gap-2">
               <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
-                <Link to="/dashboard"><Home className="mr-1.5 h-4 w-4" /> Student view</Link>
+                <Link to="/dashboard">
+                  <Home className="mr-1.5 h-4 w-4" /> Student view
+                </Link>
               </Button>
               <Button size="sm" onClick={() => setWizardOpen(true)} className="gap-1.5">
                 <Plus className="h-4 w-4" />

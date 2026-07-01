@@ -13,7 +13,6 @@ type Bookmark = {
   created_at: string;
 };
 
-
 export const Route = createFileRoute("/_authenticated/bookmarks")({
   head: () => ({ meta: [{ title: "Your bookmarks · BCA Gurukul" }] }),
   component: BookmarksPage,

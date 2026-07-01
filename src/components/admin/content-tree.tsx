@@ -21,7 +21,8 @@ export function ContentTree() {
   if (!data || data.length === 0) {
     return (
       <div className="px-3 py-2 text-xs text-muted-foreground">
-        No courses yet. Use <span className="font-medium text-foreground">+ Create</span> to add one.
+        No courses yet. Use <span className="font-medium text-foreground">+ Create</span> to add
+        one.
       </div>
     );
   }

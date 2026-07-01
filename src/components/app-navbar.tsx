@@ -31,11 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -144,7 +140,10 @@ export function AppNavbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
-        <Link to="/dashboard" className="flex items-center gap-2 font-display text-base font-semibold text-foreground">
+        <Link
+          to="/dashboard"
+          className="flex items-center gap-2 font-display text-base font-semibold text-foreground"
+        >
           <BrandMark className="h-8 w-8" />
           <span className="hidden sm:inline">BCA Gurukul</span>
         </Link>
@@ -187,10 +186,7 @@ export function AppNavbar() {
               <div className="flex items-center justify-between border-b border-border px-3 py-2">
                 <div className="text-sm font-medium">Notifications</div>
                 {unread > 0 && (
-                  <button
-                    onClick={markAllRead}
-                    className="text-xs text-primary hover:underline"
-                  >
+                  <button onClick={markAllRead} className="text-xs text-primary hover:underline">
                     Mark all read
                   </button>
                 )}
@@ -324,7 +320,10 @@ export function AppNavbar() {
                 </>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onSignOut} className="text-destructive focus:text-destructive">
+              <DropdownMenuItem
+                onClick={onSignOut}
+                className="text-destructive focus:text-destructive"
+              >
                 <LogOut className="mr-2 h-4 w-4" /> Sign out
               </DropdownMenuItem>
             </DropdownMenuContent>

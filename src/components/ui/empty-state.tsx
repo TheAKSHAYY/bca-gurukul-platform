@@ -73,25 +73,12 @@ const TONE: Record<Tone, { halo: string; tile: string }> = {
   },
 };
 
-function ActionButton({
-  action,
-  variant,
-}: {
-  action: ActionLink;
-  variant: "default" | "outline";
-}) {
+function ActionButton({ action, variant }: { action: ActionLink; variant: "default" | "outline" }) {
   const Icon = action.icon ?? (variant === "default" ? ArrowRight : undefined);
   const content = (
     <>
       {action.label}
-      {Icon && (
-        <Icon
-          className={cn(
-            "h-4 w-4",
-            variant === "default" ? "ml-2" : "ml-1.5",
-          )}
-        />
-      )}
+      {Icon && <Icon className={cn("h-4 w-4", variant === "default" ? "ml-2" : "ml-1.5")} />}
     </>
   );
 
@@ -112,12 +99,7 @@ function ActionButton({
     );
   }
   return (
-    <Button
-      variant={variant}
-      size="sm"
-      className="h-9 px-4"
-      onClick={action.onClick}
-    >
+    <Button variant={variant} size="sm" className="h-9 px-4" onClick={action.onClick}>
       {content}
     </Button>
   );
@@ -210,12 +192,8 @@ export function EmptyState({
             compact && "mt-5",
           )}
         >
-          {primaryAction && (
-            <ActionButton action={primaryAction} variant="default" />
-          )}
-          {secondaryAction && (
-            <ActionButton action={secondaryAction} variant="outline" />
-          )}
+          {primaryAction && <ActionButton action={primaryAction} variant="default" />}
+          {secondaryAction && <ActionButton action={secondaryAction} variant="outline" />}
         </div>
       )}
 

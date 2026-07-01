@@ -20,12 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -251,9 +246,7 @@ function HomepageBuilder() {
         </div>
       </header>
 
-      {isLoading && (
-        <p className="text-sm text-muted-foreground">Loading sections…</p>
-      )}
+      {isLoading && <p className="text-sm text-muted-foreground">Loading sections…</p>}
 
       {!isLoading && sections.length === 0 && (
         <Card>
@@ -272,9 +265,7 @@ function HomepageBuilder() {
             canDown={i < sections.length - 1}
             onUp={() => swap(s, sections[i - 1])}
             onDown={() => swap(s, sections[i + 1])}
-            onToggle={() =>
-              update.mutate({ id: s.id, updates: { enabled: !s.enabled } })
-            }
+            onToggle={() => update.mutate({ id: s.id, updates: { enabled: !s.enabled } })}
             onSaveDraft={(patch) => update.mutate({ id: s.id, updates: patch })}
             onPublish={(patch) =>
               update.mutate({
@@ -382,17 +373,29 @@ function SectionRow(p: RowProps) {
       <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
         <div className="flex items-center gap-3">
           <div className="flex flex-col">
-            <Button size="icon" variant="ghost" disabled={!p.canUp} onClick={p.onUp} className="h-6 w-6" aria-label="Move up">
+            <Button
+              size="icon"
+              variant="ghost"
+              disabled={!p.canUp}
+              onClick={p.onUp}
+              className="h-6 w-6"
+              aria-label="Move up"
+            >
               <ArrowUp className="h-3.5 w-3.5" />
             </Button>
-            <Button size="icon" variant="ghost" disabled={!p.canDown} onClick={p.onDown} className="h-6 w-6" aria-label="Move down">
+            <Button
+              size="icon"
+              variant="ghost"
+              disabled={!p.canDown}
+              onClick={p.onDown}
+              className="h-6 w-6"
+              aria-label="Move down"
+            >
               <ArrowDown className="h-3.5 w-3.5" />
             </Button>
           </div>
           <div>
-            <CardTitle className="font-display text-base">
-              {title || meta.label}
-            </CardTitle>
+            <CardTitle className="font-display text-base">{title || meta.label}</CardTitle>
             <p className="text-xs text-muted-foreground">
               {meta.label} · {meta.description}
             </p>
@@ -408,11 +411,7 @@ function SectionRow(p: RowProps) {
             </Badge>
           )}
           <div className="flex items-center gap-1.5 pl-1">
-            <Switch
-              checked={section.enabled}
-              onCheckedChange={p.onToggle}
-              aria-label="Visible"
-            />
+            <Switch checked={section.enabled} onCheckedChange={p.onToggle} aria-label="Visible" />
             {section.enabled ? (
               <Eye className="h-3.5 w-3.5 text-muted-foreground" />
             ) : (
@@ -448,17 +447,17 @@ function SectionRow(p: RowProps) {
 
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
             <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => p.onDuplicate()}
-              >
+              <Button size="sm" variant="outline" onClick={() => p.onDuplicate()}>
                 <Copy className="mr-1.5 h-4 w-4" />
                 Duplicate
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive hover:text-destructive"
+                  >
                     <Trash2 className="mr-1.5 h-4 w-4" />
                     Delete
                   </Button>
@@ -467,7 +466,8 @@ function SectionRow(p: RowProps) {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete this section?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This permanently removes the section from your homepage. This action cannot be undone.
+                      This permanently removes the section from your homepage. This action cannot be
+                      undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -482,17 +482,12 @@ function SectionRow(p: RowProps) {
                 size="sm"
                 variant="outline"
                 disabled={!dirty}
-                onClick={() =>
-                  p.onSaveDraft({ title, content, style, status: "draft" })
-                }
+                onClick={() => p.onSaveDraft({ title, content, style, status: "draft" })}
               >
                 <Save className="mr-1.5 h-4 w-4" />
                 Save draft
               </Button>
-              <Button
-                size="sm"
-                onClick={() => p.onPublish({ title, content, style })}
-              >
+              <Button size="sm" onClick={() => p.onPublish({ title, content, style })}>
                 <Send className="mr-1.5 h-4 w-4" />
                 Publish
               </Button>
@@ -517,8 +512,7 @@ function KindEditor({
   onChange: (next: Record<string, unknown>) => void;
   idPrefix: string;
 }) {
-  const set = (key: string, value: unknown) =>
-    onChange({ ...content, [key]: value });
+  const set = (key: string, value: unknown) => onChange({ ...content, [key]: value });
 
   // common fields used by most kinds
   const commonText = (
@@ -744,8 +738,7 @@ function StyleEditor({
   onChange: (next: Record<string, unknown>) => void;
   idPrefix: string;
 }) {
-  const set = (key: string, value: unknown) =>
-    onChange({ ...style, [key]: value });
+  const set = (key: string, value: unknown) => onChange({ ...style, [key]: value });
   return (
     <details className="rounded-md border bg-muted/30 p-3">
       <summary className="cursor-pointer text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -841,7 +834,9 @@ function ButtonsEditor({
             aria-label={`${idPrefix}-btn-href-${i}`}
           />
           <Select value={b.variant ?? "default"} onValueChange={(v) => update(i, "variant", v)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="default">Primary</SelectItem>
               <SelectItem value="outline">Outline</SelectItem>
@@ -936,15 +931,7 @@ function ItemsEditor({
   );
 }
 
-function Field({
-  id,
-  label,
-  children,
-}: {
-  id: string;
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id} className="text-xs uppercase tracking-wider text-muted-foreground">

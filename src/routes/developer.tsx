@@ -200,9 +200,7 @@ function DeveloperPage() {
     return (
       <div className="mx-auto max-w-3xl px-6 py-24 text-center">
         <Sparkles className="mx-auto h-10 w-10 text-accent" />
-        <h1 className="mt-4 font-display text-3xl font-semibold">
-          Developer profile coming soon
-        </h1>
+        <h1 className="mt-4 font-display text-3xl font-semibold">Developer profile coming soon</h1>
         <p className="mt-3 text-muted-foreground">
           The developer hasn't published their portfolio yet. Check back soon.
         </p>
@@ -239,10 +237,7 @@ function DeveloperPage() {
     <div className="bg-background">
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-border/60">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10"
-        >
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute left-1/2 top-[-10rem] h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-accent/20 blur-[120px]" />
           <div className="absolute left-[8%] top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl" />
         </div>
@@ -255,9 +250,7 @@ function DeveloperPage() {
               {name}
             </h1>
             {profile.professional_title && (
-              <p className="mt-2 font-display text-lg text-accent">
-                {profile.professional_title}
-              </p>
+              <p className="mt-2 font-display text-lg text-accent">{profile.professional_title}</p>
             )}
             {profile.short_intro && (
               <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
@@ -298,11 +291,7 @@ function DeveloperPage() {
               <div className="aspect-square w-full overflow-hidden rounded-2xl bg-muted">
                 {profile.photo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={profile.photo_url}
-                    alt={name}
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={profile.photo_url} alt={name} className="h-full w-full object-cover" />
                 ) : (
                   <Avatar className="h-full w-full rounded-2xl">
                     <AvatarFallback className="h-full w-full rounded-2xl bg-primary/10 font-display text-6xl text-primary">
@@ -324,20 +313,11 @@ function DeveloperPage() {
         profile.interests) && (
         <section className="border-b border-border/60 py-20">
           <div className="mx-auto max-w-6xl px-6">
-            <SectionHeading
-              eyebrow="About"
-              title="Behind the keyboard"
-            />
+            <SectionHeading eyebrow="About" title="Behind the keyboard" />
             <div className="mt-12 grid gap-6 lg:grid-cols-3">
-              {profile.bio && (
-                <Card title="Bio" body={profile.bio} className="lg:col-span-3" />
-              )}
-              {profile.education && (
-                <Card title="Education" body={profile.education} />
-              )}
-              {profile.current_goal && (
-                <Card title="Current Goal" body={profile.current_goal} />
-              )}
+              {profile.bio && <Card title="Bio" body={profile.bio} className="lg:col-span-3" />}
+              {profile.education && <Card title="Education" body={profile.education} />}
+              {profile.current_goal && <Card title="Current Goal" body={profile.current_goal} />}
               {profile.career_objective && (
                 <Card title="Career Objective" body={profile.career_objective} />
               )}
@@ -391,9 +371,7 @@ function DeveloperPage() {
           <SectionHeading eyebrow="Projects" title="Work I'm proud of" />
           {projects.length === 0 ? (
             <div className="mt-12 rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
-              <p className="text-sm text-muted-foreground">
-                No projects published yet.
-              </p>
+              <p className="text-sm text-muted-foreground">No projects published yet.</p>
             </div>
           ) : (
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -525,11 +503,7 @@ function DeveloperPage() {
                     <div className="font-display text-base font-semibold text-foreground">
                       {a.title}
                     </div>
-                    {a.issuer && (
-                      <div className="text-xs text-muted-foreground">
-                        {a.issuer}
-                      </div>
-                    )}
+                    {a.issuer && <div className="text-xs text-muted-foreground">{a.issuer}</div>}
                     {a.description && (
                       <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                         {a.description}
@@ -564,20 +538,14 @@ function DeveloperPage() {
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground">GitHub</div>
-                    <div className="font-display text-lg font-semibold">
-                      @{githubUsername}
-                    </div>
+                    <div className="font-display text-lg font-semibold">@{githubUsername}</div>
                   </div>
                 </div>
                 <p className="mt-4 text-sm text-muted-foreground">
                   Follow along with my projects, contributions, and experiments.
                 </p>
                 <Button asChild className="mt-5 w-full">
-                  <a
-                    href={`https://github.com/${githubUsername}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a href={`https://github.com/${githubUsername}`} target="_blank" rel="noreferrer">
                     <Github className="mr-1.5 h-4 w-4" /> View Profile
                   </a>
                 </Button>
@@ -635,9 +603,7 @@ function DeveloperPage() {
 function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <div className="mx-auto max-w-2xl text-center">
-      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-        {eyebrow}
-      </div>
+      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{eyebrow}</div>
       <h2 className="mt-2 font-display text-3xl font-semibold text-foreground sm:text-4xl">
         {title}
       </h2>
@@ -645,24 +611,10 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   );
 }
 
-function Card({
-  title,
-  body,
-  className,
-}: {
-  title: string;
-  body: string;
-  className?: string;
-}) {
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
-    <div
-      className={
-        "rounded-2xl border border-border bg-surface p-6 " + (className || "")
-      }
-    >
-      <h3 className="font-display text-base font-semibold text-foreground">
-        {title}
-      </h3>
+    <div className={"rounded-2xl border border-border bg-surface p-6 " + (className || "")}>
+      <h3 className="font-display text-base font-semibold text-foreground">{title}</h3>
       <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
         {body}
       </p>

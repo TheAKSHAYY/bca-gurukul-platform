@@ -12,7 +12,8 @@ This is a large scope. Existing project already has `quizzes`, `quiz_questions`,
 
 ## Phased Delivery
 
-### Phase 1 — Data model + admin bulk tools  (foundation)
+### Phase 1 — Data model + admin bulk tools (foundation)
+
 - Migration: add columns to `quiz_questions` (difficulty, marks, negative_marks, tags text[], year, exam_name, university, image_url).
 - Migration: add columns to `quizzes` (negative_marking, randomize_questions, randomize_options, is_public, start_date, end_date, passing_marks).
 - New table: `question_reports` (user_id, question_id, reason, status).
@@ -22,28 +23,33 @@ This is a large scope. Existing project already has `quizzes`, `quiz_questions`,
 - Admin: question editor with image upload, difficulty, tags, explanation, year, exam.
 
 ### Phase 2 — Student practice mode
+
 - `/practice` route: pick Subject → Unit → filters (difficulty, count, timed/untimed, random).
 - Question UI: bookmark, report, palette, timer, prev/next, dark mode already supported.
 - Instant feedback mode (show correct + explanation after each answer).
 - Wrong-question auto-save (derived view over `quiz_attempt_answers`).
 
 ### Phase 3 — Mock test mode
+
 - `/tests` list: filter by subject, semester, public/scheduled.
 - Real exam UI: fullscreen, autosave to `quiz_attempts.answers_draft`, resume, submit-confirm, auto-submit on timeout.
 - Result page: score, %, accuracy, time, topic breakdown, strong/weak areas, retake, share, PDF download (client-side via `jspdf`).
 
 ### Phase 4 — PYQs + Search + Bookmarks
+
 - `/pyqs` filtered browser (year, exam, university, subject, unit).
 - Global question search with FTS index on question text + tags.
 - `/bookmarks/questions` — practice from bookmarks only.
 - `/wrong-questions` — retry only previously wrong ones.
 
 ### Phase 5 — Analytics + Leaderboard
+
 - Student dashboard widgets: solved, accuracy, streak (already), avg score, weekly progress chart, weak subjects.
 - `/leaderboard` — weekly / monthly / all-time via SQL views.
 - Admin analytics: hardest questions, lowest-accuracy topics, most-active students, completion rate. Charts with Recharts.
 
 ### Phase 6 — Gamification + Daily Quiz
+
 - Daily Quiz card on dashboard.
 - Achievements table + badges (streak, 100 solved, first perfect score).
 - XP / level system derived from attempts.
@@ -53,12 +59,14 @@ This is a large scope. Existing project already has `quizzes`, `quiz_questions`,
 **Reuse over rebuild.** Don't create parallel `subjects`, `units`, `questions`, `tests`, `attempts`, `answers` tables — the project already has them under different names. Duplicating would fork the whole app.
 
 **RLS pattern (already in place):**
+
 - Students: read published quizzes/questions; write own attempts/answers/bookmarks/reports.
 - Admins: full CRUD via `has_role(auth.uid(), 'admin')`.
 
 **Scoring stays server-side** (`submit_quiz_attempt` RPC). Client never sees `is_correct` for unsubmitted attempts (already enforced via `get_quiz_options` RPC).
 
 **Bulk paste parser** — accepts formats like:
+
 ```
 Q: What is 2+2?
 A) 3
@@ -67,9 +75,11 @@ C) 5
 D) 6
 E: Basic arithmetic.
 ```
+
 The `*` marks correct answer. Parse client-side, preview table, insert in one transaction.
 
 **Folder structure:**
+
 ```
 src/routes/_authenticated/
   practice.tsx, practice.$subjectId.tsx

@@ -2,7 +2,16 @@ import { useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Download, FileText, ImageIcon, Loader2, Trash2, Upload, Video } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  FileText,
+  ImageIcon,
+  Loader2,
+  Trash2,
+  Upload,
+  Video,
+} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -39,7 +48,8 @@ function detectKind(mime: string): MediaRow["kind"] {
   if (mime === "application/pdf") return "pdf";
   if (mime.startsWith("video/")) return "video";
   if (mime.startsWith("audio/")) return "audio";
-  if (mime.includes("word") || mime.includes("document") || mime.includes("spreadsheet")) return "document";
+  if (mime.includes("word") || mime.includes("document") || mime.includes("spreadsheet"))
+    return "document";
   return "other";
 }
 
@@ -128,7 +138,9 @@ function MediaAdmin() {
   });
 
   const download = async (row: MediaRow) => {
-    const { data, error } = await supabase.storage.from(row.bucket).createSignedUrl(row.object_key, 60);
+    const { data, error } = await supabase.storage
+      .from(row.bucket)
+      .createSignedUrl(row.object_key, 60);
     if (error) {
       toast.error(error.message);
       return;
@@ -140,7 +152,10 @@ function MediaAdmin() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" /> Back to admin
           </Link>
           <div className="flex items-center gap-2">
@@ -157,7 +172,11 @@ function MediaAdmin() {
               </SelectContent>
             </Select>
             <Button onClick={() => fileInput.current?.click()} disabled={uploading}>
-              {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+              {uploading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="mr-2 h-4 w-4" />
+              )}
               Upload
             </Button>
             <input
@@ -174,7 +193,8 @@ function MediaAdmin() {
       <main className="mx-auto max-w-6xl px-6 py-10">
         <h1 className="font-display text-3xl font-semibold text-foreground">Media library</h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Central registry of all uploaded files. Pick a target bucket above before uploading. Downloads use short-lived signed URLs.
+          Central registry of all uploaded files. Pick a target bucket above before uploading.
+          Downloads use short-lived signed URLs.
         </p>
 
         <section className="mt-8">
@@ -182,7 +202,9 @@ function MediaAdmin() {
           {!isLoading && data && data.length === 0 && (
             <div className="rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
               <p className="font-display text-lg text-foreground">Library is empty</p>
-              <p className="mt-1 text-sm text-muted-foreground">Upload images, PDFs, videos or documents to start.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Upload images, PDFs, videos or documents to start.
+              </p>
             </div>
           )}
           {data && data.length > 0 && (
@@ -207,7 +229,9 @@ function MediaAdmin() {
                           </div>
                           <div>
                             <div className="font-medium text-foreground">{row.filename}</div>
-                            <div className="font-mono text-xs text-muted-foreground">{row.object_key}</div>
+                            <div className="font-mono text-xs text-muted-foreground">
+                              {row.object_key}
+                            </div>
                           </div>
                         </div>
                       </td>

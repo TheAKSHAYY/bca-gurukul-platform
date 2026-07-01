@@ -32,10 +32,7 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
     staleTime: 60_000,
   });
 
-  const bypass =
-    isAdmin ||
-    pathname.startsWith("/auth") ||
-    pathname.startsWith("/reset-password");
+  const bypass = isAdmin || pathname.startsWith("/auth") || pathname.startsWith("/reset-password");
 
   if (!data?.enabled || bypass) return <>{children}</>;
 
@@ -49,7 +46,8 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
           We'll be right back
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {data.message ?? "BCA Gurukul is undergoing scheduled maintenance. Please check back soon."}
+          {data.message ??
+            "BCA Gurukul is undergoing scheduled maintenance. Please check back soon."}
         </p>
         {data.scheduled_end && (
           <p className="mt-2 text-xs text-muted-foreground">

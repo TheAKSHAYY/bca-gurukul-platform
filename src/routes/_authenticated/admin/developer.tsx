@@ -10,12 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -43,8 +38,8 @@ function DeveloperAdmin() {
       <header>
         <h1 className="font-display text-2xl font-semibold">Developer portfolio</h1>
         <p className="text-sm text-muted-foreground">
-          Edit every section that appears at <code>/developer</code>. All
-          changes are live on the public site.
+          Edit every section that appears at <code>/developer</code>. All changes are live on the
+          public site.
         </p>
       </header>
 
@@ -117,10 +112,7 @@ function ProfileForm() {
 
   const save = useMutation({
     mutationFn: async (row: ProfileRow) => {
-      const { error } = await supabase
-        .from("developer_profile")
-        .update(row)
-        .eq("id", 1);
+      const { error } = await supabase.from("developer_profile").update(row).eq("id", 1);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -141,16 +133,10 @@ function ProfileForm() {
     <div className="space-y-6 rounded-2xl border border-border bg-surface p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Switch
-            checked={current.enabled}
-            onCheckedChange={(v) => set("enabled", v)}
-          />
+          <Switch checked={current.enabled} onCheckedChange={(v) => set("enabled", v)} />
           <Label className="text-sm">Show developer page publicly</Label>
         </div>
-        <Button
-          onClick={() => save.mutate(current)}
-          disabled={save.isPending}
-        >
+        <Button onClick={() => save.mutate(current)} disabled={save.isPending}>
           {save.isPending ? "Saving…" : "Save changes"}
         </Button>
       </div>
@@ -214,11 +200,7 @@ function ProfileForm() {
       </Field>
 
       <Field label="Bio">
-        <Textarea
-          rows={5}
-          value={current.bio ?? ""}
-          onChange={(e) => set("bio", e.target.value)}
-        />
+        <Textarea rows={5} value={current.bio ?? ""} onChange={(e) => set("bio", e.target.value)} />
       </Field>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -266,9 +248,7 @@ function Field({
 }) {
   return (
     <div className={className}>
-      <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-        {label}
-      </Label>
+      <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">{label}</Label>
       {children}
     </div>
   );
@@ -324,9 +304,7 @@ function SocialEditor() {
           .eq("id", row.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from("developer_social_links")
-          .insert(row);
+        const { error } = await supabase.from("developer_social_links").insert(row);
         if (error) throw error;
       }
     },
@@ -339,10 +317,7 @@ function SocialEditor() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("developer_social_links")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("developer_social_links").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -373,9 +348,7 @@ function SocialEditor() {
             </Badge>
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm">{s.url}</div>
-              {s.label && (
-                <div className="truncate text-xs text-muted-foreground">{s.label}</div>
-              )}
+              {s.label && <div className="truncate text-xs text-muted-foreground">{s.label}</div>}
             </div>
             <Switch
               checked={s.enabled}
@@ -392,19 +365,13 @@ function SocialEditor() {
                 </Button>
               }
             />
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => remove.mutate(s.id)}
-            >
+            <Button size="icon" variant="ghost" onClick={() => remove.mutate(s.id)}>
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
           </li>
         ))}
         {(data ?? []).length === 0 && (
-          <li className="py-6 text-center text-sm text-muted-foreground">
-            No links yet.
-          </li>
+          <li className="py-6 text-center text-sm text-muted-foreground">No links yet.</li>
         )}
       </ul>
     </div>
@@ -417,7 +384,13 @@ function SocialDialog({
   trigger,
 }: {
   initial?: SocialRow;
-  onSubmit: (v: { platform: string; url: string; label: string | null; sort_order: number; enabled: boolean }) => void;
+  onSubmit: (v: {
+    platform: string;
+    url: string;
+    label: string | null;
+    sort_order: number;
+    enabled: boolean;
+  }) => void;
   trigger: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -455,11 +428,7 @@ function SocialDialog({
             <Input value={label} onChange={(e) => setLabel(e.target.value)} />
           </Field>
           <Field label="Sort order">
-            <Input
-              type="number"
-              value={order}
-              onChange={(e) => setOrder(Number(e.target.value))}
-            />
+            <Input type="number" value={order} onChange={(e) => setOrder(Number(e.target.value))} />
           </Field>
         </div>
         <DialogFooter>
@@ -522,15 +491,10 @@ function ProjectsEditor() {
   const upsert = useMutation({
     mutationFn: async (row: Partial<ProjectRow> & { name: string }) => {
       if (row.id) {
-        const { error } = await supabase
-          .from("developer_projects")
-          .update(row)
-          .eq("id", row.id);
+        const { error } = await supabase.from("developer_projects").update(row).eq("id", row.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from("developer_projects")
-          .insert(row);
+        const { error } = await supabase.from("developer_projects").insert(row);
         if (error) throw error;
       }
     },
@@ -543,10 +507,7 @@ function ProjectsEditor() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("developer_projects")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("developer_projects").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -605,9 +566,7 @@ function ProjectsEditor() {
           </li>
         ))}
         {(data ?? []).length === 0 && (
-          <li className="py-6 text-center text-sm text-muted-foreground">
-            No projects yet.
-          </li>
+          <li className="py-6 text-center text-sm text-muted-foreground">No projects yet.</li>
         )}
       </ul>
     </div>
@@ -786,10 +745,7 @@ function SkillsEditor() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("developer_skills")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("developer_skills").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: invalidate,
@@ -799,11 +755,7 @@ function SkillsEditor() {
     <div className="space-y-6 rounded-2xl border border-border bg-surface p-6">
       <div className="flex flex-wrap items-end gap-3">
         <Field label="New skill" className="flex-1 min-w-[200px]">
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="React"
-          />
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="React" />
         </Field>
         <Field label="Category">
           <Select value={category} onValueChange={setCategory}>
@@ -905,9 +857,7 @@ function AchievementsEditor() {
           .eq("id", row.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from("developer_achievements")
-          .insert(row);
+        const { error } = await supabase.from("developer_achievements").insert(row);
         if (error) throw error;
       }
     },
@@ -920,10 +870,7 @@ function AchievementsEditor() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("developer_achievements")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("developer_achievements").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: invalidate,
@@ -951,9 +898,7 @@ function AchievementsEditor() {
             </Badge>
             <div className="min-w-0 flex-1">
               <div className="truncate font-medium">{a.title}</div>
-              {a.issuer && (
-                <div className="truncate text-xs text-muted-foreground">{a.issuer}</div>
-              )}
+              {a.issuer && <div className="truncate text-xs text-muted-foreground">{a.issuer}</div>}
             </div>
             <AchievementDialog
               initial={a}
@@ -970,9 +915,7 @@ function AchievementsEditor() {
           </li>
         ))}
         {(data ?? []).length === 0 && (
-          <li className="py-6 text-center text-sm text-muted-foreground">
-            No achievements yet.
-          </li>
+          <li className="py-6 text-center text-sm text-muted-foreground">No achievements yet.</li>
         )}
       </ul>
     </div>
@@ -1028,11 +971,7 @@ function AchievementDialog({
               <Input value={issuer} onChange={(e) => setIssuer(e.target.value)} />
             </Field>
             <Field label="Date awarded">
-              <Input
-                type="date"
-                value={date ?? ""}
-                onChange={(e) => setDate(e.target.value)}
-              />
+              <Input type="date" value={date ?? ""} onChange={(e) => setDate(e.target.value)} />
             </Field>
             <Field label="Sort order">
               <Input

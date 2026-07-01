@@ -48,12 +48,7 @@ export function BrandMark({
           opacity="0.92"
         />
         {/* Tassel cord */}
-        <path
-          d="M33 15 V22"
-          stroke="oklch(0.78 0.16 60)"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-        />
+        <path d="M33 15 V22" stroke="oklch(0.78 0.16 60)" strokeWidth="1.4" strokeLinecap="round" />
         {/* Tassel knot */}
         <circle cx="33" cy="22" r="1.6" fill="oklch(0.78 0.16 60)" />
         {/* Tassel strands */}

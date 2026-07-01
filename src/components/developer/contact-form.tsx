@@ -112,14 +112,10 @@ export function ContactForm() {
           rows={5}
           className="mt-1.5"
         />
-        {errors.message && (
-          <p className="mt-1 text-xs text-destructive">{errors.message}</p>
-        )}
+        {errors.message && <p className="mt-1 text-xs text-destructive">{errors.message}</p>}
       </div>
       <div className="mt-5 flex items-center justify-between gap-3">
-        <p className="text-xs text-muted-foreground">
-          No spam — just a friendly developer.
-        </p>
+        <p className="text-xs text-muted-foreground">No spam — just a friendly developer.</p>
         <Button type="submit" disabled={mut.isPending} size="lg">
           {mut.isPending ? (
             <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />

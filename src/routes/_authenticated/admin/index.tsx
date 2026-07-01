@@ -2,8 +2,22 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  Users, GraduationCap, Library, Layers, FileText, FileStack, FlaskConical,
-  ImageIcon, Download, Activity, Eye, ListChecks, Rocket, Plus, UploadCloud, BookOpen,
+  Users,
+  GraduationCap,
+  Library,
+  Layers,
+  FileText,
+  FileStack,
+  FlaskConical,
+  ImageIcon,
+  Download,
+  Activity,
+  Eye,
+  ListChecks,
+  Rocket,
+  Plus,
+  UploadCloud,
+  BookOpen,
 } from "lucide-react";
 
 import { getDashboardStats, getRecentUploads, getRecentActivity } from "@/lib/admin.functions";
@@ -34,8 +48,19 @@ function AdminDashboard() {
   });
 
   const tiles = [
-    { label: "Students", value: stats?.students, icon: Users, hint: "Registered profiles", to: undefined },
-    { label: "Active 24h", value: stats?.active_users_24h, icon: Activity, hint: "Sessions seen today" },
+    {
+      label: "Students",
+      value: stats?.students,
+      icon: Users,
+      hint: "Registered profiles",
+      to: undefined,
+    },
+    {
+      label: "Active 24h",
+      value: stats?.active_users_24h,
+      icon: Activity,
+      hint: "Sessions seen today",
+    },
     { label: "Semesters", value: stats?.semesters, icon: GraduationCap, to: "/admin/courses" },
     { label: "Subjects", value: stats?.subjects, icon: Library, to: "/admin/courses" },
     { label: "Units", value: stats?.units, icon: Layers, to: "/admin/courses" },
@@ -51,17 +76,27 @@ function AdminDashboard() {
   // "Cold start": no content created yet → show a guided onboarding state
   // above the stat tiles instead of a wall of zeros. The tiles still render
   // below so the operator can see the structure of what's coming.
-  const isColdStart = !statsLoading && stats
-    ? ((stats.semesters ?? 0) + (stats.subjects ?? 0) + (stats.units ?? 0) +
-       (stats.notes ?? 0) + (stats.papers ?? 0) + (stats.quizzes ?? 0)) === 0
-    : false;
+  const isColdStart =
+    !statsLoading && stats
+      ? (stats.semesters ?? 0) +
+          (stats.subjects ?? 0) +
+          (stats.units ?? 0) +
+          (stats.notes ?? 0) +
+          (stats.papers ?? 0) +
+          (stats.quizzes ?? 0) ===
+        0
+      : false;
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-foreground">Operations dashboard</h1>
-          <p className="text-sm text-muted-foreground">A live view of every piece of content and student activity.</p>
+          <h1 className="font-display text-2xl font-semibold text-foreground">
+            Operations dashboard
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            A live view of every piece of content and student activity.
+          </p>
         </div>
       </div>
 
@@ -92,25 +127,35 @@ function AdminDashboard() {
           const value = statsLoading ? "…" : (t.value ?? 0).toLocaleString();
           const isZero = !statsLoading && (t.value ?? 0) === 0;
           const inner = (
-            <div className={cn(
-              "group h-full rounded-xl border border-border/70 bg-surface p-4 transition",
-              t.to && "hover:border-primary/40 hover:shadow-sm",
-            )}>
+            <div
+              className={cn(
+                "group h-full rounded-xl border border-border/70 bg-surface p-4 transition",
+                t.to && "hover:border-primary/40 hover:shadow-sm",
+              )}
+            >
               <div className="flex items-center justify-between">
                 <div className="rounded-md bg-primary/10 p-1.5 text-primary">
                   <t.icon className="h-4 w-4" />
                 </div>
               </div>
-              <div className={cn(
-                "mt-3 font-display text-2xl font-semibold tabular-nums",
-                isZero ? "text-muted-foreground/60" : "text-foreground",
-              )}>
+              <div
+                className={cn(
+                  "mt-3 font-display text-2xl font-semibold tabular-nums",
+                  isZero ? "text-muted-foreground/60" : "text-foreground",
+                )}
+              >
                 {value}
               </div>
               <div className="text-xs uppercase tracking-wide text-muted-foreground">{t.label}</div>
             </div>
           );
-          return t.to ? <Link key={t.label} to={t.to}>{inner}</Link> : <div key={t.label}>{inner}</div>;
+          return t.to ? (
+            <Link key={t.label} to={t.to}>
+              {inner}
+            </Link>
+          ) : (
+            <div key={t.label}>{inner}</div>
+          );
         })}
       </section>
 
@@ -132,7 +177,9 @@ function AdminDashboard() {
                 <li key={`${u.kind}-${u.id}`} className="flex items-center gap-3 py-2.5 text-sm">
                   <KindBadge kind={u.kind} />
                   <span className="flex-1 truncate text-foreground">{u.title || "Untitled"}</span>
-                  <span className="text-xs text-muted-foreground">{relativeTime(u.created_at)}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {relativeTime(u.created_at)}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -173,7 +220,9 @@ function AdminDashboard() {
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-border/70 bg-surface p-4">
-      <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
+      <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h2>
       <div className="mt-2">{children}</div>
     </div>
   );
@@ -186,7 +235,16 @@ function KindBadge({ kind }: { kind: string }) {
     quiz: "bg-emerald-500/10 text-emerald-700",
     media: "bg-purple-500/10 text-purple-700",
   };
-  return <span className={cn("rounded px-1.5 py-0.5 text-[10px] font-medium uppercase", map[kind] ?? "bg-muted text-foreground")}>{kind}</span>;
+  return (
+    <span
+      className={cn(
+        "rounded px-1.5 py-0.5 text-[10px] font-medium uppercase",
+        map[kind] ?? "bg-muted text-foreground",
+      )}
+    >
+      {kind}
+    </span>
+  );
 }
 
 function ActivityIcon({ kind }: { kind: string }) {
@@ -195,7 +253,11 @@ function ActivityIcon({ kind }: { kind: string }) {
 }
 
 function activityLabel(kind: string) {
-  return kind === "note_view" ? "Viewed note" : kind === "paper_download" ? "Downloaded paper" : "Attempted quiz";
+  return kind === "note_view"
+    ? "Viewed note"
+    : kind === "paper_download"
+      ? "Downloaded paper"
+      : "Attempted quiz";
 }
 
 function relativeTime(iso: string) {
