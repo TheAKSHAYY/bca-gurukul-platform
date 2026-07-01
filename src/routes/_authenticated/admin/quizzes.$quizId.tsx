@@ -42,6 +42,7 @@ type QuestionRow = {
 function QuizEditor() {
   const { quizId } = Route.useParams();
   const qc = useQueryClient();
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   const quizQ = useQuery({
     queryKey: ["admin-quiz", quizId],
