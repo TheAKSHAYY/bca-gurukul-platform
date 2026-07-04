@@ -38,15 +38,8 @@ function isDarkMode(theme: Theme): boolean {
 }
 
 function applyTheme(theme: Theme): "light" | "dark" {
-  const resolved = theme === "system" ? getSystemTheme() : theme;
-  const root = document.documentElement;
-  root.dataset.theme = theme;
-  THEME_CLASSES.forEach((value) => root.classList.remove(value));
-  root.classList.toggle("dark", isDarkMode(theme));
-  if (theme !== "system" && theme !== "light") {
-    root.classList.add(theme);
-  }
-  root.style.colorScheme = isDarkMode(theme) ? "dark" : "light";
+  const resolved: "light" | "dark" = isDarkMode(theme) ? "dark" : "light";
+  root.style.colorScheme = resolved;
   return resolved;
 }
 
