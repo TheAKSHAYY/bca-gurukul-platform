@@ -39,6 +39,13 @@ function isDarkMode(theme: Theme): boolean {
 
 function applyTheme(theme: Theme): "light" | "dark" {
   const resolved: "light" | "dark" = isDarkMode(theme) ? "dark" : "light";
+  const root = document.documentElement;
+  root.dataset.theme = theme;
+  THEME_CLASSES.forEach((value) => root.classList.remove(value));
+  root.classList.toggle("dark", resolved === "dark");
+  if (theme !== "system" && theme !== "light" && theme !== "dark") {
+    root.classList.add(theme);
+  }
   root.style.colorScheme = resolved;
   return resolved;
 }
