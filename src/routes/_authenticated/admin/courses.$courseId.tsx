@@ -693,3 +693,144 @@ function UnitDialog({
     </Dialog>
   );
 }
+
+function UnitRow({ unit, onDelete }: { unit: { id: string; number: number; title: string; status: Status }; onDelete: () => void }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+
+  const notesQuery = useQuery({
+    queryKey: ["admin", "unit-notes", unit.id],
+    enabled: open,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("notes").select("id, title, status").eq("unit_id", unit.id).is("deleted_at", null).order("created_at");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const quizzesQuery = useQuery({
+    queryKey: ["admin", "unit-quizzes", unit.id],
+    enabled: open,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("quizzes").select("id, title, status").eq("unit_id", unit.id).is("deleted_at", null).order("created_at");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const removeNote = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("notes").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Note deleted"); qc.invalidateQueries({ queryKey: ["admin", "unit-notes", unit.id] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const removeQuiz = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("quizzes").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Quiz deleted"); qc.invalidateQueries({ queryKey: ["admin", "unit-quizzes", unit.id] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <li className="rounded-md bg-surface">
+      <div className="flex items-center gap-3 px-3 py-2 text-sm">
+        <button type="button" onClick={() => setOpen((v) => !v)} className="grid h-6 w-6 place-items-center rounded hover:bg-primary/10" aria-label="Toggle contents">
+          {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+        </button>
+        <span className="grid h-6 w-6 place-items-center rounded bg-primary/10 text-xs font-semibold text-primary">{unit.number}</span>
+        <span className="flex-1 text-foreground">{unit.title}</span>
+        <Badge variant={unit.status === "published" ? "default" : "secondary"} className="text-[10px]">{unit.status}</Badge>
+        <Button size="sm" variant="ghost" onClick={onDelete}>
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+      {open && (
+        <div className="space-y-3 border-t border-border/60 px-3 py-3">
+          <div>
+            <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <FileText className="h-3 w-3" /> Notes
+            </p>
+            {notesQuery.isLoading && <p className="text-xs text-muted-foreground">Loading…</p>}
+            {notesQuery.data?.length === 0 && <p className="text-xs text-muted-foreground">No notes.</p>}
+            <ul className="space-y-1">
+              {notesQuery.data?.map((n) => (
+                <li key={n.id} className="flex items-center gap-2 rounded bg-background px-2 py-1.5 text-xs">
+                  <span className="flex-1 truncate">{n.title}</span>
+                  <Badge variant={n.status === "published" ? "default" : "secondary"} className="text-[10px]">{n.status}</Badge>
+                  <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => { if (confirm(`Delete note "${n.title}"?`)) removeNote.mutate(n.id); }}>
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <FileQuestion className="h-3 w-3" /> Quizzes
+            </p>
+            {quizzesQuery.isLoading && <p className="text-xs text-muted-foreground">Loading…</p>}
+            {quizzesQuery.data?.length === 0 && <p className="text-xs text-muted-foreground">No quizzes.</p>}
+            <ul className="space-y-1">
+              {quizzesQuery.data?.map((q) => (
+                <li key={q.id} className="flex items-center gap-2 rounded bg-background px-2 py-1.5 text-xs">
+                  <span className="flex-1 truncate">{q.title}</span>
+                  <Badge variant={q.status === "published" ? "default" : "secondary"} className="text-[10px]">{q.status}</Badge>
+                  <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => { if (confirm(`Delete quiz "${q.title}"?`)) removeQuiz.mutate(q.id); }}>
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </li>
+  );
+}
+
+function PapersList({ subjectId }: { subjectId: string }) {
+  const qc = useQueryClient();
+  const papersQuery = useQuery({
+    queryKey: ["admin", "subject-papers", subjectId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("papers").select("id, title, status").eq("subject_id", subjectId).is("deleted_at", null).order("created_at");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const removePaper = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("papers").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Paper deleted"); qc.invalidateQueries({ queryKey: ["admin", "subject-papers", subjectId] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <div>
+      <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <ClipboardList className="h-3.5 w-3.5" /> Previous year papers
+      </p>
+      {papersQuery.isLoading && <p className="text-xs text-muted-foreground">Loading…</p>}
+      {papersQuery.data?.length === 0 && <p className="text-xs text-muted-foreground">No papers.</p>}
+      <ul className="space-y-1">
+        {papersQuery.data?.map((p) => (
+          <li key={p.id} className="flex items-center gap-2 rounded bg-surface px-3 py-1.5 text-xs">
+            <span className="flex-1 truncate">{p.title}</span>
+            <Badge variant={p.status === "published" ? "default" : "secondary"} className="text-[10px]">{p.status}</Badge>
+            <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => { if (confirm(`Delete paper "${p.title}"?`)) removePaper.mutate(p.id); }}>
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
