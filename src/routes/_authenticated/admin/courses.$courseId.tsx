@@ -337,36 +337,20 @@ function SubjectRow({
       </div>
 
       {expanded && (
-        <div className="border-t border-border px-4 py-3">
-          {unitsQuery.isLoading && <p className="text-xs text-muted-foreground">Loading units…</p>}
-          {unitsQuery.data?.length === 0 && (
-            <p className="text-xs text-muted-foreground">No units yet.</p>
-          )}
-          <ul className="space-y-1.5">
-            {unitsQuery.data?.map((u) => (
-              <li
-                key={u.id}
-                className="flex items-center gap-3 rounded-md bg-surface px-3 py-2 text-sm"
-              >
-                <span className="grid h-6 w-6 place-items-center rounded bg-primary/10 text-xs font-semibold text-primary">
-                  {u.number}
-                </span>
-                <span className="flex-1 text-foreground">{u.title}</span>
-                <Badge variant={u.status === "published" ? "default" : "secondary"} className="text-[10px]">
-                  {u.status}
-                </Badge>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    if (confirm(`Delete unit ${u.number}?`)) removeUnit.mutate(u.id);
-                  }}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </li>
-            ))}
-          </ul>
+        <div className="space-y-4 border-t border-border px-4 py-3">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Units</p>
+            {unitsQuery.isLoading && <p className="text-xs text-muted-foreground">Loading units…</p>}
+            {unitsQuery.data?.length === 0 && (
+              <p className="text-xs text-muted-foreground">No units yet.</p>
+            )}
+            <ul className="space-y-1.5">
+              {unitsQuery.data?.map((u) => (
+                <UnitRow key={u.id} unit={{ id: u.id, number: u.number, title: u.title, status: u.status as Status }} onDelete={() => { if (confirm(`Delete unit ${u.number}?`)) removeUnit.mutate(u.id); }} />
+              ))}
+            </ul>
+          </div>
+          <PapersList subjectId={sub.id} />
         </div>
       )}
 
