@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAdminRealtimeRefresh } from "@/hooks/use-admin-realtime-refresh";
 import { useRoles } from "@/hooks/use-roles";
 import { cn } from "@/lib/utils";
 
@@ -61,6 +62,7 @@ export function AdminShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { isSuperAdmin } = useRoles();
   const [wizardOpen, setWizardOpen] = useState(false);
+  useAdminRealtimeRefresh();
 
   return (
     <SidebarProvider>
