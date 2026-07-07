@@ -40,6 +40,7 @@ function SemesterDetail() {
         .select("id, code, slug, title, description, credits")
         .eq("semester_id", sem.id)
         .eq("status", "published")
+        .is("deleted_at", null)
         .order("sort_order")
         .order("code");
       if (sue) throw sue;

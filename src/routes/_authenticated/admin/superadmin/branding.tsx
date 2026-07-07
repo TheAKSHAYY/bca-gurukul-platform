@@ -61,7 +61,8 @@ function BrandingPage() {
   });
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(schema) as any,
     values: brandingQuery.data
       ? {
           site_name: brandingQuery.data.site_name ?? "",
