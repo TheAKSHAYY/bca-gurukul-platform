@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, BookText } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -12,9 +13,11 @@ export const Route = createFileRoute("/courses/$courseSlug/$semesterNumber/")({
 
 function SemesterDetail() {
   const { courseSlug, semesterNumber } = Route.useParams();
+  const qc = useQueryClient();
+  const queryKey = ["public", "sem", courseSlug, semesterNumber];
 
   const semQuery = useQuery({
-    queryKey: ["public", "sem", courseSlug, semesterNumber],
+    queryKey,
     queryFn: async () => {
       const { data: course, error: ce } = await supabase
         .from("courses")
@@ -48,6 +51,36 @@ function SemesterDetail() {
       return { course, sem, subjects: subjects ?? [] };
     },
   });
+
+  const semesterId = semQuery.data?.sem.id;
+  const courseId = semQuery.data?.course.id;
+
+  // Live-refresh when subjects (or the parent semester/course) change.
+  useEffect(() => {
+    const channel = supabase
+      .channel(`public-sem-${courseSlug}-${semesterNumber}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "subjects", ...(semesterId ? { filter: `semester_id=eq.${semesterId}` } : {}) },
+        () => qc.invalidateQueries({ queryKey }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "semesters", ...(semesterId ? { filter: `id=eq.${semesterId}` } : {}) },
+        () => qc.invalidateQueries({ queryKey }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "courses", ...(courseId ? { filter: `id=eq.${courseId}` } : {}) },
+        () => qc.invalidateQueries({ queryKey }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [semesterId, courseId, courseSlug, semesterNumber]);
+
 
   return (
     <div className="min-h-screen bg-background">
