@@ -52,6 +52,36 @@ function SemesterDetail() {
     },
   });
 
+  const semesterId = semQuery.data?.sem.id;
+  const courseId = semQuery.data?.course.id;
+
+  // Live-refresh when subjects (or the parent semester/course) change.
+  useEffect(() => {
+    const channel = supabase
+      .channel(`public-sem-${courseSlug}-${semesterNumber}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "subjects", ...(semesterId ? { filter: `semester_id=eq.${semesterId}` } : {}) },
+        () => qc.invalidateQueries({ queryKey }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "semesters", ...(semesterId ? { filter: `id=eq.${semesterId}` } : {}) },
+        () => qc.invalidateQueries({ queryKey }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "courses", ...(courseId ? { filter: `id=eq.${courseId}` } : {}) },
+        () => qc.invalidateQueries({ queryKey }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [semesterId, courseId, courseSlug, semesterNumber]);
+
+
   return (
     <div className="min-h-screen bg-background">
       <PublicHeader />
