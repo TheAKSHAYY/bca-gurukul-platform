@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, BookText } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -12,9 +13,11 @@ export const Route = createFileRoute("/courses/$courseSlug/$semesterNumber/")({
 
 function SemesterDetail() {
   const { courseSlug, semesterNumber } = Route.useParams();
+  const qc = useQueryClient();
+  const queryKey = ["public", "sem", courseSlug, semesterNumber];
 
   const semQuery = useQuery({
-    queryKey: ["public", "sem", courseSlug, semesterNumber],
+    queryKey,
     queryFn: async () => {
       const { data: course, error: ce } = await supabase
         .from("courses")
