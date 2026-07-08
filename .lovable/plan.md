@@ -1,96 +1,137 @@
-# Production MCQ System — Build Plan
+# BCA Gurukul — Admin Redesign
 
-This is a large scope. Existing project already has `quizzes`, `quiz_questions`, `quiz_options`, `quiz_attempts`, `quiz_attempt_answers`, `bookmarks`, and the Course→Semester→Subject→Unit tree. I'll **extend** that, not replace it, and ship in phases so each is usable end-to-end.
+Incremental rebuild. Old admin pages keep working until each replacement lands. No destructive deletes this pass.
 
-## Approach
+## Phase plan
 
-- Reuse `quizzes` table as "Tests". Add missing columns (negative_marking, randomize, schedule, public/private, passing_marks).
-- Reuse `quiz_questions` + `quiz_options` for the question bank. Add: difficulty, marks, negative_marks, tags, year, exam_name, image_url, university.
-- Add new tables only where existing ones don't fit: `question_reports`, `wrong_questions` (view), `daily_quiz`, `leaderboard_snapshots`, `student_stats` (materialized).
-- Extend `bookmarks` (already exists) to cover questions.
-- Server-side scoring already exists (`submit_quiz_attempt` RPC) — extend for negative marking, skipped tracking, and resume.
+**Phase 1 (this turn)** — new shell, IA, dashboard, command palette, quick add, primitives, `content_items` table + backfill + Content module.
 
-## Phased Delivery
+**Phase 2** — migrate Papers screen and Question Bank screen onto the new primitives; move `/admin/notes` to redirect into `/admin/content?type=note`; retire old notes admin page once verified.
 
-### Phase 1 — Data model + admin bulk tools  (foundation)
-- Migration: add columns to `quiz_questions` (difficulty, marks, negative_marks, tags text[], year, exam_name, university, image_url).
-- Migration: add columns to `quizzes` (negative_marking, randomize_questions, randomize_options, is_public, start_date, end_date, passing_marks).
-- New table: `question_reports` (user_id, question_id, reason, status).
-- New table: `daily_quiz` (date unique, question_id).
-- Extend `submit_quiz_attempt` RPC: negative marking, skipped count, resume support.
-- Admin: **Bulk MCQ paste/import** (paste 20 questions in a textbox → parse → preview → import). CSV import.
-- Admin: question editor with image upload, difficulty, tags, explanation, year, exam.
+**Phase 3** — Settings hub (folds Homepage, Developer, Tags, Media, Branding, SEO, Flags, Users under one Settings route); polish, empty-state illustrations, keyboard shortcuts help.
 
-### Phase 2 — Student practice mode
-- `/practice` route: pick Subject → Unit → filters (difficulty, count, timed/untimed, random).
-- Question UI: bookmark, report, palette, timer, prev/next, dark mode already supported.
-- Instant feedback mode (show correct + explanation after each answer).
-- Wrong-question auto-save (derived view over `quiz_attempt_answers`).
+Students / Analytics / Notifications are explicitly deferred.
 
-### Phase 3 — Mock test mode
-- `/tests` list: filter by subject, semester, public/scheduled.
-- Real exam UI: fullscreen, autosave to `quiz_attempts.answers_draft`, resume, submit-confirm, auto-submit on timeout.
-- Result page: score, %, accuracy, time, topic breakdown, strong/weak areas, retake, share, PDF download (client-side via `jspdf`).
+---
 
-### Phase 4 — PYQs + Search + Bookmarks
-- `/pyqs` filtered browser (year, exam, university, subject, unit).
-- Global question search with FTS index on question text + tags.
-- `/bookmarks/questions` — practice from bookmarks only.
-- `/wrong-questions` — retry only previously wrong ones.
+## New information architecture
 
-### Phase 5 — Analytics + Leaderboard
-- Student dashboard widgets: solved, accuracy, streak (already), avg score, weekly progress chart, weak subjects.
-- `/leaderboard` — weekly / monthly / all-time via SQL views.
-- Admin analytics: hardest questions, lowest-accuracy topics, most-active students, completion rate. Charts with Recharts.
+Sidebar (flat, seven items):
 
-### Phase 6 — Gamification + Daily Quiz
-- Daily Quiz card on dashboard.
-- Achievements table + badges (streak, 100 solved, first perfect score).
-- XP / level system derived from attempts.
-
-## Technical Details
-
-**Reuse over rebuild.** Don't create parallel `subjects`, `units`, `questions`, `tests`, `attempts`, `answers` tables — the project already has them under different names. Duplicating would fork the whole app.
-
-**RLS pattern (already in place):**
-- Students: read published quizzes/questions; write own attempts/answers/bookmarks/reports.
-- Admins: full CRUD via `has_role(auth.uid(), 'admin')`.
-
-**Scoring stays server-side** (`submit_quiz_attempt` RPC). Client never sees `is_correct` for unsubmitted attempts (already enforced via `get_quiz_options` RPC).
-
-**Bulk paste parser** — accepts formats like:
-```
-Q: What is 2+2?
-A) 3
-B) 4 *
-C) 5
-D) 6
-E: Basic arithmetic.
-```
-The `*` marks correct answer. Parse client-side, preview table, insert in one transaction.
-
-**Folder structure:**
-```
-src/routes/_authenticated/
-  practice.tsx, practice.$subjectId.tsx
-  tests.index.tsx, tests.$testId.tsx, tests.$testId.result.tsx
-  pyqs.tsx, leaderboard.tsx, wrong-questions.tsx
-  admin/questions.tsx, admin/questions.import.tsx, admin/test-builder.tsx
-src/components/mcq/
-  question-card.tsx, question-palette.tsx, exam-timer.tsx,
-  result-summary.tsx, difficulty-badge.tsx, bulk-paste-parser.tsx
-src/lib/mcq/
-  scoring.ts, parser.ts, analytics.functions.ts
+```text
+Dashboard        /admin
+Courses          /admin/courses          (existing, keep)
+Subjects         /admin/subjects         (NEW — flat cross-course view)
+Content          /admin/content          (NEW — unified)
+Previous Papers  /admin/papers           (existing, restyled Phase 2)
+Question Bank    /admin/quizzes          (existing, restyled Phase 2)
+Settings         /admin/settings         (Phase 3 hub; links to existing pages this phase)
 ```
 
-## Estimated Scope
+Explorer, Homepage, Developer, Media, Tags, Inbox, Super admin move under Settings in Phase 3. This phase they stay reachable via a "More" section in the sidebar so nothing breaks.
 
-~20 files per phase, ~6 migrations total, ~4-6 phases. Full build is roughly a week of dedicated work in one shot. Each phase is independently shippable.
+---
 
-## Question for You
+## Content data model (new)
 
-1. **Start with Phase 1** (bulk import + expanded question editor) so you can actually upload MCQs faster right now? That's what your last message was about.
-2. Or start with a different phase?
-3. Any features to drop (e.g., PDF result, leaderboard, gamification) to keep scope tight?
+New table `public.content_items`:
 
-Reply with the phase order you want and I'll start.
+- `type` — enum `content_type` (`note`, `pdf`, `ppt`, `video`, `assignment`, `link`)
+- `title`, `description`
+- `subject_id`, `unit_id` (both nullable; subject required, unit optional)
+- `file_path` (storage path), `file_url` (for `video`/`link`), `thumbnail_path`
+- `tags text[]`, `visibility` (`public`|`students`|`private`), `status` (`draft`|`published`|`archived`)
+- `publish_at timestamptz`, `view_count`, `download_count`
+- Standard `created_by`, `created_at`, `updated_at`, `deleted_at`
+
+Grants + RLS:
+- `GRANT SELECT ON public.content_items TO anon` (only rows `status='published'` AND `visibility='public'`)
+- `GRANT SELECT,INSERT,UPDATE,DELETE TO authenticated`; `GRANT ALL TO service_role`
+- Public read policy (published+public); owner/admin write policies via `is_admin`
+- Trigger `set_updated_at`; realtime enabled
+
+**Backfill:** copy existing `public.notes` into `content_items` with `type='note'`, preserving `title`, `summary→description`, `subject_id`, `unit_id`, `status`, `created_by`, `created_at`, `file_path` where present. Old `notes` table stays intact; nothing points at it after Phase 2.
+
+Papers and Quizzes are NOT migrated.
+
+---
+
+## New primitives (`src/components/admin/ui/`)
+
+- `PageHeader` — title, description, actions slot, breadcrumbs
+- `StatCard` — label / value / delta / icon
+- `DataTable` — TanStack Table: search, sort, pagination, column visibility, row selection, bulk-action bar, empty + loading states
+- `EmptyState` — icon, title, description, CTA
+- `TableSkeleton`, `CardSkeleton`
+- `FilterBar`, `StatusBadge`, `ConfirmDialog`
+
+All theme-token based (`bg-surface`, `text-foreground`, `border-border`). Dark mode inherited.
+
+---
+
+## New admin shell (`src/components/admin/admin-shell.tsx` rewrite)
+
+- Collapsible sidebar (icon rail on mobile, full on md+)
+- Sticky top bar: sidebar trigger, breadcrumbs, `⌘K` search trigger, quick-add button, student-view link, avatar
+- `⌘K` / `Ctrl+K` opens `CommandPalette` (built on shadcn `Command`) — jumps to any admin page + quick-creates (course, subject, content, paper, MCQ)
+- Quick-add uses the existing `CreateWizard` (extended with "New content")
+- Content tree stays in a collapsible "Explorer" section, hidden by default
+
+---
+
+## New routes
+
+- `src/routes/_authenticated/admin/index.tsx` — replace with new Dashboard (stat grid, recent uploads, recent activity, quick actions). Reuses existing `getDashboardStats`, `getRecentUploads`, `getRecentActivity`.
+- `src/routes/_authenticated/admin/subjects.tsx` — NEW flat subjects table across all courses/semesters
+- `src/routes/_authenticated/admin/content.index.tsx` — NEW unified content list
+- `src/routes/_authenticated/admin/content.new.tsx` — NEW content editor (type picker → form → upload)
+- `src/routes/_authenticated/admin/content.$id.tsx` — NEW edit view
+- `src/routes/_authenticated/admin/settings.index.tsx` — Phase 3 hub stub linking to existing settings pages
+
+Old routes (`/admin/notes`, `/admin/papers`, `/admin/quizzes`, `/admin/media`, `/admin/tags`, `/admin/homepage`, `/admin/developer`, `/admin/inbox`, `/admin/explorer`, `/admin/superadmin/*`) remain untouched and reachable.
+
+---
+
+## Server functions
+
+New `src/lib/content.functions.ts`:
+
+- `listContent({ type?, status?, subjectId?, search?, page, pageSize, sort })` — auth'd, admin-scoped
+- `getContent({ id })`
+- `createContent({ input })`
+- `updateContent({ id, patch })`
+- `bulkUpdateContent({ ids, patch })` (publish / archive / restore)
+- `deleteContent({ id })` (soft)
+- `duplicateContent({ id })`
+
+Storage: reuse existing `notes` bucket for `note`/`pdf`/`ppt`/`assignment`, `media` bucket for `video` thumbnails, `link`/`video` use `file_url` only.
+
+---
+
+## What ships this turn
+
+1. Migration: `content_type` enum + `content_items` table + grants + RLS + trigger + realtime + backfill from `notes`.
+2. `src/components/admin/ui/*` primitives.
+3. `src/lib/content.functions.ts`.
+4. Rewritten `admin-shell.tsx` (new IA, command palette, quick add, top bar).
+5. New Dashboard, Subjects, Content list, Content new/edit routes.
+6. `CommandPalette` component.
+7. `CreateWizard` extended with "Content".
+8. Skeletons + empty states wired in.
+
+Nothing existing is deleted. Old sidebar links live under a collapsible "More" group so `/admin/homepage`, `/admin/developer`, `/admin/media`, `/admin/tags`, `/admin/inbox`, `/admin/explorer`, `/admin/superadmin` remain reachable.
+
+---
+
+## Technical notes
+
+- All new pages use `useQuery` + server fns with query keys under `["admin","content", ...]` so the existing `useAdminRealtimeRefresh` invalidates them automatically once `content_items` is added to its watch list.
+- `useAdminRealtimeRefresh` gets `content_items` appended to `ADMIN_REALTIME_TABLES`.
+- Command palette uses `cmdk` (shadcn `Command` primitive — already installed).
+- Tables use `@tanstack/react-table` (add if not present).
+- Design tokens only — no hex, no `text-white`. Fraunces for section headers, Inter for body per project memory.
+
+## Risks
+
+- Bundle grows with react-table; acceptable, admin-only.
+- Backfill runs once inside the migration; safe because `content_items` starts empty. Re-running the migration would double-insert — the backfill uses `ON CONFLICT DO NOTHING` on `(title, subject_id, created_by)` to be idempotent.
