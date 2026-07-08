@@ -7,6 +7,7 @@ const ADMIN_REALTIME_TABLES = [
   "audit_logs",
   "branding",
   "contact_messages",
+  "content_items",
   "courses",
   "feature_flags",
   "homepage_sections",
