@@ -68,9 +68,7 @@ function SubjectsPage() {
           icon={Library}
           title="No subjects yet"
           description="Create a course and semester first, then add subjects."
-          action={
-            <Button asChild size="sm"><Link to="/admin/courses">Go to courses</Link></Button>
-          }
+          primaryAction={{ label: "Go to courses", to: "/admin/courses" }}
         />
       ) : (
         <div className="overflow-hidden rounded-xl border border-border/70 bg-surface">

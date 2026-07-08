@@ -82,11 +82,7 @@ function AdminDashboard() {
           icon={BookOpen}
           title="Set up your first course"
           description="Create a course, add a semester and subjects, then upload content."
-          action={
-            <Button asChild size="sm">
-              <Link to="/admin/courses"><Plus className="mr-1.5 h-4 w-4" /> Create course</Link>
-            </Button>
-          }
+          primaryAction={{ label: "Create course", to: "/admin/courses", icon: Plus }}
         />
       )}
 

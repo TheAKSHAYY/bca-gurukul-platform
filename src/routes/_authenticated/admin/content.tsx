@@ -187,9 +187,7 @@ function ContentPage() {
               ? "Try clearing filters or adjusting your search."
               : "Add your first content item to get started."
           }
-          action={
-            <Button asChild size="sm"><Link to="/admin/content/new"><Plus className="mr-1.5 h-4 w-4" /> New content</Link></Button>
-          }
+          primaryAction={{ label: "New content", to: "/admin/content/new", icon: Plus }}
         />
       ) : (
         <div className="overflow-hidden rounded-xl border border-border/70 bg-surface">
