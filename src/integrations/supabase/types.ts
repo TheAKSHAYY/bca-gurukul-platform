@@ -272,6 +272,96 @@ export type Database = {
         }
         Relationships: []
       }
+      content_items: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          description: string | null
+          download_count: number
+          file_bucket: string | null
+          file_mime: string | null
+          file_path: string | null
+          file_size_bytes: number | null
+          file_url: string | null
+          id: string
+          publish_at: string | null
+          status: string
+          subject_id: string | null
+          tags: string[]
+          thumbnail_path: string | null
+          title: string
+          type: Database["public"]["Enums"]["content_type"]
+          unit_id: string | null
+          updated_at: string
+          view_count: number
+          visibility: Database["public"]["Enums"]["content_visibility"]
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          download_count?: number
+          file_bucket?: string | null
+          file_mime?: string | null
+          file_path?: string | null
+          file_size_bytes?: number | null
+          file_url?: string | null
+          id?: string
+          publish_at?: string | null
+          status?: string
+          subject_id?: string | null
+          tags?: string[]
+          thumbnail_path?: string | null
+          title: string
+          type?: Database["public"]["Enums"]["content_type"]
+          unit_id?: string | null
+          updated_at?: string
+          view_count?: number
+          visibility?: Database["public"]["Enums"]["content_visibility"]
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          download_count?: number
+          file_bucket?: string | null
+          file_mime?: string | null
+          file_path?: string | null
+          file_size_bytes?: number | null
+          file_url?: string | null
+          id?: string
+          publish_at?: string | null
+          status?: string
+          subject_id?: string | null
+          tags?: string[]
+          thumbnail_path?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["content_type"]
+          unit_id?: string | null
+          updated_at?: string
+          view_count?: number
+          visibility?: Database["public"]["Enums"]["content_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_items_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_items_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           code: string
@@ -2055,6 +2145,8 @@ export type Database = {
     Enums: {
       app_role: "super_admin" | "admin" | "instructor" | "student"
       bookmark_kind: "note" | "paper" | "quiz" | "unit"
+      content_type: "note" | "pdf" | "ppt" | "video" | "assignment" | "link"
+      content_visibility: "public" | "students" | "private"
       homepage_section_type:
         | "hero"
         | "trust_bar"
@@ -2223,6 +2315,8 @@ export const Constants = {
     Enums: {
       app_role: ["super_admin", "admin", "instructor", "student"],
       bookmark_kind: ["note", "paper", "quiz", "unit"],
+      content_type: ["note", "pdf", "ppt", "video", "assignment", "link"],
+      content_visibility: ["public", "students", "private"],
       homepage_section_type: [
         "hero",
         "trust_bar",
