@@ -40,11 +40,11 @@ export const Route = createFileRoute("/")({
         content:
           "The structured learning platform for BCA students. Notes, past papers, video lectures, and MCQ practice — organized by semester and subject.",
       },
-      { property: "og:title", content: "BCA Gurukul — Master your BCA" },
+      { property: "og:title", content: "BCA Gurukul — Master your BCA, semester by semester" },
       {
         property: "og:description",
         content:
-          "Structured BCA learning — notes, papers, videos, and MCQs by semester and subject.",
+          "The structured learning platform for BCA students. Notes, past papers, video lectures, and MCQ practice — organized by semester and subject.",
       },
     ],
   }),

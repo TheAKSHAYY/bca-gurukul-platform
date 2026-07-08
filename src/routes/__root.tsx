@@ -86,30 +86,30 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "BCA Gurukul — Learn BCA, the right way" },
+      { title: "BCA Gurukul — Master your BCA, semester by semester" },
       {
         name: "description",
         content:
-          "BCA Gurukul is a structured learning platform for BCA students — notes, past papers, videos, and MCQ practice, organized by semester and subject.",
+          "The structured learning platform for BCA students. Notes, past papers, video lectures, and MCQ practice — organized by semester and subject.",
       },
       { name: "theme-color", content: "#2a2566" },
       { property: "og:site_name", content: "BCA Gurukul" },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "BCA Gurukul — Learn BCA, the right way" },
+      { property: "og:title", content: "BCA Gurukul — Master your BCA, semester by semester" },
       {
         property: "og:description",
         content:
-          "Structured notes, past papers, videos, and MCQ practice for BCA students — organized by semester and subject.",
+          "The structured learning platform for BCA students. Notes, past papers, video lectures, and MCQ practice — organized by semester and subject.",
       },
       { property: "og:image", content: "/og-image.jpg" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "640" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "BCA Gurukul — Learn BCA, the right way" },
+      { name: "twitter:title", content: "BCA Gurukul — Master your BCA, semester by semester" },
       {
         name: "twitter:description",
         content:
-          "Structured notes, past papers, videos, and MCQ practice for BCA students — organized by semester and subject.",
+          "The structured learning platform for BCA students. Notes, past papers, video lectures, and MCQ practice — organized by semester and subject.",
       },
       { name: "twitter:image", content: "/og-image.jpg" },
     ],
