@@ -65,7 +65,6 @@ const MORE_NAV = [
   { label: "Homepage", to: "/admin/homepage", icon: Layout },
   { label: "Developer", to: "/admin/developer", icon: UserCircle2 },
   { label: "Inbox", to: "/admin/inbox", icon: Inbox },
-  { label: "Notes (legacy)", to: "/admin/notes", icon: FileText },
 ];
 
 export function AdminShell() {
