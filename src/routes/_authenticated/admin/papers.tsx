@@ -1,10 +1,19 @@
-import { useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, FileStack, Pencil, Plus, Trash2, Upload } from "lucide-react";
+import {
+  FileStack, Pencil, Plus, Trash2, Upload, Search, MoreHorizontal,
+  CheckCircle2, XCircle, Archive,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 import { supabase } from "@/integrations/supabase/client";
+import { PageHeader } from "@/components/admin/ui/page-header";
+import { StatusBadge } from "@/components/admin/ui/status-badge";
+import { TableSkeleton } from "@/components/admin/ui/table-skeleton";
+import { ConfirmDialog } from "@/components/admin/ui/confirm-dialog";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,9 +25,12 @@ import {
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/_authenticated/admin/papers")({
-  head: () => ({ meta: [{ title: "Question Papers · Admin · BCA Gurukul" }] }),
+  head: () => ({ meta: [{ title: "Previous Papers · Admin · BCA Gurukul" }] }),
   component: AdminPapersPage,
 });
 
@@ -35,54 +47,86 @@ type PaperRow = {
   file_mime: string | null;
   file_size_bytes: number | null;
   status: string;
+  created_at: string;
+  updated_at: string;
 };
+
+type SubjectLite = { id: string; code: string; title: string };
+
+const EXAM_TYPES = [
+  { value: "all", label: "All exams" },
+  { value: "end_sem", label: "End sem" },
+  { value: "mid_sem", label: "Mid sem" },
+  { value: "supplementary", label: "Supplementary" },
+  { value: "model", label: "Model" },
+  { value: "other", label: "Other" },
+];
+
+const STATUSES = [
+  { value: "all", label: "All statuses" },
+  { value: "draft", label: "Draft" },
+  { value: "published", label: "Published" },
+  { value: "archived", label: "Archived" },
+];
 
 function AdminPapersPage() {
   const qc = useQueryClient();
-  const [courseId, setCourseId] = useState("");
-  const [semesterId, setSemesterId] = useState("");
-  const [subjectId, setSubjectId] = useState("");
+  const [search, setSearch] = useState("");
+  const [subjectId, setSubjectId] = useState("all");
+  const [examType, setExamType] = useState("all");
+  const [status, setStatus] = useState("all");
+  const [year, setYear] = useState("all");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<PaperRow | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<PaperRow | null>(null);
 
-  const coursesQuery = useQuery({
-    queryKey: ["admin", "papers", "courses"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("courses").select("id, title").order("title");
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-  const semestersQuery = useQuery({
-    queryKey: ["admin", "papers", "semesters", courseId],
-    enabled: !!courseId,
+  const subjectsQuery = useQuery<SubjectLite[]>({
+    queryKey: ["admin", "papers", "subjects-all"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("semesters").select("id, number, title").eq("course_id", courseId).order("number");
+        .from("subjects").select("id, code, title").order("title");
       if (error) throw error;
       return data ?? [];
     },
   });
-  const subjectsQuery = useQuery({
-    queryKey: ["admin", "papers", "subjects", semesterId],
-    enabled: !!semesterId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("subjects").select("id, code, title").eq("semester_id", semesterId).order("title");
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+
   const papersQuery = useQuery({
-    queryKey: ["admin", "papers", "list", subjectId],
-    enabled: !!subjectId,
+    queryKey: ["admin", "papers", "list", { subjectId, examType, status, year, search }],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("papers").select("*").eq("subject_id", subjectId)
-        .order("year", { ascending: false }).order("created_at", { ascending: false });
+      let q = supabase.from("papers").select("*", { count: "exact" });
+      if (subjectId !== "all") q = q.eq("subject_id", subjectId);
+      if (examType !== "all") q = q.eq("exam_type", examType);
+      if (status !== "all") q = q.eq("status", status);
+      if (year !== "all") q = q.eq("year", Number(year));
+      if (search.trim()) q = q.ilike("title", `%${search.trim()}%`);
+      const { data, error, count } = await q
+        .order("year", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(200);
       if (error) throw error;
-      return data ?? [];
+      return { items: (data ?? []) as PaperRow[], total: count ?? 0 };
     },
+  });
+
+  const items = papersQuery.data?.items ?? [];
+  const total = papersQuery.data?.total ?? 0;
+  const subjects = subjectsQuery.data ?? [];
+  const subjectMap = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
+  const years = useMemo(() => {
+    const set = new Set<number>();
+    items.forEach((p) => set.add(p.year));
+    return Array.from(set).sort((a, b) => b - a);
+  }, [items]);
+
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "papers"] });
+
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status: s }: { id: string; status: string }) => {
+      const { error } = await supabase.from("papers").update({ status: s }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { invalidate(); toast.success("Updated"); },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const deleteMutation = useMutation({
@@ -91,121 +135,184 @@ function AdminPapersPage() {
       const { error } = await supabase.from("papers").delete().eq("id", p.id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      toast.success("Paper deleted");
-      qc.invalidateQueries({ queryKey: ["admin", "papers", "list", subjectId] });
-    },
+    onSuccess: () => { invalidate(); setConfirmDelete(null); toast.success("Deleted"); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> Back to admin
-          </Link>
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        title="Previous Papers"
+        description="Curate past exam papers per subject — searchable across every course."
+        actions={
+          <Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}>
+            <Plus className="mr-1.5 h-4 w-4" /> New paper
+          </Button>
+        }
+      />
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="relative min-w-[220px] flex-1 sm:max-w-sm">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search title…"
+            className="h-9 pl-8"
+          />
         </div>
-      </header>
+        <Select value={subjectId} onValueChange={setSubjectId}>
+          <SelectTrigger className="h-9 w-48"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All subjects</SelectItem>
+            {subjects.map((s) => (
+              <SelectItem key={s.id} value={s.id}>{s.code} · {s.title}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={examType} onValueChange={setExamType}>
+          <SelectTrigger className="h-9 w-32"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {EXAM_TYPES.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={year} onValueChange={setYear}>
+          <SelectTrigger className="h-9 w-24"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All years</SelectItem>
+            {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {STATUSES.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <div className="ml-auto text-xs text-muted-foreground">{total} papers</div>
+      </div>
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <div className="flex items-center gap-3">
-          <FileStack className="h-6 w-6 text-primary" />
-          <h1 className="font-display text-3xl font-semibold text-foreground">Previous-year question papers</h1>
+      {papersQuery.isLoading ? (
+        <TableSkeleton rows={8} cols={5} />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon={FileStack}
+          title={search || subjectId !== "all" || examType !== "all" || status !== "all" || year !== "all" ? "No matches" : "No previous papers yet"}
+          description={
+            search || subjectId !== "all" || examType !== "all" || status !== "all" || year !== "all"
+              ? "Try clearing filters or adjusting your search."
+              : "Upload past exam papers so students can practice with real questions."
+          }
+          primaryAction={{ label: "New paper", onClick: () => { setEditing(null); setOpen(true); }, icon: Plus }}
+        />
+      ) : (
+        <div className="overflow-hidden rounded-xl border border-border/70 bg-surface">
+          <table className="w-full">
+            <thead className="border-b border-border/70 bg-surface-muted text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2.5">Title</th>
+                <th className="px-3 py-2.5 hidden md:table-cell">Subject</th>
+                <th className="px-3 py-2.5">Year</th>
+                <th className="px-3 py-2.5 hidden md:table-cell">Type</th>
+                <th className="px-3 py-2.5">Status</th>
+                <th className="px-3 py-2.5 hidden lg:table-cell">Updated</th>
+                <th className="w-10 px-3 py-2.5"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/60">
+              {items.map((p) => {
+                const subj = subjectMap.get(p.subject_id);
+                return (
+                  <tr key={p.id} className="text-sm hover:bg-surface-muted/40">
+                    <td className="px-3 py-2.5">
+                      <button type="button" onClick={() => { setEditing(p); setOpen(true); }} className="text-left">
+                        <span className="block font-medium text-foreground hover:text-primary">{p.title}</span>
+                        {p.paper_number && (
+                          <span className="text-xs text-muted-foreground">#{p.paper_number}</span>
+                        )}
+                      </button>
+                    </td>
+                    <td className="px-3 py-2.5 hidden md:table-cell text-muted-foreground">
+                      {subj ? `${subj.code} · ${subj.title}` : "—"}
+                    </td>
+                    <td className="px-3 py-2.5"><Badge variant="outline">{p.year}</Badge></td>
+                    <td className="px-3 py-2.5 hidden md:table-cell text-xs capitalize text-muted-foreground">
+                      {p.exam_type.replace("_", " ")}
+                    </td>
+                    <td className="px-3 py-2.5"><StatusBadge value={p.status} /></td>
+                    <td className="px-3 py-2.5 hidden lg:table-cell text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(p.updated_at ?? p.created_at), { addSuffix: true })}
+                    </td>
+                    <td className="px-3 py-2.5 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => { setEditing(p); setOpen(true); }}>
+                            <Pencil className="mr-2 h-3.5 w-3.5" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {p.status !== "published" ? (
+                            <DropdownMenuItem onClick={() => updateStatus.mutate({ id: p.id, status: "published" })}>
+                              <CheckCircle2 className="mr-2 h-3.5 w-3.5" /> Publish
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem onClick={() => updateStatus.mutate({ id: p.id, status: "draft" })}>
+                              <XCircle className="mr-2 h-3.5 w-3.5" /> Unpublish
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem onClick={() => updateStatus.mutate({ id: p.id, status: "archived" })}>
+                            <Archive className="mr-2 h-3.5 w-3.5" /> Archive
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive" onClick={() => setConfirmDelete(p)}>
+                            <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-        <p className="mt-2 max-w-2xl text-muted-foreground">
-          Curate past exam papers per subject so students can practice with real questions.
-        </p>
-
-        <section className="mt-8 grid gap-4 rounded-2xl border border-border bg-surface p-5 sm:grid-cols-3">
-          <Picker label="Course" value={courseId}
-            onChange={(v) => { setCourseId(v); setSemesterId(""); setSubjectId(""); }}
-            options={(coursesQuery.data ?? []).map((c) => ({ value: c.id, label: c.title }))} />
-          <Picker label="Semester" value={semesterId} disabled={!courseId}
-            onChange={(v) => { setSemesterId(v); setSubjectId(""); }}
-            options={(semestersQuery.data ?? []).map((s) => ({ value: s.id, label: `S${s.number} · ${s.title}` }))} />
-          <Picker label="Subject" value={subjectId} disabled={!semesterId}
-            onChange={setSubjectId}
-            options={(subjectsQuery.data ?? []).map((s) => ({ value: s.id, label: `${s.code} · ${s.title}` }))} />
-        </section>
-
-        {subjectId && (
-          <section className="mt-8">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl font-semibold text-foreground">Papers for this subject</h2>
-              <Button onClick={() => { setEditing(null); setOpen(true); }}>
-                <Plus className="mr-2 h-4 w-4" /> New paper
-              </Button>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {(papersQuery.data ?? []).length === 0 && (
-                <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-sm text-muted-foreground">
-                  No papers yet for this subject.
-                </p>
-              )}
-              {(papersQuery.data ?? []).map((p) => (
-                <div key={p.id} className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-border bg-surface p-4">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-display text-base font-semibold text-foreground">{p.title}</h3>
-                      <Badge>{p.year}</Badge>
-                      <Badge variant="outline">{p.exam_type.replace("_", " ")}</Badge>
-                      {p.paper_number && <Badge variant="outline">#{p.paper_number}</Badge>}
-                      <Badge variant={p.status === "published" ? "default" : "secondary"}>{p.status}</Badge>
-                      {p.file_path && <Badge variant="outline">PDF</Badge>}
-                    </div>
-                    {p.description && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{p.description}</p>}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => { setEditing(p); setOpen(true); }}>
-                      <Pencil className="mr-2 h-3.5 w-3.5" /> Edit
-                    </Button>
-                    <Button variant="outline" size="sm"
-                      onClick={() => { if (confirm(`Delete "${p.title}"?`)) deleteMutation.mutate(p); }}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
+      )}
 
       <PaperDialog
-        open={open} onOpenChange={setOpen} subjectId={subjectId} editing={editing}
-        onSaved={() => qc.invalidateQueries({ queryKey: ["admin", "papers", "list", subjectId] })}
+        open={open}
+        onOpenChange={setOpen}
+        editing={editing}
+        subjects={subjects}
+        onSaved={invalidate}
+      />
+
+      <ConfirmDialog
+        open={!!confirmDelete}
+        onOpenChange={(v) => !v && setConfirmDelete(null)}
+        title={`Delete "${confirmDelete?.title ?? ""}"?`}
+        description="This permanently removes the paper and its uploaded file."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => confirmDelete && deleteMutation.mutate(confirmDelete)}
       />
     </div>
   );
 }
 
-function Picker({
-  label, value, onChange, options, disabled,
-}: {
-  label: string; value: string; onChange: (v: string) => void;
-  options: { value: string; label: string }[]; disabled?: boolean;
-}) {
-  return (
-    <div>
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground">{label}</Label>
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
-        <SelectTrigger className="mt-1"><SelectValue placeholder={`Select ${label.toLowerCase()}`} /></SelectTrigger>
-        <SelectContent>
-          {options.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-}
-
 function PaperDialog({
-  open, onOpenChange, subjectId, editing, onSaved,
+  open, onOpenChange, editing, subjects, onSaved,
 }: {
-  open: boolean; onOpenChange: (v: boolean) => void; subjectId: string;
-  editing: PaperRow | null; onSaved: () => void;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  editing: PaperRow | null;
+  subjects: SubjectLite[];
+  onSaved: () => void;
 }) {
+  const [subjectId, setSubjectId] = useState("");
   const [title, setTitle] = useState("");
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [examType, setExamType] = useState("end_sem");
@@ -217,6 +324,7 @@ function PaperDialog({
 
   useEffect(() => {
     if (open) {
+      setSubjectId(editing?.subject_id ?? "");
       setTitle(editing?.title ?? "");
       setYear(editing?.year ?? new Date().getFullYear());
       setExamType(editing?.exam_type ?? "end_sem");
@@ -228,7 +336,7 @@ function PaperDialog({
   }, [open, editing]);
 
   const save = async () => {
-    if (!subjectId) return toast.error("Pick a subject first");
+    if (!subjectId) return toast.error("Pick a subject");
     if (!title.trim()) return toast.error("Title required");
     setBusy(true);
     try {
@@ -280,6 +388,17 @@ function PaperDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader><DialogTitle>{editing ? "Edit paper" : "New paper"}</DialogTitle></DialogHeader>
         <div className="grid gap-4">
+          <div>
+            <Label>Subject</Label>
+            <Select value={subjectId} onValueChange={setSubjectId}>
+              <SelectTrigger className="mt-1"><SelectValue placeholder="Select subject" /></SelectTrigger>
+              <SelectContent>
+                {subjects.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>{s.code} · {s.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div><Label>Title</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. End Semester Examination" />
           </div>

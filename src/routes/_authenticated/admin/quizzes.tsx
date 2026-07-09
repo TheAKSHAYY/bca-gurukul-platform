@@ -1,12 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, FlaskConical, Plus, Pencil, Trash2, ExternalLink, Upload, Sparkles } from "lucide-react";
-
-import { EmptyState } from "@/components/ui/empty-state";
+import {
+  FlaskConical, Plus, Pencil, Trash2, ExternalLink, Upload, Search,
+  MoreHorizontal, CheckCircle2, XCircle, Archive,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 import { supabase } from "@/integrations/supabase/client";
+import { PageHeader } from "@/components/admin/ui/page-header";
+import { StatusBadge } from "@/components/admin/ui/status-badge";
+import { TableSkeleton } from "@/components/admin/ui/table-skeleton";
+import { ConfirmDialog } from "@/components/admin/ui/confirm-dialog";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,9 +21,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/_authenticated/admin/quizzes")({
-  head: () => ({ meta: [{ title: "Quizzes · Admin · BCA Gurukul" }] }),
+  head: () => ({ meta: [{ title: "Question Bank · Admin · BCA Gurukul" }] }),
   component: AdminQuizzesPage,
 });
 
@@ -37,60 +47,93 @@ type QuizRow = {
   shuffle_questions: boolean;
   shuffle_options: boolean;
   status: string;
+  created_at: string;
+  updated_at: string;
 };
+
+type UnitLite = {
+  id: string;
+  number: number;
+  title: string;
+  subject_id: string;
+  subject?: { id: string; code: string; title: string } | null;
+};
+
+const STATUSES = [
+  { value: "all", label: "All statuses" },
+  { value: "draft", label: "Draft" },
+  { value: "published", label: "Published" },
+  { value: "archived", label: "Archived" },
+];
 
 function AdminQuizzesPage() {
   const qc = useQueryClient();
-  const [courseId, setCourseId] = useState("");
-  const [semesterId, setSemesterId] = useState("");
-  const [subjectId, setSubjectId] = useState("");
-  const [unitId, setUnitId] = useState("");
+  const [search, setSearch] = useState("");
+  const [subjectId, setSubjectId] = useState("all");
+  const [status, setStatus] = useState("all");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<QuizRow | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<QuizRow | null>(null);
 
-  const coursesQ = useQuery({
-    queryKey: ["admin-quizzes-courses"],
+  const subjectsQuery = useQuery({
+    queryKey: ["admin", "quizzes", "subjects-all"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("courses").select("id, title").order("title");
+      const { data, error } = await supabase
+        .from("subjects").select("id, code, title").order("title");
       if (error) throw error;
       return data ?? [];
     },
   });
-  const semestersQ = useQuery({
-    queryKey: ["admin-quizzes-sem", courseId],
-    enabled: !!courseId,
+
+  const unitsQuery = useQuery<UnitLite[]>({
+    queryKey: ["admin", "quizzes", "units-all"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("semesters").select("id, number, title").eq("course_id", courseId).order("number");
+      const { data, error } = await supabase
+        .from("units")
+        .select("id, number, title, subject_id, subject:subjects(id, code, title)")
+        .order("number");
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as unknown as UnitLite[];
     },
   });
-  const subjectsQ = useQuery({
-    queryKey: ["admin-quizzes-sub", semesterId],
-    enabled: !!semesterId,
+
+  const quizzesQuery = useQuery({
+    queryKey: ["admin", "quizzes", "list", { subjectId, status, search }],
     queryFn: async () => {
-      const { data, error } = await supabase.from("subjects").select("id, code, title").eq("semester_id", semesterId).order("title");
+      let q = supabase.from("quizzes").select("*", { count: "exact" });
+      if (status !== "all") q = q.eq("status", status as "draft" | "published" | "archived");
+      if (search.trim()) q = q.ilike("title", `%${search.trim()}%`);
+      const { data, error, count } = await q
+        .order("created_at", { ascending: false })
+        .limit(300);
       if (error) throw error;
-      return data ?? [];
+      let items = (data ?? []) as QuizRow[];
+      if (subjectId !== "all") {
+        const unitIds = new Set(
+          (unitsQuery.data ?? []).filter((u) => u.subject_id === subjectId).map((u) => u.id),
+        );
+        items = items.filter((qz) => unitIds.has(qz.unit_id));
+      }
+      return { items, total: count ?? 0 };
     },
+    enabled: unitsQuery.isSuccess,
   });
-  const unitsQ = useQuery({
-    queryKey: ["admin-quizzes-units", subjectId],
-    enabled: !!subjectId,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("units").select("id, number, title").eq("subject_id", subjectId).order("number");
+
+  const items = quizzesQuery.data?.items ?? [];
+  const total = quizzesQuery.data?.total ?? 0;
+  const units = unitsQuery.data ?? [];
+  const unitMap = useMemo(() => new Map(units.map((u) => [u.id, u])), [units]);
+  const subjects = subjectsQuery.data ?? [];
+
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "quizzes"] });
+
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status: s }: { id: string; status: "draft" | "published" | "archived" }) => {
+      const { error } = await supabase.from("quizzes").update({ status: s }).eq("id", id);
       if (error) throw error;
-      return data ?? [];
     },
-  });
-  const quizzesQ = useQuery({
-    queryKey: ["admin-quizzes-list", unitId],
-    enabled: !!unitId,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("quizzes").select("*").eq("unit_id", unitId).order("order_index").order("created_at");
-      if (error) throw error;
-      return (data ?? []) as QuizRow[];
-    },
+    onSuccess: () => { invalidate(); toast.success("Updated"); },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const del = useMutation({
@@ -98,133 +141,184 @@ function AdminQuizzesPage() {
       const { error } = await supabase.from("quizzes").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      toast.success("Quiz deleted");
-      qc.invalidateQueries({ queryKey: ["admin-quizzes-list", unitId] });
-    },
+    onSuccess: () => { invalidate(); setConfirmDelete(null); toast.success("Quiz deleted"); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> Back to admin
-          </Link>
-        </div>
-      </header>
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <div className="flex items-center gap-3">
-          <FlaskConical className="h-6 w-6 text-primary" />
-          <h1 className="font-display text-3xl font-semibold text-foreground">Quizzes & MCQ banks</h1>
-        </div>
-        <p className="mt-2 max-w-2xl text-muted-foreground">
-          Pick a unit, create a quiz, then add questions and answer choices.
-        </p>
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        title="Question Bank"
+        description="Author MCQ quizzes and manage them across every unit and subject."
+        actions={
+          <Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}>
+            <Plus className="mr-1.5 h-4 w-4" /> New quiz
+          </Button>
+        }
+      />
 
-        <section className="mt-8 grid gap-4 rounded-2xl border border-border bg-surface p-5 sm:grid-cols-4">
-          <Picker label="Course" value={courseId} onChange={(v) => { setCourseId(v); setSemesterId(""); setSubjectId(""); setUnitId(""); }}
-            options={(coursesQ.data ?? []).map((c) => ({ value: c.id, label: c.title }))} />
-          <Picker label="Semester" value={semesterId} disabled={!courseId} onChange={(v) => { setSemesterId(v); setSubjectId(""); setUnitId(""); }}
-            options={(semestersQ.data ?? []).map((s) => ({ value: s.id, label: `S${s.number} · ${s.title}` }))} />
-          <Picker label="Subject" value={subjectId} disabled={!semesterId} onChange={(v) => { setSubjectId(v); setUnitId(""); }}
-            options={(subjectsQ.data ?? []).map((s) => ({ value: s.id, label: `${s.code} · ${s.title}` }))} />
-          <Picker label="Unit" value={unitId} disabled={!subjectId} onChange={setUnitId}
-            options={(unitsQ.data ?? []).map((u) => ({ value: u.id, label: `U${u.number} · ${u.title}` }))} />
-        </section>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="relative min-w-[220px] flex-1 sm:max-w-sm">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search title…"
+            className="h-9 pl-8"
+          />
+        </div>
+        <Select value={subjectId} onValueChange={setSubjectId}>
+          <SelectTrigger className="h-9 w-48"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All subjects</SelectItem>
+            {subjects.map((s) => (
+              <SelectItem key={s.id} value={s.id}>{s.code} · {s.title}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {STATUSES.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <div className="ml-auto text-xs text-muted-foreground">{total} quizzes</div>
+      </div>
 
-        {unitId && (
-          <section className="mt-8">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl font-semibold text-foreground">Quizzes in this unit</h2>
-              <Button onClick={() => { setEditing(null); setOpen(true); }}>
-                <Plus className="mr-2 h-4 w-4" /> New quiz
-              </Button>
-            </div>
-            <div className="mt-4 space-y-3">
-              {(quizzesQ.data ?? []).length === 0 && (
-                <EmptyState
-                  icon={FlaskConical}
-                  tone="success"
-                  title="No quizzes for this unit yet"
-                  description="Add 8–10 conceptual MCQs to lock in the unit. Students get instant scoring with per-question explanations, and you'll see attempt analytics roll in on the dashboard."
-                  tip="Create a quiz first, then click Upload MCQs to paste questions in bulk or add them one by one."
-                  primaryAction={{
-                    label: "Create the first quiz",
-                    icon: Sparkles,
-                    onClick: () => { setEditing(null); setOpen(true); },
-                  }}
-                />
-              )}
-              {(quizzesQ.data ?? []).map((q) => (
-                <div key={q.id} className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-border bg-surface p-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-display text-base font-semibold text-foreground">{q.title}</h3>
-                      <Badge variant={q.status === "published" ? "default" : "secondary"}>{q.status}</Badge>
-                      <Badge variant="outline">Pass {q.passing_pct}%</Badge>
-                      {q.time_limit_minutes && <Badge variant="outline">{q.time_limit_minutes}m</Badge>}
-                    </div>
-                    {q.description && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{q.description}</p>}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Link to="/admin/quizzes/$quizId" params={{ quizId: q.id }}>
-                      <Button variant="outline" size="sm">
-                        <Upload className="mr-2 h-3.5 w-3.5" /> Upload MCQs
-                      </Button>
-                    </Link>
-                    <Link to="/quizzes/$quizId" params={{ quizId: q.id }}>
-                      <Button variant="outline" size="sm">
-                        <ExternalLink className="mr-2 h-3.5 w-3.5" /> Preview
-                      </Button>
-                    </Link>
-                    <Button variant="outline" size="sm" onClick={() => { setEditing(q); setOpen(true); }}>
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => { if (confirm(`Delete "${q.title}"?`)) del.mutate(q.id); }}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
+      {quizzesQuery.isLoading || unitsQuery.isLoading ? (
+        <TableSkeleton rows={8} cols={5} />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon={FlaskConical}
+          title={search || subjectId !== "all" || status !== "all" ? "No matches" : "No quizzes yet"}
+          description={
+            search || subjectId !== "all" || status !== "all"
+              ? "Try clearing filters or adjusting your search."
+              : "Create a quiz, then upload MCQs or add them one by one."
+          }
+          primaryAction={{ label: "New quiz", onClick: () => { setEditing(null); setOpen(true); }, icon: Plus }}
+        />
+      ) : (
+        <div className="overflow-hidden rounded-xl border border-border/70 bg-surface">
+          <table className="w-full">
+            <thead className="border-b border-border/70 bg-surface-muted text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2.5">Title</th>
+                <th className="px-3 py-2.5 hidden md:table-cell">Unit / Subject</th>
+                <th className="px-3 py-2.5">Pass</th>
+                <th className="px-3 py-2.5 hidden md:table-cell">Time</th>
+                <th className="px-3 py-2.5">Status</th>
+                <th className="px-3 py-2.5 hidden lg:table-cell">Updated</th>
+                <th className="w-10 px-3 py-2.5"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/60">
+              {items.map((q) => {
+                const unit = unitMap.get(q.unit_id);
+                return (
+                  <tr key={q.id} className="text-sm hover:bg-surface-muted/40">
+                    <td className="px-3 py-2.5">
+                      <Link
+                        to="/admin/quizzes/$quizId"
+                        params={{ quizId: q.id }}
+                        className="block font-medium text-foreground hover:text-primary"
+                      >
+                        {q.title}
+                      </Link>
+                    </td>
+                    <td className="px-3 py-2.5 hidden md:table-cell text-xs text-muted-foreground">
+                      {unit
+                        ? `U${unit.number} · ${unit.title}${unit.subject ? ` — ${unit.subject.code}` : ""}`
+                        : "—"}
+                    </td>
+                    <td className="px-3 py-2.5"><Badge variant="outline">{q.passing_pct}%</Badge></td>
+                    <td className="px-3 py-2.5 hidden md:table-cell text-xs text-muted-foreground">
+                      {q.time_limit_minutes ? `${q.time_limit_minutes}m` : "—"}
+                    </td>
+                    <td className="px-3 py-2.5"><StatusBadge value={q.status} /></td>
+                    <td className="px-3 py-2.5 hidden lg:table-cell text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(q.updated_at ?? q.created_at), { addSuffix: true })}
+                    </td>
+                    <td className="px-3 py-2.5 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link to="/admin/quizzes/$quizId" params={{ quizId: q.id }}>
+                              <Upload className="mr-2 h-3.5 w-3.5" /> Upload MCQs
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link to="/quizzes/$quizId" params={{ quizId: q.id }}>
+                              <ExternalLink className="mr-2 h-3.5 w-3.5" /> Preview
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => { setEditing(q); setOpen(true); }}>
+                            <Pencil className="mr-2 h-3.5 w-3.5" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {q.status !== "published" ? (
+                            <DropdownMenuItem onClick={() => updateStatus.mutate({ id: q.id, status: "published" })}>
+                              <CheckCircle2 className="mr-2 h-3.5 w-3.5" /> Publish
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem onClick={() => updateStatus.mutate({ id: q.id, status: "draft" })}>
+                              <XCircle className="mr-2 h-3.5 w-3.5" /> Unpublish
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem onClick={() => updateStatus.mutate({ id: q.id, status: "archived" })}>
+                            <Archive className="mr-2 h-3.5 w-3.5" /> Archive
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive" onClick={() => setConfirmDelete(q)}>
+                            <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <QuizDialog
         open={open}
         onOpenChange={setOpen}
-        unitId={unitId}
         editing={editing}
-        onSaved={() => qc.invalidateQueries({ queryKey: ["admin-quizzes-list", unitId] })}
+        units={units}
+        onSaved={invalidate}
+      />
+
+      <ConfirmDialog
+        open={!!confirmDelete}
+        onOpenChange={(v) => !v && setConfirmDelete(null)}
+        title={`Delete "${confirmDelete?.title ?? ""}"?`}
+        description="This removes the quiz and all its questions."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => confirmDelete && del.mutate(confirmDelete.id)}
       />
     </div>
   );
 }
 
-function Picker({ label, value, onChange, options, disabled }: {
-  label: string; value: string; onChange: (v: string) => void;
-  options: { value: string; label: string }[]; disabled?: boolean;
+function QuizDialog({
+  open, onOpenChange, editing, units, onSaved,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  editing: QuizRow | null;
+  units: UnitLite[];
+  onSaved: () => void;
 }) {
-  return (
-    <div>
-      <Label className="text-xs uppercase tracking-wider text-muted-foreground">{label}</Label>
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
-        <SelectTrigger className="mt-1"><SelectValue placeholder={`Select ${label.toLowerCase()}`} /></SelectTrigger>
-        <SelectContent>
-          {options.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-}
-
-function QuizDialog({ open, onOpenChange, unitId, editing, onSaved }: {
-  open: boolean; onOpenChange: (v: boolean) => void;
-  unitId: string; editing: QuizRow | null; onSaved: () => void;
-}) {
+  const [unitId, setUnitId] = useState("");
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
@@ -237,6 +331,7 @@ function QuizDialog({ open, onOpenChange, unitId, editing, onSaved }: {
 
   useEffect(() => {
     if (open) {
+      setUnitId(editing?.unit_id ?? "");
       setTitle(editing?.title ?? "");
       setSlug(editing?.slug ?? "");
       setDescription(editing?.description ?? "");
@@ -249,7 +344,7 @@ function QuizDialog({ open, onOpenChange, unitId, editing, onSaved }: {
   }, [open, editing]);
 
   const save = async () => {
-    if (!unitId) return toast.error("Pick a unit first");
+    if (!unitId) return toast.error("Pick a unit");
     if (!title.trim()) return toast.error("Title required");
     const finalSlug = (slug.trim() || slugify(title)).slice(0, 80);
     setSaving(true);
@@ -290,6 +385,19 @@ function QuizDialog({ open, onOpenChange, unitId, editing, onSaved }: {
         <DialogHeader><DialogTitle>{editing ? "Edit quiz" : "New quiz"}</DialogTitle></DialogHeader>
         <div className="grid gap-4">
           <div>
+            <Label>Unit</Label>
+            <Select value={unitId} onValueChange={setUnitId}>
+              <SelectTrigger className="mt-1"><SelectValue placeholder="Select unit" /></SelectTrigger>
+              <SelectContent>
+                {units.map((u) => (
+                  <SelectItem key={u.id} value={u.id}>
+                    {u.subject ? `${u.subject.code} · ` : ""}U{u.number} · {u.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
             <Label>Title</Label>
             <Input value={title} onChange={(e) => { setTitle(e.target.value); if (!editing && !slug) setSlug(slugify(e.target.value)); }} />
           </div>
@@ -307,7 +415,7 @@ function QuizDialog({ open, onOpenChange, unitId, editing, onSaved }: {
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <Label>Time limit (min, blank = none)</Label>
+              <Label>Time limit (min)</Label>
               <Input type="number" min={0} value={timeLimit} onChange={(e) => setTimeLimit(e.target.value)} />
             </div>
             <div>
