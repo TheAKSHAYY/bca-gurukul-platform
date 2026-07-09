@@ -128,7 +128,7 @@ function AdminQuizzesPage() {
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "quizzes"] });
 
   const updateStatus = useMutation({
-    mutationFn: async ({ id, status: s }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status: s }: { id: string; status: "draft" | "published" | "archived" }) => {
       const { error } = await supabase.from("quizzes").update({ status: s }).eq("id", id);
       if (error) throw error;
     },
