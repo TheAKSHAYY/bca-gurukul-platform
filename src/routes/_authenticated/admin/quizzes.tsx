@@ -101,7 +101,7 @@ function AdminQuizzesPage() {
     queryKey: ["admin", "quizzes", "list", { subjectId, status, search }],
     queryFn: async () => {
       let q = supabase.from("quizzes").select("*", { count: "exact" });
-      if (status !== "all") q = q.eq("status", status);
+      if (status !== "all") q = q.eq("status", status as "draft" | "published" | "archived");
       if (search.trim()) q = q.ilike("title", `%${search.trim()}%`);
       const { data, error, count } = await q
         .order("created_at", { ascending: false })
