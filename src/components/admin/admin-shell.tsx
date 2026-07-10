@@ -102,32 +102,20 @@ export function AdminShell() {
               </SidebarGroupContent>
             </SidebarGroup>
 
-            <SidebarGroup>
-              <Collapsible open={moreOpen} onOpenChange={setMoreOpen}>
-                <CollapsibleTrigger asChild>
-                  <button className="flex w-full items-center justify-between px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground">
-                    More
-                    <ChevronsUpDown className="h-3 w-3" />
-                  </button>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      {MORE_NAV.map((item) => (
-                        <SidebarMenuItem key={item.to}>
-                          <SidebarMenuButton asChild isActive={isActive(item.to)}>
-                            <Link to={item.to} className="flex items-center gap-2">
-                              <item.icon className="h-4 w-4" />
-                              <span>{item.label}</span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </CollapsibleContent>
-              </Collapsible>
+            <SidebarGroup className="mt-auto">
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton onClick={() => shortcuts.setOpen(true)}>
+                      <Keyboard className="h-4 w-4" />
+                      <span>Keyboard shortcuts</span>
+                      <kbd className="ml-auto rounded border border-border bg-background px-1 py-0.5 text-[10px] font-medium">?</kbd>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
             </SidebarGroup>
+
           </SidebarContent>
         </Sidebar>
 
