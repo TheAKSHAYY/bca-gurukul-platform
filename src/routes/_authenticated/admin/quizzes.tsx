@@ -24,6 +24,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { BulkImportDialog } from "@/components/mcq/bulk-import-dialog";
+
 
 export const Route = createFileRoute("/_authenticated/admin/quizzes")({
   head: () => ({ meta: [{ title: "Question Bank · Admin · BCA Gurukul" }] }),
@@ -72,6 +74,7 @@ function AdminQuizzesPage() {
   const [subjectId, setSubjectId] = useState("all");
   const [status, setStatus] = useState("all");
   const [open, setOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState<QuizRow | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<QuizRow | null>(null);
 
@@ -151,9 +154,14 @@ function AdminQuizzesPage() {
         title="Question Bank"
         description="Author MCQ quizzes and manage them across every unit and subject."
         actions={
-          <Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}>
-            <Plus className="mr-1.5 h-4 w-4" /> New quiz
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}>
+              <Upload className="mr-1.5 h-4 w-4" /> Import MCQs
+            </Button>
+            <Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}>
+              <Plus className="mr-1.5 h-4 w-4" /> New quiz
+            </Button>
+          </div>
         }
       />
 
@@ -294,6 +302,13 @@ function AdminQuizzesPage() {
         editing={editing}
         units={units}
         onSaved={invalidate}
+      />
+
+      <BulkImportDialog
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        showQuizPicker
+        onImported={invalidate}
       />
 
       <ConfirmDialog

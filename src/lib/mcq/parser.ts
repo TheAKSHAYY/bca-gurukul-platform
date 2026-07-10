@@ -35,11 +35,24 @@ const OPTION_RE = /^\s*([A-Ha-h])\s*[).\-:]\s*(.+?)\s*$/;
 const Q_RE = /^\s*(?:Q\s*[:.)-]|(\d+)\s*[.)])\s*(.+)$/i;
 
 export function parseMcqBulk(input: string): ParsedQuestion[] {
-  const blocks = input
+  const trimmed = input.trim();
+  // JSON mode — accept an array of question objects, or { questions: [...] }.
+  if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+    try {
+      const raw = JSON.parse(trimmed);
+      const list = Array.isArray(raw) ? raw : Array.isArray(raw?.questions) ? raw.questions : null;
+      if (list) return list.map(normalizeJsonQuestion);
+    } catch {
+      // fall through to text parser so users see per-block errors
+    }
+  }
+
+  const blocks = trimmed
     .replace(/\r\n/g, "\n")
     .split(/\n\s*\n/)
     .map((b) => b.trim())
     .filter(Boolean);
+
 
   const out: ParsedQuestion[] = [];
 
@@ -111,3 +124,75 @@ export function parseMcqBulk(input: string): ParsedQuestion[] {
 
   return out;
 }
+
+// Normalize a JSON question object into ParsedQuestion. Accepts flexible shapes:
+//   { prompt, options: [{ text, is_correct }] }
+//   { question, choices: ["a","b"], answer: 1 }           // answer = index
+//   { question, options: ["a","b"], correct: [0,2] }      // correct = indexes
+//   { q, a, b, c, d, ans: "B" }                           // legacy MCQ dump
+function normalizeJsonQuestion(raw: unknown): ParsedQuestion {
+  const r = (raw ?? {}) as Record<string, unknown>;
+  const q: ParsedQuestion = { prompt: "", options: [], errors: [] };
+
+  const prompt = (r.prompt ?? r.question ?? r.q ?? r.text ?? "") as string;
+  q.prompt = String(prompt || "").trim();
+
+  // Build options
+  let opts: ParsedOption[] = [];
+  const rawOpts = (r.options ?? r.choices ?? r.answers) as unknown;
+  if (Array.isArray(rawOpts)) {
+    opts = rawOpts.map((o) => {
+      if (typeof o === "string") return { text: o, is_correct: false };
+      const oo = o as Record<string, unknown>;
+      return {
+        text: String(oo.text ?? oo.label ?? oo.value ?? ""),
+        is_correct: Boolean(oo.is_correct ?? oo.correct ?? oo.isAnswer),
+      };
+    });
+  } else {
+    // legacy a/b/c/d fields
+    for (const key of ["a", "b", "c", "d", "e", "f"]) {
+      const v = r[key];
+      if (typeof v === "string" && v.trim()) opts.push({ text: v.trim(), is_correct: false });
+    }
+  }
+
+  // Apply answer/correct index(es) if provided separately
+  const applyIndex = (idx: number) => {
+    if (idx >= 0 && idx < opts.length) opts[idx].is_correct = true;
+  };
+  const ans = r.answer ?? r.correct ?? r.ans ?? r.correctIndex;
+  if (typeof ans === "number") applyIndex(ans);
+  else if (typeof ans === "string" && ans.trim()) {
+    const s = ans.trim();
+    if (/^[A-Za-z]$/.test(s)) applyIndex(s.toUpperCase().charCodeAt(0) - 65);
+    else if (/^\d+$/.test(s)) applyIndex(parseInt(s, 10));
+    else {
+      const match = opts.findIndex((o) => o.text.trim().toLowerCase() === s.toLowerCase());
+      if (match >= 0) applyIndex(match);
+    }
+  } else if (Array.isArray(ans)) {
+    for (const a of ans) {
+      if (typeof a === "number") applyIndex(a);
+      else if (typeof a === "string" && /^[A-Za-z]$/.test(a)) applyIndex(a.toUpperCase().charCodeAt(0) - 65);
+      else if (typeof a === "string" && /^\d+$/.test(a)) applyIndex(parseInt(a, 10));
+    }
+  }
+
+  q.options = opts;
+  q.explanation = (r.explanation ?? r.reason) as string | undefined;
+  const d = String(r.difficulty ?? "").toLowerCase();
+  if (d === "easy" || d === "medium" || d === "hard") q.difficulty = d;
+  if (Array.isArray(r.tags)) q.tags = r.tags.map(String);
+  if (typeof r.year === "number") q.year = r.year;
+  else if (typeof r.year === "string" && /^\d{4}$/.test(r.year)) q.year = parseInt(r.year, 10);
+  if (typeof r.exam_name === "string") q.exam_name = r.exam_name;
+  else if (typeof r.exam === "string") q.exam_name = r.exam;
+
+  if (!q.prompt) q.errors.push("Missing question text");
+  if (q.options.length < 2) q.errors.push("Need at least 2 options");
+  if (q.options.length && !q.options.some((o) => o.is_correct))
+    q.errors.push("No correct option marked (set is_correct: true or answer index)");
+  return q;
+}
+
