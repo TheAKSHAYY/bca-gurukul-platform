@@ -154,9 +154,14 @@ function AdminQuizzesPage() {
         title="Question Bank"
         description="Author MCQ quizzes and manage them across every unit and subject."
         actions={
-          <Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}>
-            <Plus className="mr-1.5 h-4 w-4" /> New quiz
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}>
+              <Upload className="mr-1.5 h-4 w-4" /> Import MCQs
+            </Button>
+            <Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}>
+              <Plus className="mr-1.5 h-4 w-4" /> New quiz
+            </Button>
+          </div>
         }
       />
 
