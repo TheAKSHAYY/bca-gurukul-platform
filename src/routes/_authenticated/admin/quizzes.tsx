@@ -24,6 +24,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { BulkImportDialog } from "@/components/mcq/bulk-import-dialog";
+
 
 export const Route = createFileRoute("/_authenticated/admin/quizzes")({
   head: () => ({ meta: [{ title: "Question Bank · Admin · BCA Gurukul" }] }),
