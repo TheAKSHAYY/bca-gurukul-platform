@@ -161,6 +161,7 @@ export function AdminShell() {
 
       <CreateWizard open={wizardOpen} onOpenChange={setWizardOpen} />
       <CommandPalette />
+      <KeyboardShortcutsDialog open={shortcuts.open} onOpenChange={shortcuts.setOpen} />
     </SidebarProvider>
   );
 }
