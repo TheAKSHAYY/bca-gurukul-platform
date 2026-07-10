@@ -5,20 +5,14 @@ import {
   FileText,
   FileStack,
   FlaskConical,
-  ImageIcon,
-  Tag as TagIcon,
   BookOpen,
   Library,
   Shield,
   Search,
   Plus,
   Home,
-  Layout,
-  FolderTree,
-  UserCircle2,
-  Inbox,
   Settings,
-  ChevronsUpDown,
+  Keyboard,
 } from "lucide-react";
 
 import {
@@ -33,11 +27,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { useAdminRealtimeRefresh } from "@/hooks/use-admin-realtime-refresh";
 import { useRoles } from "@/hooks/use-roles";
@@ -47,6 +36,10 @@ import { BrandMark } from "@/components/brand-mark";
 
 import { CreateWizard } from "./create-wizard";
 import { CommandPalette } from "./command-palette";
+import {
+  KeyboardShortcutsDialog,
+  useKeyboardShortcutsDialog,
+} from "./keyboard-shortcuts";
 
 const PRIMARY_NAV = [
   { label: "Dashboard", to: "/admin", icon: LayoutDashboard, exact: true },
@@ -58,20 +51,11 @@ const PRIMARY_NAV = [
   { label: "Settings", to: "/admin/settings", icon: Settings },
 ];
 
-const MORE_NAV = [
-  { label: "Content tree", to: "/admin/explorer", icon: FolderTree },
-  { label: "Media", to: "/admin/media", icon: ImageIcon },
-  { label: "Tags", to: "/admin/tags", icon: TagIcon },
-  { label: "Homepage", to: "/admin/homepage", icon: Layout },
-  { label: "Developer", to: "/admin/developer", icon: UserCircle2 },
-  { label: "Inbox", to: "/admin/inbox", icon: Inbox },
-];
-
 export function AdminShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { isSuperAdmin } = useRoles();
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const shortcuts = useKeyboardShortcutsDialog();
   useAdminRealtimeRefresh();
 
   const isActive = (to: string, exact?: boolean) =>
