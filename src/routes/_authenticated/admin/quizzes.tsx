@@ -304,6 +304,13 @@ function AdminQuizzesPage() {
         onSaved={invalidate}
       />
 
+      <BulkImportDialog
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        showQuizPicker
+        onImported={invalidate}
+      />
+
       <ConfirmDialog
         open={!!confirmDelete}
         onOpenChange={(v) => !v && setConfirmDelete(null)}
