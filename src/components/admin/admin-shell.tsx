@@ -5,20 +5,14 @@ import {
   FileText,
   FileStack,
   FlaskConical,
-  ImageIcon,
-  Tag as TagIcon,
   BookOpen,
   Library,
   Shield,
   Search,
   Plus,
   Home,
-  Layout,
-  FolderTree,
-  UserCircle2,
-  Inbox,
   Settings,
-  ChevronsUpDown,
+  Keyboard,
 } from "lucide-react";
 
 import {
@@ -33,11 +27,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { useAdminRealtimeRefresh } from "@/hooks/use-admin-realtime-refresh";
 import { useRoles } from "@/hooks/use-roles";
@@ -47,6 +36,10 @@ import { BrandMark } from "@/components/brand-mark";
 
 import { CreateWizard } from "./create-wizard";
 import { CommandPalette } from "./command-palette";
+import {
+  KeyboardShortcutsDialog,
+  useKeyboardShortcutsDialog,
+} from "./keyboard-shortcuts";
 
 const PRIMARY_NAV = [
   { label: "Dashboard", to: "/admin", icon: LayoutDashboard, exact: true },
@@ -58,20 +51,11 @@ const PRIMARY_NAV = [
   { label: "Settings", to: "/admin/settings", icon: Settings },
 ];
 
-const MORE_NAV = [
-  { label: "Content tree", to: "/admin/explorer", icon: FolderTree },
-  { label: "Media", to: "/admin/media", icon: ImageIcon },
-  { label: "Tags", to: "/admin/tags", icon: TagIcon },
-  { label: "Homepage", to: "/admin/homepage", icon: Layout },
-  { label: "Developer", to: "/admin/developer", icon: UserCircle2 },
-  { label: "Inbox", to: "/admin/inbox", icon: Inbox },
-];
-
 export function AdminShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { isSuperAdmin } = useRoles();
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const shortcuts = useKeyboardShortcutsDialog();
   useAdminRealtimeRefresh();
 
   const isActive = (to: string, exact?: boolean) =>
@@ -118,32 +102,20 @@ export function AdminShell() {
               </SidebarGroupContent>
             </SidebarGroup>
 
-            <SidebarGroup>
-              <Collapsible open={moreOpen} onOpenChange={setMoreOpen}>
-                <CollapsibleTrigger asChild>
-                  <button className="flex w-full items-center justify-between px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground">
-                    More
-                    <ChevronsUpDown className="h-3 w-3" />
-                  </button>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      {MORE_NAV.map((item) => (
-                        <SidebarMenuItem key={item.to}>
-                          <SidebarMenuButton asChild isActive={isActive(item.to)}>
-                            <Link to={item.to} className="flex items-center gap-2">
-                              <item.icon className="h-4 w-4" />
-                              <span>{item.label}</span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </CollapsibleContent>
-              </Collapsible>
+            <SidebarGroup className="mt-auto">
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton onClick={() => shortcuts.setOpen(true)}>
+                      <Keyboard className="h-4 w-4" />
+                      <span>Keyboard shortcuts</span>
+                      <kbd className="ml-auto rounded border border-border bg-background px-1 py-0.5 text-[10px] font-medium">?</kbd>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
             </SidebarGroup>
+
           </SidebarContent>
         </Sidebar>
 
@@ -160,6 +132,16 @@ export function AdminShell() {
               <kbd className="ml-auto rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-medium">⌘K</kbd>
             </button>
             <div className="ml-auto flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden md:inline-flex"
+                onClick={() => shortcuts.setOpen(true)}
+                aria-label="Keyboard shortcuts"
+                title="Keyboard shortcuts (?)"
+              >
+                <Keyboard className="h-4 w-4" />
+              </Button>
               <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
                 <Link to="/dashboard"><Home className="mr-1.5 h-4 w-4" /> Student view</Link>
               </Button>
@@ -170,6 +152,7 @@ export function AdminShell() {
             </div>
           </header>
 
+
           <main className={cn("flex-1 min-w-0")}>
             <Outlet />
           </main>
@@ -178,6 +161,7 @@ export function AdminShell() {
 
       <CreateWizard open={wizardOpen} onOpenChange={setWizardOpen} />
       <CommandPalette />
+      <KeyboardShortcutsDialog open={shortcuts.open} onOpenChange={shortcuts.setOpen} />
     </SidebarProvider>
   );
 }
