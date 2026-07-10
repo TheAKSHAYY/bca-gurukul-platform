@@ -35,11 +35,24 @@ const OPTION_RE = /^\s*([A-Ha-h])\s*[).\-:]\s*(.+?)\s*$/;
 const Q_RE = /^\s*(?:Q\s*[:.)-]|(\d+)\s*[.)])\s*(.+)$/i;
 
 export function parseMcqBulk(input: string): ParsedQuestion[] {
-  const blocks = input
+  const trimmed = input.trim();
+  // JSON mode — accept an array of question objects, or { questions: [...] }.
+  if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+    try {
+      const raw = JSON.parse(trimmed);
+      const list = Array.isArray(raw) ? raw : Array.isArray(raw?.questions) ? raw.questions : null;
+      if (list) return list.map(normalizeJsonQuestion);
+    } catch {
+      // fall through to text parser so users see per-block errors
+    }
+  }
+
+  const blocks = trimmed
     .replace(/\r\n/g, "\n")
     .split(/\n\s*\n/)
     .map((b) => b.trim())
     .filter(Boolean);
+
 
   const out: ParsedQuestion[] = [];
 
