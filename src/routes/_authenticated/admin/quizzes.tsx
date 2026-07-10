@@ -74,6 +74,7 @@ function AdminQuizzesPage() {
   const [subjectId, setSubjectId] = useState("all");
   const [status, setStatus] = useState("all");
   const [open, setOpen] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState<QuizRow | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<QuizRow | null>(null);
 
