@@ -132,6 +132,16 @@ export function AdminShell() {
               <kbd className="ml-auto rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-medium">⌘K</kbd>
             </button>
             <div className="ml-auto flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden md:inline-flex"
+                onClick={() => shortcuts.setOpen(true)}
+                aria-label="Keyboard shortcuts"
+                title="Keyboard shortcuts (?)"
+              >
+                <Keyboard className="h-4 w-4" />
+              </Button>
               <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
                 <Link to="/dashboard"><Home className="mr-1.5 h-4 w-4" /> Student view</Link>
               </Button>
@@ -141,6 +151,7 @@ export function AdminShell() {
               </Button>
             </div>
           </header>
+
 
           <main className={cn("flex-1 min-w-0")}>
             <Outlet />
