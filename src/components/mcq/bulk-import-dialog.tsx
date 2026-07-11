@@ -119,17 +119,17 @@ export function BulkImportDialog({
         _quiz_id: targetQuizId,
         _prompt: q.prompt,
         _options: q.options as never,
-        _explanation: q.explanation ?? undefined,
+        _explanation: q.explanation ?? null,
         _difficulty: q.difficulty ?? "medium",
         _points: 1,
         _negative_marks: 0,
         _tags: q.tags ?? [],
-        _year: q.year ?? undefined,
-        _exam_name: q.exam_name ?? undefined,
+        _year: q.year ?? null,
+        _exam_name: q.exam_name ?? null,
       });
       if (error) {
         fail += 1;
-        lastError = error.message || String(error);
+        lastError = [error.message, error.details, error.hint].filter(Boolean).join(" ") || String(error);
         console.error("admin_create_mcq failed", error);
       } else ok += 1;
     }
