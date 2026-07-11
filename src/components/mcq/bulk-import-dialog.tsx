@@ -113,6 +113,7 @@ export function BulkImportDialog({
     setImporting(true);
     let ok = 0;
     let fail = 0;
+    let lastError: string | null = null;
     for (const q of valid) {
       const { error } = await supabase.rpc("admin_create_mcq", {
         _quiz_id: targetQuizId,
@@ -126,11 +127,15 @@ export function BulkImportDialog({
         _year: q.year ?? undefined,
         _exam_name: q.exam_name ?? undefined,
       });
-      if (error) { fail += 1; console.error(error); } else ok += 1;
+      if (error) {
+        fail += 1;
+        lastError = error.message || String(error);
+        console.error("admin_create_mcq failed", error);
+      } else ok += 1;
     }
     setImporting(false);
     if (ok > 0) toast.success(`Imported ${ok} question${ok === 1 ? "" : "s"}${fail ? ` · ${fail} failed` : ""}`);
-    else toast.error(`Import failed for all ${fail} questions`);
+    else toast.error(`Import failed: ${lastError ?? "unknown error"}`);
     if (ok > 0) {
       setText("");
       onImported();
