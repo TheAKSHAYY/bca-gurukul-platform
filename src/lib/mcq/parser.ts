@@ -31,7 +31,7 @@ export type ParsedQuestion = {
   errors: string[];
 };
 
-const OPTION_RE = /^\s*([A-Ha-h])\s*[).\-:]\s*(.+?)\s*$/;
+const OPTION_RE = /^\s*([A-Ha-h])\s*[).\-]\s*(.+?)\s*$/;
 const Q_RE = /^\s*(?:Q\s*[:.)-]|(\d+)\s*[.)])\s*(.+)$/i;
 
 export function parseMcqBulk(input: string): ParsedQuestion[] {
@@ -67,7 +67,7 @@ export function parseMcqBulk(input: string): ParsedQuestion[] {
 
       // Meta prefixes
       const meta = /^([EDTYX])\s*[:.\-]\s*(.+)$/i.exec(line);
-      if (meta && !OPTION_RE.test(line)) {
+      if (meta) {
         const key = meta[1].toUpperCase();
         const val = meta[2].trim();
         if (key === "E") q.explanation = val;
@@ -139,14 +139,20 @@ function normalizeJsonQuestion(raw: unknown): ParsedQuestion {
 
   // Build options
   let opts: ParsedOption[] = [];
+  const asBool = (value: unknown) => {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "string") return /^(true|yes|y|1)$/i.test(value.trim());
+    if (typeof value === "number") return value === 1;
+    return false;
+  };
   const rawOpts = (r.options ?? r.choices ?? r.answers) as unknown;
   if (Array.isArray(rawOpts)) {
     opts = rawOpts.map((o) => {
       if (typeof o === "string") return { text: o, is_correct: false };
       const oo = o as Record<string, unknown>;
       return {
-        text: String(oo.text ?? oo.label ?? oo.value ?? ""),
-        is_correct: Boolean(oo.is_correct ?? oo.correct ?? oo.isAnswer),
+        text: String(oo.text ?? oo.label ?? oo.value ?? oo.option ?? ""),
+        is_correct: asBool(oo.is_correct ?? oo.correct ?? oo.isAnswer ?? oo.answer),
       };
     });
   } else {
@@ -161,26 +167,30 @@ function normalizeJsonQuestion(raw: unknown): ParsedQuestion {
   const applyIndex = (idx: number) => {
     if (idx >= 0 && idx < opts.length) opts[idx].is_correct = true;
   };
-  const ans = r.answer ?? r.correct ?? r.ans ?? r.correctIndex;
-  if (typeof ans === "number") applyIndex(ans);
-  else if (typeof ans === "string" && ans.trim()) {
-    const s = ans.trim();
+  const applyAnswerToken = (token: string) => {
+    const s = token.trim();
+    if (!s) return;
     if (/^[A-Za-z]$/.test(s)) applyIndex(s.toUpperCase().charCodeAt(0) - 65);
     else if (/^\d+$/.test(s)) applyIndex(parseInt(s, 10));
     else {
       const match = opts.findIndex((o) => o.text.trim().toLowerCase() === s.toLowerCase());
       if (match >= 0) applyIndex(match);
     }
+  };
+  const ans = r.answer ?? r.correct ?? r.ans ?? r.correctIndex ?? r.correct_answer ?? r.correctAnswer ?? r.correct_answers ?? r.correctAnswers;
+  if (typeof ans === "number") applyIndex(ans);
+  else if (typeof ans === "string" && ans.trim()) {
+    ans.split(/[,;|]/).forEach(applyAnswerToken);
   } else if (Array.isArray(ans)) {
     for (const a of ans) {
       if (typeof a === "number") applyIndex(a);
-      else if (typeof a === "string" && /^[A-Za-z]$/.test(a)) applyIndex(a.toUpperCase().charCodeAt(0) - 65);
-      else if (typeof a === "string" && /^\d+$/.test(a)) applyIndex(parseInt(a, 10));
+      else if (typeof a === "string") applyAnswerToken(a);
     }
   }
 
   q.options = opts;
-  q.explanation = (r.explanation ?? r.reason) as string | undefined;
+  const explanation = r.explanation ?? r.reason;
+  if (explanation != null) q.explanation = String(explanation);
   const d = String(r.difficulty ?? "").toLowerCase();
   if (d === "easy" || d === "medium" || d === "hard") q.difficulty = d;
   if (Array.isArray(r.tags)) q.tags = r.tags.map(String);

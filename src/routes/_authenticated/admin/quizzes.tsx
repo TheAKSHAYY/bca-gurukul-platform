@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -69,6 +69,12 @@ const STATUSES = [
 ];
 
 function AdminQuizzesPage() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname.replace(/\/$/, "") });
+  if (pathname !== "/admin/quizzes") return <Outlet />;
+  return <AdminQuizzesList />;
+}
+
+function AdminQuizzesList() {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [subjectId, setSubjectId] = useState("all");

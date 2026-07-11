@@ -129,7 +129,7 @@ export function BulkImportDialog({
       });
       if (error) {
         fail += 1;
-        lastError = error.message || String(error);
+        lastError = [error.message, error.details, error.hint].filter(Boolean).join(" ") || String(error);
         console.error("admin_create_mcq failed", error);
       } else ok += 1;
     }
