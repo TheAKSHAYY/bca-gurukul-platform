@@ -142,11 +142,14 @@ function CoursesAdmin() {
                 {c.total_semesters} semesters{c.duration_years ? ` · ${c.duration_years} years` : ""}
               </div>
               <div className="mt-4 flex items-center gap-2">
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/admin/courses/$courseId" params={{ courseId: c.id }}>
-                    Manage tree
-                  </Link>
-                </Button>
+                <Link
+                  to="/admin/courses/$courseId"
+                  params={{ courseId: c.id }}
+                  preload="intent"
+                  className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  Manage tree
+                </Link>
                 <Button
                   size="sm"
                   variant="ghost"
