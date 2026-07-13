@@ -1,25 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
-  Award,
-  Bell,
-  Bookmark,
   BookOpen,
+  Bookmark,
   Compass,
   FileText,
   Flame,
+  GraduationCap,
   ListChecks,
   PlayCircle,
-  Search,
   Sparkles,
-  Target,
-  TrendingUp,
   Trophy,
 } from "lucide-react";
-import { toast } from "sonner";
-
 
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -51,16 +45,6 @@ type BookmarkRow = {
   created_at: string;
 };
 
-type NotificationRow = {
-  id: string;
-  kind: "system" | "content" | "quiz" | "announcement";
-  title: string;
-  body: string | null;
-  link: string | null;
-  read_at: string | null;
-  published_at: string | null;
-};
-
 type QuizAttemptRow = {
   id: string;
   quiz_id: string;
@@ -81,12 +65,9 @@ function greeting() {
 
 function calcStreak(dates: string[]): number {
   if (!dates.length) return 0;
-  const days = new Set(
-    dates.map((d) => new Date(d).toISOString().slice(0, 10)),
-  );
+  const days = new Set(dates.map((d) => new Date(d).toISOString().slice(0, 10)));
   let streak = 0;
   const cursor = new Date();
-  // allow today OR yesterday as the starting point
   const today = cursor.toISOString().slice(0, 10);
   if (!days.has(today)) {
     cursor.setDate(cursor.getDate() - 1);
@@ -101,17 +82,63 @@ function calcStreak(dates: string[]): number {
 
 function DashboardPage() {
   const { user } = Route.useRouteContext();
-  const queryClient = useQueryClient();
 
   const fullName =
     (user.user_metadata?.full_name as string | undefined) ?? user.email ?? "there";
   const firstName = fullName.split(" ")[0];
 
-  // ---------- queries ----------
+  // ---------- queries (preserved) ----------
+  const profileQuery = useQuery({
+    queryKey: ["dashboard-profile", user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("current_course_id, current_semester_id, onboarded_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const contextQuery = useQuery({
+    queryKey: [
+      "dashboard-context",
+      profileQuery.data?.current_course_id,
+      profileQuery.data?.current_semester_id,
+    ],
+    enabled: !!profileQuery.data?.current_semester_id,
+    queryFn: async () => {
+      const semId = profileQuery.data!.current_semester_id!;
+      const [semRes, subjRes] = await Promise.all([
+        supabase
+          .from("semesters")
+          .select("id, number, title, course_id, courses(title, slug)")
+          .eq("id", semId)
+          .maybeSingle(),
+        supabase
+          .from("subjects")
+          .select("id, code, slug, title, credits")
+          .eq("semester_id", semId)
+          .eq("status", "published")
+          .is("deleted_at", null)
+          .order("sort_order")
+          .order("code")
+          .limit(12),
+      ]);
+      if (semRes.error) throw semRes.error;
+      if (subjRes.error) throw subjRes.error;
+      return {
+        semester: semRes.data,
+        subjects: subjRes.data ?? [],
+      };
+    },
+  });
+
   const bookmarksQuery = useQuery({
     queryKey: ["student-bookmarks", user.id],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("student_bookmarks", { _limit: 6 });
+      const { data, error } = await supabase.rpc("student_bookmarks", { _limit: 5 });
       if (error) throw error;
       return (data ?? []) as BookmarkRow[];
     },
@@ -126,22 +153,6 @@ function DashboardPage() {
     },
   });
 
-  const notificationsQuery = useQuery({
-    queryKey: ["student-notifications", user.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("notifications")
-        .select("id, kind, title, body, link, read_at, published_at")
-        .eq("user_id", user.id)
-        .eq("status", "published")
-        .is("deleted_at", null)
-        .order("published_at", { ascending: false })
-        .limit(8);
-      if (error) throw error;
-      return (data ?? []) as NotificationRow[];
-    },
-  });
-
   const quizAttemptsQuery = useQuery({
     queryKey: ["student-quiz-attempts", user.id],
     queryFn: async () => {
@@ -151,7 +162,7 @@ function DashboardPage() {
         .eq("user_id", user.id)
         .not("submitted_at", "is", null)
         .order("submitted_at", { ascending: false })
-        .limit(20);
+        .limit(6);
       if (error) throw error;
       return (data ?? []) as unknown as QuizAttemptRow[];
     },
@@ -167,282 +178,202 @@ function DashboardPage() {
         .order("last_activity_at", { ascending: false })
         .limit(60);
       if (error) throw error;
-      return calcStreak((data ?? []).map((r: any) => r.last_activity_at as string));
+      return calcStreak((data ?? []).map((r: { last_activity_at: string }) => r.last_activity_at));
     },
   });
 
   const bookmarks = bookmarksQuery.data ?? [];
   const progress = progressQuery.data ?? [];
-  const notifications = notificationsQuery.data ?? [];
   const attempts = quizAttemptsQuery.data ?? [];
   const streak = streakQuery.data ?? 0;
-  const unreadCount = notifications.filter((n) => !n.read_at).length;
+  const semester = contextQuery.data?.semester ?? null;
+  const semesterSubjects = contextQuery.data?.subjects ?? [];
+  const courseTitle = (semester?.courses as { title?: string; slug?: string } | null)?.title;
+  const courseSlug = (semester?.courses as { title?: string; slug?: string } | null)?.slug;
 
-  // ---------- derived stats ----------
-  const inProgressCount = progress.filter((p) => p.status !== "completed").length;
   const avgScore = useMemo(() => {
     const scored = attempts.filter((a) => typeof a.pct === "number");
     if (!scored.length) return null;
     const sum = scored.reduce((acc, a) => acc + Number(a.pct ?? 0), 0);
     return Math.round(sum / scored.length);
   }, [attempts]);
-  const pickUp = progress[0] ?? null;
 
-  // ---------- actions ----------
-  async function markAllRead() {
-    if (unreadCount === 0) return;
-    const ids = notifications.filter((n) => !n.read_at).map((n) => n.id);
-    const { error } = await supabase
-      .from("notifications")
-      .update({ read_at: new Date().toISOString() })
-      .in("id", ids);
-    if (error) {
-      toast.error("Could not update notifications");
-      return;
-    }
-    await queryClient.invalidateQueries({ queryKey: ["student-notifications", user.id] });
-  }
-
+  const pickUp = progress.find((p) => p.status !== "completed") ?? progress[0] ?? null;
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10">
+    <main className="mx-auto max-w-6xl px-5 pb-20 pt-8 sm:px-6 sm:pt-12">
+      {/* ─── Focus bar ─── */}
+      <section className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 sm:flex sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            {greeting()}
+          </p>
+          <h1 className="mt-1.5 truncate font-display text-3xl font-semibold text-foreground sm:text-[2.25rem] sm:leading-tight">
+            {firstName}
+          </h1>
+        </div>
 
-      <section className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary via-primary to-primary/85 p-8 text-primary-foreground sm:p-10">
-        <div aria-hidden className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-accent/35 blur-3xl" />
-        <div aria-hidden className="pointer-events-none absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-accent/15 blur-3xl" />
-        <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px]" />
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {semester && (
+            <Link
+              to="/courses/$courseSlug/$semesterNumber"
+              params={{
+                courseSlug: courseSlug ?? "",
+                semesterNumber: String(semester.number),
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+            >
+              <GraduationCap className="h-3.5 w-3.5 text-primary" />
+              {courseTitle ? `${courseTitle} · ` : ""}Semester {semester.number}
+            </Link>
+          )}
+          {!semester && !profileQuery.isLoading && (
+            <Link
+              to="/onboarding"
+              className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground hover:border-primary/40 hover:text-primary"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Choose your semester
+            </Link>
+          )}
+          <span
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium",
+              streak > 0
+                ? "bg-accent/15 text-accent-foreground ring-1 ring-accent/30"
+                : "bg-muted text-muted-foreground",
+            )}
+            title={streak > 0 ? `${streak}-day study streak` : "Study today to start a streak"}
+          >
+            <Flame className={cn("h-3.5 w-3.5", streak > 0 && "text-accent-foreground")} />
+            {streakQuery.isLoading ? "—" : `${streak}d`}
+          </span>
+        </div>
+      </section>
 
-        <div className="relative">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/10 px-3 py-1 text-xs backdrop-blur-sm ring-1 ring-primary-foreground/15">
-              <Sparkles className="h-3 w-3" />
-              {greeting()}
-            </span>
-            {streak > 0 && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-xs font-medium text-accent-foreground ring-1 ring-accent/40">
-                <Flame className="h-3 w-3" />
-                {streak}-day streak
+      {/* ─── The one primary action ─── */}
+      <section className="mt-8">
+        <ContinueHero
+          loading={progressQuery.isLoading || profileQuery.isLoading}
+          pickUp={pickUp}
+          semester={semester}
+          courseSlug={courseSlug}
+        />
+      </section>
+
+      {/* ─── Your semester rail ─── */}
+      <section className="mt-12">
+        <div className="flex items-baseline justify-between gap-3">
+          <div>
+            <h2 className="font-display text-xl font-semibold text-foreground">
+              {semester ? `Your Semester ${semester.number}` : "Your subjects"}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {semester
+                ? "Pick a subject to open its units, notes and practice."
+                : "Choose your course and semester to see your subjects here."}
+            </p>
+          </div>
+          {semester && courseSlug && (
+            <Link
+              to="/courses/$courseSlug/$semesterNumber"
+              params={{ courseSlug, semesterNumber: String(semester.number) }}
+              className="hidden text-xs font-medium text-primary hover:underline sm:inline"
+            >
+              View semester →
+            </Link>
+          )}
+        </div>
+
+        {contextQuery.isLoading || profileQuery.isLoading ? (
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Skeleton className="h-28 rounded-2xl" />
+            <Skeleton className="h-28 rounded-2xl" />
+            <Skeleton className="h-28 rounded-2xl" />
+          </div>
+        ) : !semester ? (
+          <div className="mt-5">
+            <EmptyState
+              icon={Compass}
+              tone="accent"
+              variant="panel"
+              title="Set your current semester"
+              description="Tell us your course and semester once — we'll personalize your dashboard, subjects and recommendations."
+              primaryAction={{ label: "Set semester", to: "/onboarding", icon: ArrowRight }}
+              secondaryAction={{ label: "Browse all courses", to: "/courses" }}
+            />
+          </div>
+        ) : semesterSubjects.length === 0 ? (
+          <p className="mt-5 rounded-2xl border border-dashed border-border bg-surface p-6 text-sm text-muted-foreground">
+            Subjects for this semester haven't been published yet. Check back soon.
+          </p>
+        ) : (
+          <div className="mt-5 -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
+            {semesterSubjects.map((s) => (
+              <Link
+                key={s.id}
+                to="/courses/$courseSlug/$semesterNumber/$subjectSlug"
+                params={{
+                  courseSlug: courseSlug ?? "",
+                  semesterNumber: String(semester.number),
+                  subjectSlug: s.slug,
+                }}
+                className="group min-w-[78%] shrink-0 snap-start rounded-2xl border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm sm:min-w-0 sm:shrink"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                    {s.code}
+                  </span>
+                  {s.credits != null && (
+                    <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                      {s.credits} cr
+                    </span>
+                  )}
+                </div>
+                <h3 className="mt-2 font-display text-base font-semibold leading-snug text-foreground line-clamp-2">
+                  {s.title}
+                </h3>
+                <div className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                  Open <ArrowRight className="h-3.5 w-3.5" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ─── Secondary: quizzes + bookmarks ─── */}
+      <section className="mt-12 grid gap-5 lg:grid-cols-5">
+        {/* Recent quiz attempts */}
+        <div className="rounded-2xl border border-border bg-surface p-6 lg:col-span-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="font-display text-base font-semibold text-foreground">
+                Recent practice
+              </h3>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {avgScore !== null
+                  ? `Average ${avgScore}% across ${attempts.length} attempt${attempts.length === 1 ? "" : "s"}`
+                  : "Take your first MCQ to see your scores here"}
+              </p>
+            </div>
+            {avgScore !== null && (
+              <span
+                className={cn(
+                  "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
+                  avgScore >= 70
+                    ? "bg-primary/10 text-primary"
+                    : "bg-accent/15 text-accent-foreground",
+                )}
+              >
+                <Trophy className="mr-1 inline h-3 w-3" />
+                {avgScore}%
               </span>
             )}
           </div>
 
-          <h1 className="mt-4 font-display text-3xl font-semibold leading-tight sm:text-4xl">
-            {greeting()}, {firstName}.
-          </h1>
-          <p className="mt-2 max-w-xl text-sm text-primary-foreground/80">
-            {pickUp
-              ? `Pick up “${pickUp.unit_title ?? "your unit"}” where you left off, or explore something new.`
-              : "Open a unit to start tracking your progress — bookmarks, quizzes and streaks land here automatically."}
-          </p>
-
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            {pickUp ? (
-              <Button asChild size="lg" variant="secondary" className="shrink-0">
-                <Link to="/courses">
-                  <PlayCircle className="mr-2 h-4 w-4" />
-                  Resume learning
-                </Link>
-              </Button>
-            ) : (
-              <Button asChild size="lg" variant="secondary" className="shrink-0">
-                <Link to="/courses">
-                  Browse courses
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            )}
-            <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 bg-primary-foreground/5 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground">
-              <Link to="/search">
-                <Search className="mr-2 h-4 w-4" />
-                Quick search
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ============== STATS STRIP ============== */}
-      <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          icon={<Flame className="h-4 w-4" />}
-          label="Study streak"
-          value={streakQuery.isLoading ? null : `${streak} ${streak === 1 ? "day" : "days"}`}
-          hint={streak > 0 ? "Keep it alive today" : "Study today to begin"}
-          tone="accent"
-        />
-        <StatCard
-          icon={<Target className="h-4 w-4" />}
-          label="In progress"
-          value={progressQuery.isLoading ? null : `${inProgressCount}`}
-          hint={inProgressCount ? "Units underway" : "No active units"}
-        />
-        <StatCard
-          icon={<Trophy className="h-4 w-4" />}
-          label="Quizzes taken"
-          value={quizAttemptsQuery.isLoading ? null : `${attempts.length}`}
-          hint={attempts.length ? "Lifetime attempts" : "Try your first quiz"}
-        />
-        <StatCard
-          icon={<Award className="h-4 w-4" />}
-          label="Avg quiz score"
-          value={quizAttemptsQuery.isLoading ? null : avgScore !== null ? `${avgScore}%` : "—"}
-          hint={avgScore !== null ? (avgScore >= 70 ? "Great work" : "Room to climb") : "Take a quiz to begin"}
-          tone={avgScore !== null && avgScore >= 70 ? "success" : "default"}
-        />
-      </section>
-
-      {/* ============== PICK UP WHERE YOU LEFT OFF ============== */}
-      {pickUp && (
-        <section className="mt-8 overflow-hidden rounded-2xl border border-border bg-surface">
-          <div className="grid gap-0 md:grid-cols-[1.4fr_1fr]">
-            <div className="p-6 sm:p-7">
-              <div className="text-[11px] font-medium uppercase tracking-wider text-accent">
-                Pick up where you left off
-              </div>
-              <h3 className="mt-2 font-display text-2xl font-semibold text-foreground">
-                {pickUp.unit_title ?? "Your unit"}
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground">{pickUp.subject_title ?? "—"}</p>
-
-              <div className="mt-5">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Progress</span>
-                  <span className="font-medium text-foreground">
-                    {Math.round(Number(pickUp.progress_pct))}%
-                  </span>
-                </div>
-                <Progress value={Number(pickUp.progress_pct)} className="mt-2 h-2" />
-              </div>
-
-              <div className="mt-6 flex gap-2">
-                <Button asChild>
-                  <Link to="/courses">
-                    Resume
-                    <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline">
-                  <Link to="/bookmarks">View bookmarks</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="relative hidden bg-gradient-to-br from-primary/10 via-accent/10 to-transparent md:block">
-              <div aria-hidden className="absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,hsl(var(--primary)/0.12)_1px,transparent_0)] [background-size:18px_18px]" />
-              <div className="relative grid h-full place-items-center p-6">
-                <BookOpen className="h-24 w-24 text-primary/30" strokeWidth={1.2} />
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ============== QUICK ACTIONS ============== */}
-      <section className="mt-10">
-        <h2 className="font-display text-xl font-semibold text-foreground">Quick actions</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Jump straight into the part of the platform you need right now.
-        </p>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <ActionCard to="/courses" icon={<BookOpen className="h-5 w-5" />} title="Notes" body="Read structured semester-wise notes." />
-          <ActionCard to="/courses" icon={<FileText className="h-5 w-5" />} title="Past papers" body="Practise with previous year question papers." />
-          <ActionCard to="/courses" icon={<PlayCircle className="h-5 w-5" />} title="Video lectures" body="Watch curated lectures alongside the syllabus." />
-          <ActionCard to="/courses" icon={<ListChecks className="h-5 w-5" />} title="MCQ practice" body="Take timed quizzes with explanations." />
-        </div>
-      </section>
-
-      {/* ============== CONTINUE LEARNING + BOOKMARKS ============== */}
-      <section className="mt-10 grid gap-5 lg:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-surface p-6 lg:col-span-2">
-          <CardHeader
-            icon={<TrendingUp className="h-4 w-4" />}
-            title="Continue learning"
-            action={progress.length > 0 ? <Link to="/courses" className="text-xs font-medium text-primary hover:underline">Browse all →</Link> : null}
-          />
-
-          {progressQuery.isLoading ? (
-            <div className="mt-5 space-y-3">
-              <Skeleton className="h-16 rounded-xl" />
-              <Skeleton className="h-16 rounded-xl" />
-            </div>
-          ) : progress.length === 0 ? (
-            <div className="mt-5">
-              <EmptyState
-                icon={Compass}
-                tone="accent"
-                variant="panel"
-                title="Start your first unit"
-                description="Open any unit from your semester — your progress, bookmarks and quiz attempts will land here automatically."
-                tip="Aim for one unit a day. Six small wins beats one long binge."
-                primaryAction={{ label: "Explore courses", to: "/courses", icon: ArrowRight }}
-                secondaryAction={{ label: "Try a quick MCQ", to: "/search", icon: ListChecks }}
-              />
-            </div>
-          ) : (
-            <ul className="mt-5 space-y-3">
-              {progress.map((p) => (
-                <li key={p.id} className="group rounded-xl border border-border/70 p-4 transition-colors hover:border-primary/30 hover:bg-surface-muted/40">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">{p.unit_title ?? "Untitled unit"}</p>
-                      <p className="mt-0.5 truncate text-xs text-muted-foreground">{p.subject_title ?? "—"}</p>
-                    </div>
-                    <span className={cn(
-                      "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium",
-                      p.status === "completed" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                        : p.status === "in_progress" ? "bg-primary/10 text-primary"
-                        : "bg-muted text-muted-foreground",
-                    )}>
-                      {Math.round(Number(p.progress_pct))}%
-                    </span>
-                  </div>
-                  <Progress value={Number(p.progress_pct)} className="mt-3 h-1.5" />
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="rounded-2xl border border-border bg-surface-muted/60 p-6">
-          <CardHeader
-            icon={<Bookmark className="h-4 w-4" />}
-            title="Bookmarks"
-            tone="accent"
-            action={bookmarks.length > 0 ? <Link to="/bookmarks" className="text-xs font-medium text-primary hover:underline">All →</Link> : null}
-          />
-
-          {bookmarksQuery.isLoading ? (
-            <div className="mt-4 space-y-2">
-              <Skeleton className="h-12 rounded-lg" />
-              <Skeleton className="h-12 rounded-lg" />
-              <Skeleton className="h-12 rounded-lg" />
-            </div>
-          ) : bookmarks.length === 0 ? (
-            <p className="mt-4 text-sm text-muted-foreground">
-              Save notes, papers and quizzes to find them quickly. Your bookmarks will appear here.
-            </p>
-          ) : (
-            <ul className="mt-4 space-y-2.5">
-              {bookmarks.map((b) => (
-                <li key={b.id}>
-                  <BookmarkLink kind={b.kind} refId={b.ref_id} title={b.title} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
-
-      {/* ============== RECENT QUIZZES + NOTIFICATIONS ============== */}
-      <section className="mt-10 grid gap-5 lg:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-surface p-6 lg:col-span-2">
-          <CardHeader
-            icon={<Trophy className="h-4 w-4" />}
-            title="Recent quiz attempts"
-            action={attempts.length > 0 ? <Link to="/quizzes" className="text-xs font-medium text-primary hover:underline">All quizzes →</Link> : null}
-          />
-
           {quizAttemptsQuery.isLoading ? (
-            <div className="mt-5 space-y-2.5">
+            <div className="mt-5 space-y-2">
               <Skeleton className="h-14 rounded-xl" />
               <Skeleton className="h-14 rounded-xl" />
             </div>
@@ -450,33 +381,45 @@ function DashboardPage() {
             <div className="mt-5">
               <EmptyState
                 icon={ListChecks}
-                title="No attempts yet"
-                description="Take your first MCQ to see scores, pass/fail and your average right here."
                 variant="panel"
+                title="No attempts yet"
+                description="Practice a quiz to see scores and averages here."
                 primaryAction={{ label: "Find a quiz", to: "/courses", icon: ArrowRight }}
               />
             </div>
           ) : (
             <ul className="mt-5 divide-y divide-border/60">
-              {attempts.slice(0, 6).map((a) => {
+              {attempts.map((a) => {
                 const pct = typeof a.pct === "number" ? Math.round(a.pct) : null;
                 return (
-                  <li key={a.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
-                    <div className="min-w-0 flex items-center gap-3">
-                      <div className={cn(
-                        "grid h-9 w-9 shrink-0 place-items-center rounded-lg text-xs font-semibold",
-                        a.passed ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-destructive/10 text-destructive",
-                      )}>
-                        {pct !== null ? `${pct}` : "–"}
+                  <li
+                    key={a.id}
+                    className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div
+                        className={cn(
+                          "grid h-10 w-10 shrink-0 place-items-center rounded-xl text-[11px] font-semibold",
+                          a.passed
+                            ? "bg-primary/10 text-primary"
+                            : "bg-destructive/10 text-destructive",
+                        )}
+                      >
+                        {pct !== null ? `${pct}%` : "—"}
                       </div>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-foreground">
                           {a.quizzes?.title ?? "Quiz"}
                         </p>
                         <p className="text-[11px] text-muted-foreground">
-                          {a.submitted_at ? new Date(a.submitted_at).toLocaleDateString(undefined, { day: "numeric", month: "short" }) : ""}
+                          {a.submitted_at
+                            ? new Date(a.submitted_at).toLocaleDateString(undefined, {
+                                day: "numeric",
+                                month: "short",
+                              })
+                            : ""}
                           {" · "}
-                          {a.passed ? "Passed" : "Did not pass"}
+                          {a.passed ? "Passed" : "Retry"}
                         </p>
                       </div>
                     </div>
@@ -494,58 +437,38 @@ function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-border bg-surface p-6">
+        {/* Bookmarks */}
+        <div className="rounded-2xl border border-border bg-surface p-6 lg:col-span-2">
           <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
-                <Bell className="h-4 w-4" />
-                {unreadCount > 0 && (
-                  <span aria-hidden className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground">
-                    {unreadCount}
-                  </span>
-                )}
-              </div>
-              <h3 className="font-display text-base font-semibold text-foreground">Notifications</h3>
-            </div>
-            {unreadCount > 0 && (
-              <button onClick={markAllRead} className="text-[11px] font-medium text-primary hover:underline">
-                Mark all read
-              </button>
+            <h3 className="font-display text-base font-semibold text-foreground">
+              <Bookmark className="mr-1.5 inline h-4 w-4 text-primary" />
+              Bookmarks
+            </h3>
+            {bookmarks.length > 0 && (
+              <Link to="/bookmarks" className="text-xs font-medium text-primary hover:underline">
+                All →
+              </Link>
             )}
           </div>
 
-          {notificationsQuery.isLoading ? (
-            <div className="mt-4 space-y-2"><Skeleton className="h-14 rounded-xl" /><Skeleton className="h-14 rounded-xl" /></div>
-          ) : notifications.length === 0 ? (
-            <div className="mt-4 rounded-xl border border-dashed border-border bg-surface-muted/40 p-4 text-center">
-              <p className="text-sm font-medium text-foreground">You're all caught up</p>
-              <p className="mt-1 text-xs text-muted-foreground">We'll let you know when something new arrives.</p>
+          {bookmarksQuery.isLoading ? (
+            <div className="mt-4 space-y-2">
+              <Skeleton className="h-12 rounded-xl" />
+              <Skeleton className="h-12 rounded-xl" />
+              <Skeleton className="h-12 rounded-xl" />
             </div>
+          ) : bookmarks.length === 0 ? (
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Save notes, papers and quizzes with the bookmark icon — they'll live here for quick
+              access.
+            </p>
           ) : (
             <ul className="mt-4 space-y-2">
-              {notifications.slice(0, 5).map((n) => {
-                const isUnread = !n.read_at;
-                const inner = (
-                  <div className={cn(
-                    "rounded-xl border px-3.5 py-3 transition-colors",
-                    isUnread ? "border-primary/30 bg-primary/5" : "border-border/60 bg-background hover:bg-surface-muted/40",
-                  )}>
-                    <div className="flex items-center gap-2">
-                      {isUnread && <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />}
-                      <p className="truncate text-sm font-medium text-foreground">{n.title}</p>
-                    </div>
-                    {n.body && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{n.body}</p>}
-                    <p className="mt-1.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                      {n.kind}{n.published_at ? ` · ${new Date(n.published_at).toLocaleDateString()}` : ""}
-                    </p>
-                  </div>
-                );
-                return (
-                  <li key={n.id}>
-                    {n.link ? <a href={n.link} className="block">{inner}</a> : inner}
-                  </li>
-                );
-              })}
+              {bookmarks.map((b) => (
+                <li key={b.id}>
+                  <BookmarkLink kind={b.kind} refId={b.ref_id} title={b.title} />
+                </li>
+              ))}
             </ul>
           )}
         </div>
@@ -554,65 +477,143 @@ function DashboardPage() {
   );
 }
 
-// ---------------- helpers ----------------
+/* ---------------- helpers ---------------- */
 
-function StatCard({
-  icon,
-  label,
-  value,
-  hint,
-  tone = "default",
+function ContinueHero({
+  loading,
+  pickUp,
+  semester,
+  courseSlug,
 }: {
-  icon: React.ReactNode;
-  label: string;
-  value: string | null;
-  hint?: string;
-  tone?: "default" | "accent" | "success";
+  loading: boolean;
+  pickUp: ProgressRow | null;
+  semester: { id: string; number: number; title: string | null } | null;
+  courseSlug: string | undefined;
 }) {
-  const toneClass =
-    tone === "accent"
-      ? "bg-accent/15 text-accent-foreground ring-accent/30"
-      : tone === "success"
-        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 ring-emerald-500/20"
-        : "bg-primary/10 text-primary ring-primary/15";
-  return (
-    <div className="rounded-2xl border border-border bg-surface p-4 transition-colors hover:border-primary/25">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
-        <span className={cn("grid h-7 w-7 place-items-center rounded-lg ring-1", toneClass)}>{icon}</span>
-      </div>
-      <div className="mt-3 font-display text-2xl font-semibold text-foreground">
-        {value === null ? <Skeleton className="h-7 w-16" /> : value}
-      </div>
-      {hint && <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p>}
-    </div>
-  );
-}
+  if (loading) {
+    return <Skeleton className="h-56 rounded-3xl" />;
+  }
 
-function CardHeader({
-  icon,
-  title,
-  action,
-  tone = "primary",
-}: {
-  icon: React.ReactNode;
-  title: string;
-  action?: React.ReactNode;
-  tone?: "primary" | "accent";
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <div className="flex items-center gap-2.5">
-        <div className={cn(
-          "grid h-9 w-9 place-items-center rounded-xl",
-          tone === "accent" ? "bg-accent/20 text-accent-foreground" : "bg-primary/10 text-primary",
-        )}>
-          {icon}
+  // In-progress state — the primary case
+  if (pickUp) {
+    return (
+      <article className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary via-primary to-primary/90 p-7 text-primary-foreground shadow-sm sm:p-10">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/30 blur-3xl"
+        />
+        <div className="relative grid gap-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+          <div className="min-w-0">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider ring-1 ring-primary-foreground/20">
+              <PlayCircle className="h-3 w-3" /> Continue where you left off
+            </span>
+            <h2 className="mt-4 font-display text-2xl font-semibold leading-tight sm:text-3xl">
+              {pickUp.unit_title ?? "Your next unit"}
+            </h2>
+            <p className="mt-1.5 text-sm text-primary-foreground/80">
+              {pickUp.subject_title ?? "—"}
+            </p>
+
+            <div className="mt-5 max-w-md">
+              <div className="flex items-center justify-between text-[11px] font-medium uppercase tracking-wider text-primary-foreground/70">
+                <span>Progress</span>
+                <span className="text-primary-foreground">
+                  {Math.round(Number(pickUp.progress_pct))}%
+                </span>
+              </div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-primary-foreground/15">
+                <div
+                  className="h-full rounded-full bg-primary-foreground/90 transition-[width]"
+                  style={{ width: `${Math.min(100, Math.max(0, Number(pickUp.progress_pct)))}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 flex-wrap gap-2 sm:flex-col">
+            <Button asChild size="lg" variant="secondary" className="shadow-sm">
+              <Link to="/courses">
+                <PlayCircle className="mr-2 h-4 w-4" />
+                Resume
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="ghost"
+              className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            >
+              <Link to="/bookmarks">
+                <Bookmark className="mr-2 h-4 w-4" />
+                Bookmarks
+              </Link>
+            </Button>
+          </div>
         </div>
-        <h3 className="font-display text-base font-semibold text-foreground">{title}</h3>
+      </article>
+    );
+  }
+
+  // Personalized "start your semester" state
+  if (semester && courseSlug) {
+    return (
+      <article className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary via-primary to-primary/90 p-7 text-primary-foreground shadow-sm sm:p-10">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/30 blur-3xl"
+        />
+        <div className="relative max-w-2xl">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider ring-1 ring-primary-foreground/20">
+            <Sparkles className="h-3 w-3" /> Ready when you are
+          </span>
+          <h2 className="mt-4 font-display text-2xl font-semibold leading-tight sm:text-3xl">
+            Start Semester {semester.number}
+          </h2>
+          <p className="mt-1.5 max-w-lg text-sm text-primary-foreground/85">
+            Open your first subject — your progress, bookmarks and quiz scores will start showing
+            up here automatically.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button asChild size="lg" variant="secondary">
+              <Link
+                to="/courses/$courseSlug/$semesterNumber"
+                params={{ courseSlug, semesterNumber: String(semester.number) }}
+              >
+                <BookOpen className="mr-2 h-4 w-4" />
+                Open my semester
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
+  // First-time / no personalization
+  return (
+    <article className="rounded-3xl border border-border bg-surface p-7 sm:p-10">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-primary">
+        <Sparkles className="h-3 w-3" /> Let's set you up
+      </span>
+      <h2 className="mt-4 font-display text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
+        Pick your course and semester
+      </h2>
+      <p className="mt-1.5 max-w-lg text-sm text-muted-foreground">
+        Tell us where you are in your BCA journey — we'll personalize your dashboard, your subjects
+        and your recommended practice.
+      </p>
+      <div className="mt-5 flex flex-wrap gap-2">
+        <Button asChild size="lg">
+          <Link to="/onboarding">
+            Get started
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+        <Button asChild size="lg" variant="outline">
+          <Link to="/courses">Browse courses</Link>
+        </Button>
       </div>
-      {action}
-    </div>
+    </article>
   );
 }
 
@@ -626,12 +627,17 @@ function BookmarkLink({
   title: string | null;
 }) {
   const label = title ?? "Untitled";
-  const kindLabel = kind === "note" ? "Note" : kind === "paper" ? "Paper" : kind === "quiz" ? "Quiz" : "Unit";
+  const Icon = kind === "note" ? FileText : kind === "paper" ? FileText : kind === "quiz" ? ListChecks : BookOpen;
+  const kindLabel =
+    kind === "note" ? "Note" : kind === "paper" ? "Paper" : kind === "quiz" ? "Quiz" : "Unit";
   const inner = (
-    <div className="group flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-background px-3 py-2.5 transition-colors hover:border-primary/40 hover:bg-surface">
-      <div className="min-w-0">
+    <div className="group flex items-center gap-3 rounded-xl border border-border/70 bg-background px-3 py-2.5 transition-colors hover:border-primary/40 hover:bg-surface">
+      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-foreground">{label}</p>
-        <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{kindLabel}</p>
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{kindLabel}</p>
       </div>
       <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
     </div>
@@ -641,34 +647,3 @@ function BookmarkLink({
   if (kind === "quiz") return <Link to="/quizzes/$quizId" params={{ quizId: refId }}>{inner}</Link>;
   return <Link to="/courses">{inner}</Link>;
 }
-
-function ActionCard({
-  to,
-  icon,
-  title,
-  body,
-}: {
-  to: "/courses";
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-}) {
-  return (
-    <Link
-      to={to}
-      className="group relative block overflow-hidden rounded-2xl border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
-    >
-      <div aria-hidden className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100" />
-      <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-        {icon}
-      </div>
-      <h3 className="relative mt-4 font-display text-base font-semibold text-foreground">{title}</h3>
-      <p className="relative mt-1.5 text-sm text-muted-foreground">{body}</p>
-      <div className="relative mt-4 inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
-        Open
-        <ArrowRight className="h-3.5 w-3.5" />
-      </div>
-    </Link>
-  );
-}
-
