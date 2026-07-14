@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, BookOpen, Compass } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Check, Compass } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -230,131 +230,114 @@ function SemesterDetail() {
     return { inProgressOrDone, completedSubjects, avgPct, resume };
   }, [stats]);
 
-  const fullName =
-    (user?.user_metadata?.full_name as string | undefined) ??
-    user?.email?.split("@")[0] ??
-    null;
-  const firstName = fullName?.split(" ")[0] ?? null;
+  const firstName = useMemo(() => {
+    const fullName =
+      (user?.user_metadata?.full_name as string | undefined) ??
+      user?.email?.split("@")[0] ??
+      null;
+    return fullName?.split(" ")[0] ?? null;
+  }, [user]);
 
   const loadingCore = semQuery.isLoading;
   const loadingProgress = unitsQuery.isLoading || (!!user && progressQuery.isLoading);
+
+  const heroCta = useMemo(() => {
+    if (stats.length === 0) return null;
+    const target = user && overall.resume ? overall.resume : stats[0];
+    const label =
+      user && overall.resume
+        ? overall.resume.status === "not_started"
+          ? `Start ${overall.resume.subject.title}`
+          : `Continue ${overall.resume.subject.title}`
+        : "Start your first subject";
+    return { subjectSlug: target.subject.slug, label };
+  }, [stats, overall.resume, user]);
+
+  const heroSubtitle = (() => {
+    if (stats.length === 0) return "Subjects for this semester haven't been published yet.";
+    if (!user) return `${stats.length} subjects in this semester. Sign in to track your progress.`;
+    if (overall.completedSubjects === stats.length)
+      return `All ${stats.length} subjects completed. Beautifully done.`;
+    if (overall.inProgressOrDone === 0)
+      return `${stats.length} subjects ready. Pick one to begin.`;
+    return `${overall.inProgressOrDone} of ${stats.length} subjects in progress · ${overall.completedSubjects} completed`;
+  })();
 
   return (
     <div className="min-h-screen bg-background">
       <PublicHeader />
       <main className="mx-auto max-w-6xl px-5 pb-24 pt-8 sm:px-8 sm:pt-12">
-        {/* Back link */}
         <Link
           to="/courses/$courseSlug"
           params={{ courseSlug }}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          className="inline-flex items-center gap-1.5 rounded-md text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           {semQuery.data?.course.title ?? "Course"}
         </Link>
 
         {/* ─── Hero ─── */}
-        <section className="mt-6 rounded-3xl border border-border bg-surface p-7 sm:p-10">
+        <section className="mt-6 rounded-3xl border border-border bg-surface p-6 sm:p-10">
           {loadingCore ? (
             <div className="space-y-4">
               <Skeleton className="h-4 w-40" />
-              <Skeleton className="h-9 w-72" />
-              <Skeleton className="h-2 w-full max-w-md" />
+              <Skeleton className="h-10 w-72" />
+              <Skeleton className="h-4 w-96 max-w-full" />
+              <Skeleton className="h-11 w-48" />
             </div>
           ) : (
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
               <div className="min-w-0">
-                <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
                   {semQuery.data?.course.title} · Semester {semQuery.data?.sem.number}
                 </p>
-                <h1 className="mt-2 font-display text-3xl font-semibold leading-tight text-foreground sm:text-[2.5rem]">
+                <h1 className="mt-3 font-display text-3xl font-semibold leading-[1.15] tracking-tight text-foreground sm:text-4xl md:text-[2.5rem]">
                   {firstName ? (
                     <>
-                      Welcome back,{" "}
-                      <span className="text-primary">{firstName}</span>.
+                      Welcome back, <span className="text-primary">{firstName}</span>.
                     </>
                   ) : (
                     <>Your learning workspace.</>
                   )}
                 </h1>
-                <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
-                  {stats.length === 0
-                    ? "Subjects for this semester haven't been published yet."
-                    : user
-                      ? overall.completedSubjects === stats.length
-                        ? `All ${stats.length} subjects completed. Beautifully done.`
-                        : overall.inProgressOrDone === 0
-                          ? `${stats.length} subjects ready. Pick one to begin.`
-                          : `${overall.inProgressOrDone} of ${stats.length} subjects in progress · ${overall.completedSubjects} completed`
-                      : `${stats.length} subjects in this semester. Sign in to track your progress.`}
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
+                  {heroSubtitle}
                 </p>
 
-                {/* Progress bar */}
                 {user && stats.length > 0 && (
-                  <div className="mt-6 max-w-md">
-                    <div
-                      className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
-                      role="progressbar"
-                      aria-label="Semester progress"
-                      aria-valuenow={overall.avgPct}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                    >
-                      <div
-                        className="h-full rounded-full bg-primary transition-all"
-                        style={{ width: `${overall.avgPct}%` }}
-                      />
-                    </div>
+                  <div className="mt-6 max-w-sm">
+                    <ProgressBar
+                      value={overall.avgPct}
+                      label="Semester progress"
+                      tone={overall.completedSubjects === stats.length ? "done" : "active"}
+                    />
                     <div className="mt-2 flex items-center justify-between text-[11px] font-medium text-muted-foreground">
                       <span>Overall progress</span>
-                      <span className="tabular-nums">{overall.avgPct}%</span>
+                      <span className="tabular-nums text-foreground">{overall.avgPct}%</span>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Primary CTA */}
-              {stats.length > 0 && (
-                <div className="lg:pl-6">
-                  {user && overall.resume ? (
-                    <Button
-                      asChild
-                      size="lg"
-                      className="h-12 gap-2 rounded-xl px-6 text-sm font-semibold"
+              {heroCta && (
+                <div className="md:pl-6">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="h-12 w-full gap-2 rounded-xl px-6 text-sm font-semibold shadow-sm sm:w-auto"
+                  >
+                    <Link
+                      to="/courses/$courseSlug/$semesterNumber/$subjectSlug"
+                      params={{
+                        courseSlug,
+                        semesterNumber,
+                        subjectSlug: heroCta.subjectSlug,
+                      }}
                     >
-                      <Link
-                        to="/courses/$courseSlug/$semesterNumber/$subjectSlug"
-                        params={{
-                          courseSlug,
-                          semesterNumber,
-                          subjectSlug: overall.resume.subject.slug,
-                        }}
-                      >
-                        {overall.resume.status === "not_started"
-                          ? `Start ${overall.resume.subject.title}`
-                          : `Continue ${overall.resume.subject.title}`}
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                  ) : (
-                    <Button
-                      asChild
-                      size="lg"
-                      className="h-12 gap-2 rounded-xl px-6 text-sm font-semibold"
-                    >
-                      <Link
-                        to="/courses/$courseSlug/$semesterNumber/$subjectSlug"
-                        params={{
-                          courseSlug,
-                          semesterNumber,
-                          subjectSlug: stats[0].subject.slug,
-                        }}
-                      >
-                        Start your first subject
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                  )}
+                      <span className="truncate">{heroCta.label}</span>
+                      <ArrowRight className="h-4 w-4 shrink-0" />
+                    </Link>
+                  </Button>
                 </div>
               )}
             </div>
@@ -362,13 +345,13 @@ function SemesterDetail() {
         </section>
 
         {/* ─── Subjects ─── */}
-        <section className="mt-12">
+        <section className="mt-14">
           <div className="flex items-baseline justify-between gap-4">
-            <h2 className="font-display text-xl font-semibold text-foreground sm:text-2xl">
+            <h2 className="font-display text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
               Subjects
             </h2>
             {stats.length > 0 && user && (
-              <span className="text-xs font-medium text-muted-foreground tabular-nums">
+              <span className="text-xs font-medium tabular-nums text-muted-foreground">
                 {overall.completedSubjects}/{stats.length} completed
               </span>
             )}
@@ -376,34 +359,65 @@ function SemesterDetail() {
 
           {loadingCore ? (
             <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              <Skeleton className="h-44 rounded-2xl" />
-              <Skeleton className="h-44 rounded-2xl" />
-              <Skeleton className="h-44 rounded-2xl" />
+              <Skeleton className="h-48 rounded-2xl" />
+              <Skeleton className="h-48 rounded-2xl" />
+              <Skeleton className="h-48 rounded-2xl" />
             </div>
           ) : stats.length === 0 ? (
             <EmptySubjects courseSlug={courseSlug} />
           ) : (
-            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {stats.map((s) => (
-                <SubjectCard
-                  key={s.subject.id}
-                  stats={s}
-                  loading={loadingProgress}
-                  href={{
-                    to: "/courses/$courseSlug/$semesterNumber/$subjectSlug",
-                    params: {
-                      courseSlug,
-                      semesterNumber,
-                      subjectSlug: s.subject.slug,
-                    },
-                  }}
-                  showProgress={!!user}
-                />
+                <li key={s.subject.id} className="flex">
+                  <SubjectCard
+                    stats={s}
+                    loading={loadingProgress}
+                    href={{
+                      to: "/courses/$courseSlug/$semesterNumber/$subjectSlug",
+                      params: {
+                        courseSlug,
+                        semesterNumber,
+                        subjectSlug: s.subject.slug,
+                      },
+                    }}
+                    showProgress={!!user}
+                  />
+                </li>
               ))}
-            </div>
+            </ul>
           )}
         </section>
       </main>
+    </div>
+  );
+}
+
+function ProgressBar({
+  value,
+  label,
+  tone = "active",
+}: {
+  value: number;
+  label: string;
+  tone?: "active" | "done";
+}) {
+  return (
+    <div
+      className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+      role="progressbar"
+      aria-label={label}
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuetext={`${value} percent`}
+    >
+      <div
+        className={cn(
+          "h-full rounded-full transition-[width] duration-500 ease-out",
+          tone === "done" ? "bg-primary" : "bg-primary/75",
+        )}
+        style={{ width: `${value}%` }}
+      />
     </div>
   );
 }
@@ -424,73 +438,73 @@ function SubjectCard({
 }) {
   const { subject, totalUnits, completedUnits, pct, lastActivity, status } = stats;
   const rel = formatRelative(lastActivity);
+  const isDone = status === "completed";
+
+  const ctaLabel = !showProgress
+    ? "Open"
+    : isDone
+      ? "Review"
+      : status === "in_progress"
+        ? "Continue"
+        : "Start";
 
   return (
     <Link
       {...href}
-      className="group flex h-full flex-col justify-between rounded-2xl border border-border bg-surface p-7 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      aria-label={`${subject.title} — ${ctaLabel}`}
+      className="group flex h-full w-full flex-col rounded-2xl border border-border bg-surface p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm focus-visible:-translate-y-0.5 focus-visible:border-primary/40 focus-visible:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <div>
-        <div className="flex items-center justify-between gap-3">
-          <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-            {subject.code}
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3">
+        <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+          {subject.code}
+        </span>
+        {showProgress && isDone && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+            <Check className="h-3 w-3" aria-hidden />
+            Done
           </span>
-          {showProgress && status === "completed" && (
-            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
-              Done
-            </span>
-          )}
-        </div>
-        <h3 className="mt-3 font-display text-lg font-semibold leading-snug text-foreground line-clamp-2">
-          {subject.title}
-        </h3>
+        )}
       </div>
 
-      <div className="mt-8">
-        {showProgress ? (
-          loading ? (
+      {/* Title */}
+      <h3 className="mt-3 font-display text-lg font-semibold leading-snug tracking-tight text-foreground line-clamp-2">
+        {subject.title}
+      </h3>
+
+      {/* Progress — promoted directly under title so it's instantly scannable */}
+      {showProgress && !isDone && (
+        <div className="mt-4">
+          {loading ? (
             <Skeleton className="h-1.5 w-full rounded-full" />
           ) : (
-            <div
-              className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
-              role="progressbar"
-              aria-label={`${subject.title} progress`}
-              aria-valuenow={pct}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
-              <div
-                className={cn(
-                  "h-full rounded-full transition-all",
-                  status === "completed" ? "bg-primary" : "bg-primary/70",
-                )}
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-          )
-        ) : null}
+            <ProgressBar value={pct} label={`${subject.title} progress`} />
+          )}
+        </div>
+      )}
 
-        <div className="mt-3 flex items-center justify-between text-[11px] font-medium text-muted-foreground">
-          <span className="tabular-nums">
+      {/* Spacer pushes footer to bottom for equal-height alignment */}
+      <div className="flex-1" />
+
+      {/* Footer: single meta line + right-aligned CTA */}
+      <div className="mt-5 flex items-end justify-between gap-3">
+        <div className="min-w-0 text-[11px] font-medium text-muted-foreground">
+          <div className="tabular-nums">
             {totalUnits === 0
               ? "Units coming soon"
               : showProgress
                 ? `${completedUnits} of ${totalUnits} units`
                 : `${totalUnits} unit${totalUnits === 1 ? "" : "s"}`}
-          </span>
-          {showProgress && rel && <span>Last studied {rel}</span>}
+          </div>
+          {showProgress && rel && (
+            <div className="mt-0.5 truncate">Last studied {rel}</div>
+          )}
         </div>
 
-        <div className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
-          {showProgress
-            ? status === "completed"
-              ? "Review"
-              : status === "in_progress"
-                ? "Continue"
-                : "Start"
-            : "Open"}
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-        </div>
+        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg text-sm font-semibold text-primary">
+          {ctaLabel}
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5" />
+        </span>
       </div>
     </Link>
   );
@@ -498,23 +512,24 @@ function SubjectCard({
 
 function EmptySubjects({ courseSlug }: { courseSlug: string }) {
   return (
-    <div className="mt-6 flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-surface px-6 py-16 text-center">
-      <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary">
-        <BookOpen className="h-5 w-5" />
+    <div className="mt-6 flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-surface px-6 py-20 text-center">
+      <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/10">
+        <BookOpen className="h-6 w-6" aria-hidden />
       </div>
-      <h3 className="mt-4 font-display text-lg font-semibold text-foreground">
-        Start your first subject
+      <h3 className="mt-5 font-display text-lg font-semibold tracking-tight text-foreground">
+        Subjects are on their way
       </h3>
-      <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
-        Subjects for this semester haven't been published yet. Explore other semesters in
-        this course to get started.
+      <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+        Nothing has been published for this semester yet. Explore other semesters in this
+        course while you wait.
       </p>
-      <Button asChild variant="outline" className="mt-6 gap-2 rounded-xl">
+      <Button asChild variant="outline" className="mt-6 h-11 gap-2 rounded-xl">
         <Link to="/courses/$courseSlug" params={{ courseSlug }}>
-          <Compass className="h-4 w-4" />
+          <Compass className="h-4 w-4" aria-hidden />
           Browse semesters
         </Link>
       </Button>
     </div>
   );
 }
+
