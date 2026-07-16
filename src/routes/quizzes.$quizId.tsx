@@ -1,8 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle2, Clock, FlaskConical, XCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  FlaskConical,
+  XCircle,
+} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -82,8 +90,11 @@ function QuizPage() {
 
   const [activeAttempt, setActiveAttempt] = useState<Attempt | null>(null);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
+  const [currentIdx, setCurrentIdx] = useState(0);
   const [result, setResult] = useState<Attempt | null>(null);
   const [resultAnswers, setResultAnswers] = useState<Record<string, { selected: string[]; is_correct: boolean | null }>>({});
+
+  const startedAtRef = useRef<number | null>(null);
 
   const startMutation = useMutation({
     mutationFn: async () => {
@@ -96,8 +107,10 @@ function QuizPage() {
     onSuccess: (a) => {
       setActiveAttempt(a);
       setAnswers({});
+      setCurrentIdx(0);
       setResult(null);
       setResultAnswers({});
+      startedAtRef.current = Date.now();
       qc.invalidateQueries({ queryKey: ["public-quiz-attempts", quizId, user?.id] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -133,94 +146,227 @@ function QuizPage() {
     return map;
   }, [optionsQ.data]);
 
+  const questions = questionsQ.data ?? [];
+  const total = questions.length;
+  const current = activeAttempt ? questions[currentIdx] : null;
+  const answeredCount = useMemo(
+    () => questions.reduce((n, q) => n + ((answers[q.id]?.length ?? 0) > 0 ? 1 : 0), 0),
+    [questions, answers],
+  );
+
+  // Countdown display (does not auto-submit)
+  const timeLimitMin = quizQ.data?.time_limit_minutes as number | null | undefined;
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    if (!activeAttempt || !timeLimitMin) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [activeAttempt, timeLimitMin]);
+  const remainingLabel = useMemo(() => {
+    if (!timeLimitMin || !startedAtRef.current) return null;
+    const total = timeLimitMin * 60;
+    const elapsed = Math.floor((now - startedAtRef.current) / 1000);
+    const left = Math.max(0, total - elapsed);
+    const m = Math.floor(left / 60).toString().padStart(2, "0");
+    const s = (left % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  }, [now, timeLimitMin]);
+
+  const goPrev = useCallback(() => setCurrentIdx((i) => Math.max(0, i - 1)), []);
+  const goNext = useCallback(() => setCurrentIdx((i) => Math.min(total - 1, i + 1)), [total]);
+
+  // Keyboard: arrow nav + digit hotkeys for options
+  useEffect(() => {
+    if (!activeAttempt || !current) return;
+    const opts = optionsByQ[current.id] ?? [];
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (e.key === "ArrowRight") { e.preventDefault(); goNext(); return; }
+      if (e.key === "ArrowLeft") { e.preventDefault(); goPrev(); return; }
+      if (/^[1-9]$/.test(e.key)) {
+        const idx = parseInt(e.key, 10) - 1;
+        const opt = opts[idx];
+        if (!opt) return;
+        e.preventDefault();
+        setAnswers((prev) => {
+          const sel = prev[current.id] ?? [];
+          if (current.type === "multiple") {
+            const next = sel.includes(opt.id) ? sel.filter((x) => x !== opt.id) : [...sel, opt.id];
+            return { ...prev, [current.id]: next };
+          }
+          return { ...prev, [current.id]: [opt.id] };
+        });
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [activeAttempt, current, optionsByQ, goNext, goPrev]);
+
+  const progressPct = total ? Math.round(((currentIdx + 1) / total) * 100) : 0;
+
   return (
     <div className="min-h-screen bg-background">
       <PublicHeader />
-      <main className="mx-auto max-w-3xl px-6 py-12">
-        <Link to="/courses" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> All courses
-        </Link>
 
-        {quizQ.data && (
-          <header className="mt-6">
-            <div className="flex items-center gap-2">
-              <FlaskConical className="h-6 w-6 text-primary" />
-              <h1 className="font-display text-3xl font-semibold text-foreground">{quizQ.data.title}</h1>
-            </div>
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-              <Badge variant="outline">Pass {quizQ.data.passing_pct}%</Badge>
-              {quizQ.data.time_limit_minutes && (
-                <Badge variant="outline"><Clock className="mr-1 h-3 w-3" />{quizQ.data.time_limit_minutes} min</Badge>
+      {/* Sticky quiz header during an active attempt */}
+      {activeAttempt && quizQ.data && (
+        <div className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
+          <div className="mx-auto max-w-3xl px-6 py-3">
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0">
+                <div className="truncate font-display text-sm font-semibold text-foreground">
+                  {quizQ.data.title}
+                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground tabular-nums">
+                  Question {currentIdx + 1} of {total} · {answeredCount} answered
+                </div>
+              </div>
+              {remainingLabel && (
+                <div className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs font-medium tabular-nums text-foreground">
+                  <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                  {remainingLabel}
+                </div>
               )}
-              <Badge variant="outline">{(questionsQ.data ?? []).length} questions</Badge>
             </div>
-            {quizQ.data.description && <p className="mt-3 text-muted-foreground">{quizQ.data.description}</p>}
-          </header>
-        )}
-
-        {!user && (
-          <div className="mt-8 rounded-xl border border-border bg-surface p-6 text-center">
-            <p className="text-muted-foreground">Sign in to take this quiz and track your results.</p>
-            <Link to="/auth" className="mt-3 inline-block"><Button>Sign in</Button></Link>
-          </div>
-        )}
-
-        {user && !activeAttempt && !result && (
-          <section className="mt-8 space-y-4">
-            {quizQ.data?.instructions && (
-              <div className="rounded-xl border border-border bg-surface p-5 text-sm text-muted-foreground whitespace-pre-wrap">
-                {quizQ.data.instructions}
-              </div>
-            )}
-            <Button onClick={() => startMutation.mutate()} disabled={startMutation.isPending}>
-              {startMutation.isPending ? "Starting…" : "Start attempt"}
-            </Button>
-
-            {(myAttemptsQ.data ?? []).filter((a) => a.submitted_at).length > 0 && (
-              <div className="mt-6">
-                <h2 className="font-display text-lg font-semibold text-foreground">Your previous attempts</h2>
-                <ul className="mt-2 space-y-2">
-                  {(myAttemptsQ.data ?? []).filter((a) => a.submitted_at).map((a) => (
-                    <li key={a.id} className="rounded-lg border border-border bg-surface px-4 py-3 text-sm">
-                      <span className="font-medium">{a.pct}%</span> · {a.score}/{a.max_score} ·{" "}
-                      <Badge variant={a.passed ? "default" : "secondary"}>{a.passed ? "Passed" : "Did not pass"}</Badge>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </section>
-        )}
-
-        {user && activeAttempt && (
-          <section className="mt-8 space-y-6">
-            {(questionsQ.data ?? []).map((q, idx) => (
-              <QuestionView
-                key={q.id}
-                index={idx + 1}
-                question={q}
-                options={optionsByQ[q.id] ?? []}
-                selected={answers[q.id] ?? []}
-                onChange={(sel) => setAnswers((prev) => ({ ...prev, [q.id]: sel }))}
+            <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full bg-primary transition-all"
+                style={{ width: `${progressPct}%` }}
+                role="progressbar"
+                aria-valuenow={progressPct}
+                aria-valuemin={0}
+                aria-valuemax={100}
               />
-            ))}
-            <Button onClick={() => submitMutation.mutate()} disabled={submitMutation.isPending}>
-              {submitMutation.isPending ? "Submitting…" : "Submit attempt"}
-            </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <main className="mx-auto max-w-3xl px-6 py-10 pb-32">
+        {!activeAttempt && !result && (
+          <Link to="/courses" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" /> All courses
+          </Link>
+        )}
+
+        {/* Intro / start screen */}
+        {!activeAttempt && !result && quizQ.data && (
+          <>
+            <header className="mt-6">
+              <div className="flex items-center gap-2">
+                <FlaskConical className="h-6 w-6 text-primary" />
+                <h1 className="font-display text-3xl font-semibold text-foreground">{quizQ.data.title}</h1>
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                <Badge variant="outline">Pass {quizQ.data.passing_pct}%</Badge>
+                {quizQ.data.time_limit_minutes && (
+                  <Badge variant="outline"><Clock className="mr-1 h-3 w-3" />{quizQ.data.time_limit_minutes} min</Badge>
+                )}
+                <Badge variant="outline">{total} questions</Badge>
+              </div>
+              {quizQ.data.description && <p className="mt-3 text-muted-foreground">{quizQ.data.description}</p>}
+            </header>
+
+            {!user && (
+              <div className="mt-8 rounded-xl border border-border bg-surface p-6 text-center">
+                <p className="text-muted-foreground">Sign in to take this quiz and track your results.</p>
+                <Link to="/auth" className="mt-3 inline-block"><Button>Sign in</Button></Link>
+              </div>
+            )}
+
+            {user && (
+              <section className="mt-8 space-y-4">
+                {quizQ.data.instructions && (
+                  <div className="rounded-xl border border-border bg-surface p-5 text-sm text-muted-foreground whitespace-pre-wrap">
+                    {quizQ.data.instructions}
+                  </div>
+                )}
+                <Button size="lg" onClick={() => startMutation.mutate()} disabled={startMutation.isPending}>
+                  {startMutation.isPending ? "Starting…" : "Start attempt"}
+                </Button>
+
+                {(myAttemptsQ.data ?? []).filter((a) => a.submitted_at).length > 0 && (
+                  <div className="mt-6">
+                    <h2 className="font-display text-lg font-semibold text-foreground">Your previous attempts</h2>
+                    <ul className="mt-2 space-y-2">
+                      {(myAttemptsQ.data ?? []).filter((a) => a.submitted_at).map((a) => (
+                        <li key={a.id} className="rounded-lg border border-border bg-surface px-4 py-3 text-sm">
+                          <span className="font-medium tabular-nums">{a.pct}%</span> · {a.score}/{a.max_score} ·{" "}
+                          <Badge variant={a.passed ? "default" : "secondary"}>{a.passed ? "Passed" : "Did not pass"}</Badge>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </section>
+            )}
+          </>
+        )}
+
+        {/* Active attempt — one question at a time */}
+        {user && activeAttempt && current && (
+          <section className="mt-8">
+            <QuestionView
+              index={currentIdx + 1}
+              question={current}
+              options={optionsByQ[current.id] ?? []}
+              selected={answers[current.id] ?? []}
+              onChange={(sel) => setAnswers((prev) => ({ ...prev, [current.id]: sel }))}
+            />
+
+            {/* Question navigator */}
+            <div className="mt-8">
+              <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Questions
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {questions.map((q, i) => {
+                  const isCurrent = i === currentIdx;
+                  const isAnswered = (answers[q.id]?.length ?? 0) > 0;
+                  return (
+                    <button
+                      key={q.id}
+                      type="button"
+                      onClick={() => setCurrentIdx(i)}
+                      aria-label={`Go to question ${i + 1}${isAnswered ? ", answered" : ""}`}
+                      aria-current={isCurrent ? "step" : undefined}
+                      className={[
+                        "h-9 w-9 rounded-md border text-sm font-medium tabular-nums transition",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        isCurrent
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : isAnswered
+                            ? "border-primary/40 bg-primary/10 text-foreground hover:bg-primary/15"
+                            : "border-border bg-surface text-muted-foreground hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      {i + 1}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
+                <LegendDot className="border-primary bg-primary" label="Current" />
+                <LegendDot className="border-primary/40 bg-primary/10" label="Answered" />
+                <LegendDot className="border-border bg-surface" label="Unanswered" />
+              </div>
+            </div>
           </section>
         )}
 
+        {/* Results */}
         {result && (
           <section className="mt-8 space-y-6">
             <div className="rounded-2xl border border-border bg-surface p-6">
-              <div className="font-display text-3xl font-semibold text-foreground">{result.pct}%</div>
+              <div className="font-display text-3xl font-semibold text-foreground tabular-nums">{result.pct}%</div>
               <p className="text-sm text-muted-foreground">
                 Score {result.score}/{result.max_score} ·{" "}
                 <Badge variant={result.passed ? "default" : "secondary"}>{result.passed ? "Passed" : "Did not pass"}</Badge>
               </p>
             </div>
 
-            {(questionsQ.data ?? []).map((q, idx) => {
+            {questions.map((q, idx) => {
               const r = resultAnswers[q.id];
               const opts = optionsByQ[q.id] ?? [];
               return (
@@ -259,7 +405,47 @@ function QuizPage() {
           </section>
         )}
       </main>
+
+      {/* Sticky footer nav during an active attempt */}
+      {activeAttempt && current && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur">
+          <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-6 py-3">
+            <Button
+              variant="outline"
+              onClick={goPrev}
+              disabled={currentIdx === 0}
+              className="gap-1"
+            >
+              <ChevronLeft className="h-4 w-4" /> Previous
+            </Button>
+            <div className="hidden text-xs text-muted-foreground tabular-nums sm:block">
+              {answeredCount} / {total} answered
+            </div>
+            {currentIdx < total - 1 ? (
+              <Button onClick={goNext} className="gap-1">
+                Next <ChevronRight className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                onClick={() => submitMutation.mutate()}
+                disabled={submitMutation.isPending}
+              >
+                {submitMutation.isPending ? "Submitting…" : "Submit quiz"}
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function LegendDot({ className, label }: { className: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span className={`inline-block h-3 w-3 rounded-sm border ${className}`} />
+      {label}
+    </span>
   );
 }
 
@@ -272,20 +458,40 @@ function QuestionView({ index, question, options, selected, onChange }: {
 }) {
   const multi = question.type === "multiple";
   return (
-    <div className="rounded-2xl border border-border bg-surface p-5">
-      <h3 className="font-display text-base font-semibold text-foreground">
-        Question {index}{" "}
-        <span className="ml-2 text-xs font-normal text-muted-foreground">
-          {multi ? "(select all that apply)" : "(select one)"}
-        </span>
-      </h3>
-      <p className="mt-2 text-foreground">{question.prompt}</p>
-      <ul className="mt-4 space-y-2">
-        {options.map((o) => {
+    <div>
+      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        Question {index} <span className="ml-1 normal-case tracking-normal text-muted-foreground/80">· {multi ? "select all that apply" : "select one"}</span>
+      </div>
+      <h2 className="mt-3 font-display text-2xl font-semibold leading-snug text-foreground">
+        {question.prompt}
+      </h2>
+
+      <ul className="mt-8 space-y-3" role={multi ? "group" : "radiogroup"} aria-label={`Options for question ${index}`}>
+        {options.map((o, i) => {
           const checked = selected.includes(o.id);
+          const letter = String.fromCharCode(65 + i);
           return (
             <li key={o.id}>
-              <label className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 transition ${checked ? "border-primary bg-primary/5" : "border-border"}`}>
+              <label
+                className={[
+                  "group flex cursor-pointer items-center gap-4 rounded-xl border bg-surface px-4 py-4 transition",
+                  "hover:border-primary/50",
+                  "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                  checked ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border",
+                ].join(" ")}
+              >
+                <span
+                  className={[
+                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-md border text-sm font-semibold tabular-nums transition",
+                    checked
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background text-muted-foreground group-hover:text-foreground",
+                  ].join(" ")}
+                  aria-hidden="true"
+                >
+                  {letter}
+                </span>
+                <span className="min-w-0 flex-1 text-base leading-relaxed text-foreground">{o.text}</span>
                 {multi ? (
                   <Checkbox
                     checked={checked}
@@ -293,6 +499,7 @@ function QuestionView({ index, question, options, selected, onChange }: {
                       const next = c ? [...selected, o.id] : selected.filter((id) => id !== o.id);
                       onChange(next);
                     }}
+                    aria-label={o.text}
                   />
                 ) : (
                   <input
@@ -300,15 +507,19 @@ function QuestionView({ index, question, options, selected, onChange }: {
                     name={question.id}
                     checked={checked}
                     onChange={() => onChange([o.id])}
-                    className="h-4 w-4"
+                    className="h-4 w-4 accent-primary"
+                    aria-label={o.text}
                   />
                 )}
-                <span className="text-sm text-foreground">{o.text}</span>
               </label>
             </li>
           );
         })}
       </ul>
+
+      <p className="mt-6 text-xs text-muted-foreground">
+        Tip: press <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">1</kbd>–<kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">{Math.min(options.length, 9)}</kbd> to select, <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">←</kbd> / <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">→</kbd> to navigate.
+      </p>
     </div>
   );
 }
