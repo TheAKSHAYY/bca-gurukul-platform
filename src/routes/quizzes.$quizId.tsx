@@ -356,55 +356,20 @@ function QuizPage() {
         )}
 
         {/* Results */}
-        {result && (
-          <section className="mt-8 space-y-6">
-            <div className="rounded-2xl border border-border bg-surface p-6">
-              <div className="font-display text-3xl font-semibold text-foreground tabular-nums">{result.pct}%</div>
-              <p className="text-sm text-muted-foreground">
-                Score {result.score}/{result.max_score} ·{" "}
-                <Badge variant={result.passed ? "default" : "secondary"}>{result.passed ? "Passed" : "Did not pass"}</Badge>
-              </p>
-            </div>
-
-            {questions.map((q, idx) => {
-              const r = resultAnswers[q.id];
-              const opts = optionsByQ[q.id] ?? [];
-              return (
-                <div key={q.id} className="rounded-2xl border border-border bg-surface p-5">
-                  <div className="flex items-center gap-2">
-                    {r?.is_correct ? (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-destructive" />
-                    )}
-                    <h3 className="font-display text-base font-semibold text-foreground">
-                      Question {idx + 1}
-                    </h3>
-                  </div>
-                  <p className="mt-2 text-foreground">{q.prompt}</p>
-                  <ul className="mt-3 space-y-1.5 text-sm">
-                    {opts.map((o) => {
-                      const picked = r?.selected.includes(o.id);
-                      return (
-                        <li key={o.id} className={`rounded-md border px-3 py-2 ${picked ? "border-primary bg-primary/5" : "border-border"}`}>
-                          {o.text} {picked && <span className="ml-2 text-xs text-muted-foreground">(your answer)</span>}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  {q.explanation && (
-                    <p className="mt-3 rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
-                      <strong>Explanation:</strong> {q.explanation}
-                    </p>
-                  )}
-                </div>
-              );
-            })}
-
-            <Button variant="outline" onClick={() => { setResult(null); setResultAnswers({}); }}>Done</Button>
-          </section>
+        {result && quizQ.data && (
+          <ResultsView
+            quizTitle={quizQ.data.title}
+            passingPct={quizQ.data.passing_pct}
+            result={result}
+            questions={questions}
+            optionsByQ={optionsByQ}
+            resultAnswers={resultAnswers}
+            onRetry={() => startMutation.mutate()}
+            retryPending={startMutation.isPending}
+          />
         )}
       </main>
+
 
       {/* Sticky footer nav during an active attempt */}
       {activeAttempt && current && (
