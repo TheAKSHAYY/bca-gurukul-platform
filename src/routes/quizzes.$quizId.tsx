@@ -9,6 +9,8 @@ import {
   ChevronRight,
   Clock,
   FlaskConical,
+  RotateCcw,
+  Sparkles,
   XCircle,
 } from "lucide-react";
 
@@ -18,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/use-auth";
 import { PublicHeader } from "./courses.index";
+
 
 export const Route = createFileRoute("/quizzes/$quizId")({
   head: () => ({ meta: [{ title: "Quiz · BCA Gurukul" }] }),
