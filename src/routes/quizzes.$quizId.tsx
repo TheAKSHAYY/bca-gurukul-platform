@@ -491,3 +491,216 @@ function QuestionView({ index, question, options, selected, onChange }: {
     </div>
   );
 }
+
+function ResultsView({
+  quizTitle,
+  passingPct,
+  result,
+  questions,
+  optionsByQ,
+  resultAnswers,
+  onRetry,
+  retryPending,
+}: {
+  quizTitle: string;
+  passingPct: number;
+  result: Attempt;
+  questions: Question[];
+  optionsByQ: Record<string, Option[]>;
+  resultAnswers: Record<string, { selected: string[]; is_correct: boolean | null }>;
+  onRetry: () => void;
+  retryPending: boolean;
+}) {
+  const summary = useMemo(() => {
+    let correct = 0;
+    let incorrect = 0;
+    let skipped = 0;
+    for (const q of questions) {
+      const r = resultAnswers[q.id];
+      if (!r || (r.selected?.length ?? 0) === 0) skipped++;
+      else if (r.is_correct) correct++;
+      else incorrect++;
+    }
+    return { correct, incorrect, skipped, total: questions.length };
+  }, [questions, resultAnswers]);
+
+  const pct = result.pct ?? 0;
+  const encouragement = useMemo(() => {
+    if (pct >= 90) return "Excellent work — you've mastered this material.";
+    if (result.passed) return "Great job — you passed. Keep the momentum going.";
+    if (pct >= passingPct - 10) return "Almost there. Review the misses and try again.";
+    return "Keep practicing — every attempt sharpens your understanding.";
+  }, [pct, result.passed, passingPct]);
+
+  return (
+    <section className="mt-10 space-y-10" aria-labelledby="results-heading">
+      {/* Hero */}
+      <header className="border-b border-border pb-10">
+        <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          Quiz completed
+        </div>
+        <h1 id="results-heading" className="mt-3 font-display text-2xl font-semibold text-foreground">
+          {quizTitle}
+        </h1>
+        <div className="mt-6 flex flex-wrap items-end gap-6">
+          <div>
+            <div className="font-display text-6xl font-semibold leading-none text-foreground tabular-nums">
+              {pct}
+              <span className="text-3xl text-muted-foreground">%</span>
+            </div>
+            <div className="mt-2 text-sm text-muted-foreground tabular-nums">
+              Score {result.score} / {result.max_score} · Pass mark {passingPct}%
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Badge
+              variant={result.passed ? "default" : "secondary"}
+              className="w-fit px-3 py-1 text-sm"
+            >
+              {result.passed ? "Passed" : "Did not pass"}
+            </Badge>
+            <p className="max-w-md text-sm text-foreground/80">
+              <Sparkles className="mr-1.5 inline h-4 w-4 text-primary" aria-hidden="true" />
+              {encouragement}
+            </p>
+          </div>
+        </div>
+      </header>
+
+      {/* Summary tiles */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <SummaryTile label="Correct" value={summary.correct} tone="positive" />
+        <SummaryTile label="Incorrect" value={summary.incorrect} tone="negative" />
+        <SummaryTile label="Skipped" value={summary.skipped} tone="muted" />
+        <SummaryTile label="Total" value={summary.total} tone="muted" />
+      </div>
+
+      {/* Next steps */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Button asChild size="lg">
+          <Link to="/courses">Continue learning</Link>
+        </Button>
+        <Button variant="outline" onClick={onRetry} disabled={retryPending} className="gap-1.5">
+          <RotateCcw className="h-4 w-4" />
+          {retryPending ? "Starting…" : "Retry quiz"}
+        </Button>
+        <Button asChild variant="ghost">
+          <Link to="/courses">Back to courses</Link>
+        </Button>
+      </div>
+
+      {/* Review */}
+      <div>
+        <h2 className="font-display text-xl font-semibold text-foreground">
+          Review your answers
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Understanding the misses is where the real learning happens.
+        </p>
+
+        <ol className="mt-6 space-y-4">
+          {questions.map((q, idx) => {
+            const r = resultAnswers[q.id];
+            const opts = optionsByQ[q.id] ?? [];
+            const skipped = !r || (r.selected?.length ?? 0) === 0;
+            const status: "correct" | "incorrect" | "skipped" = skipped
+              ? "skipped"
+              : r?.is_correct
+                ? "correct"
+                : "incorrect";
+            const statusLabel =
+              status === "correct" ? "Correct" : status === "incorrect" ? "Incorrect" : "Skipped";
+            return (
+              <li key={q.id} className="rounded-2xl border border-border bg-surface p-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    {status === "correct" ? (
+                      <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+                    ) : status === "incorrect" ? (
+                      <XCircle className="h-5 w-5 text-destructive" aria-hidden="true" />
+                    ) : (
+                      <span
+                        className="h-2 w-2 rounded-full bg-muted-foreground/60"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground tabular-nums">
+                      Question {idx + 1}
+                    </span>
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {statusLabel}
+                  </Badge>
+                </div>
+                <p className="mt-3 text-foreground">{q.prompt}</p>
+
+                <ul className="mt-4 space-y-2 text-sm">
+                  {opts.map((o) => {
+                    const picked = r?.selected.includes(o.id);
+                    return (
+                      <li
+                        key={o.id}
+                        className={[
+                          "rounded-lg border px-3 py-2.5",
+                          picked
+                            ? status === "correct"
+                              ? "border-emerald-500/50 bg-emerald-500/5 text-foreground"
+                              : "border-destructive/50 bg-destructive/5 text-foreground"
+                            : "border-border text-muted-foreground",
+                        ].join(" ")}
+                      >
+                        {o.text}
+                        {picked && (
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            (your answer)
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                {q.explanation && (
+                  <div className="mt-4 rounded-lg border border-border bg-background p-3 text-sm text-muted-foreground">
+                    <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-foreground">
+                      Explanation
+                    </div>
+                    {q.explanation}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+function SummaryTile({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "positive" | "negative" | "muted";
+}) {
+  const valueClass =
+    tone === "positive"
+      ? "text-emerald-600"
+      : tone === "negative"
+        ? "text-destructive"
+        : "text-foreground";
+  return (
+    <div className="rounded-xl border border-border bg-surface px-4 py-4">
+      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </div>
+      <div className={`mt-1 font-display text-2xl font-semibold tabular-nums ${valueClass}`}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
