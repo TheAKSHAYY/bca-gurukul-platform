@@ -245,7 +245,6 @@ function BrandingPage() {
             </Button>
           </div>
         </form>
-      </main>
     </div>
   );
 }
