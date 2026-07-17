@@ -141,10 +141,9 @@ function SeoPage() {
                 title="Pick a route"
                 description="Choose a route on the left or add a new one to override its SEO metadata."
               />
-            )}
-          </section>
-        </div>
-      </main>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
