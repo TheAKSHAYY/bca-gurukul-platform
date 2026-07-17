@@ -40,75 +40,65 @@ function FlagsPage() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin/superadmin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> Back to Super Admin
-          </Link>
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        title="Feature flags"
+        description="Enable, disable, or kill-switch entire modules without a redeploy."
+      />
+
+      {isLoading ? (
+        <div className="rounded-xl border border-border/70 bg-surface p-10 text-center text-sm text-muted-foreground">Loading…</div>
+      ) : (flags ?? []).length === 0 ? (
+        <div className="rounded-xl border border-border/70 bg-surface p-10 text-center text-sm text-muted-foreground">
+          No feature flags configured yet.
         </div>
-      </header>
-
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <h1 className="font-display text-3xl font-semibold text-foreground">Feature Flags</h1>
-        <p className="mt-2 text-muted-foreground">
-          Enable, disable, or kill-switch entire modules without a redeploy.
-        </p>
-
-        {isLoading ? (
-          <div className="mt-8 rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted-foreground">Loading…</div>
-        ) : (flags ?? []).length === 0 ? (
-          <div className="mt-8 rounded-2xl border border-border bg-surface p-10 text-center text-sm text-muted-foreground">
-            No feature flags configured yet.
-          </div>
-        ) : (
-          <div className="mt-8 space-y-8">
-            {Object.entries(grouped).map(([module, items]) => (
-              <section key={module}>
-                <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-muted-foreground">{module}</h2>
-                <div className="mt-3 divide-y divide-border rounded-2xl border border-border bg-surface">
-                  {(items ?? []).map((f) => (
-                    <div key={f.key} className="flex items-start justify-between gap-4 p-4">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <Flag className="h-4 w-4 text-muted-foreground" />
-                          <code className="font-mono text-sm font-semibold text-foreground">{f.key}</code>
-                          {f.kill_switch && (
-                            <Badge variant="outline" className="border-destructive/40 bg-destructive/10 text-destructive">
-                              <AlertTriangle className="mr-1 h-3 w-3" /> Killed
-                            </Badge>
-                          )}
-                        </div>
-                        {f.description && (
-                          <p className="mt-1 text-sm text-muted-foreground">{f.description}</p>
+      ) : (
+        <div className="space-y-6">
+          {Object.entries(grouped).map(([module, items]) => (
+            <section key={module}>
+              <h2 className="mb-2 font-serif text-sm font-semibold uppercase tracking-wide text-muted-foreground">{module}</h2>
+              <div className="divide-y divide-border/60 rounded-xl border border-border/70 bg-surface">
+                {(items ?? []).map((f) => (
+                  <div key={f.key} className="flex items-start justify-between gap-4 p-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <Flag className="h-4 w-4 text-muted-foreground" />
+                        <code className="font-mono text-sm font-semibold text-foreground">{f.key}</code>
+                        {f.kill_switch && (
+                          <Badge variant="outline" className="border-destructive/40 bg-destructive/10 text-destructive">
+                            <AlertTriangle className="mr-1 h-3 w-3" /> Killed
+                          </Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-6">
-                        <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                          Enabled
-                          <Switch
-                            checked={f.enabled}
-                            disabled={updateMut.isPending}
-                            onCheckedChange={(v) => updateMut.mutate({ key: f.key, enabled: v })}
-                          />
-                        </label>
-                        <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                          Kill
-                          <Switch
-                            checked={f.kill_switch}
-                            disabled={updateMut.isPending}
-                            onCheckedChange={(v) => updateMut.mutate({ key: f.key, kill_switch: v })}
-                          />
-                        </label>
-                      </div>
+                      {f.description && (
+                        <p className="mt-1 text-sm text-muted-foreground">{f.description}</p>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        )}
-      </main>
+                    <div className="flex items-center gap-6">
+                      <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                        Enabled
+                        <Switch
+                          checked={f.enabled}
+                          disabled={updateMut.isPending}
+                          onCheckedChange={(v) => updateMut.mutate({ key: f.key, enabled: v })}
+                        />
+                      </label>
+                      <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                        Kill
+                        <Switch
+                          checked={f.kill_switch}
+                          disabled={updateMut.isPending}
+                          onCheckedChange={(v) => updateMut.mutate({ key: f.key, kill_switch: v })}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

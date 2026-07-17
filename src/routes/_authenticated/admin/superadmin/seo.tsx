@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, FileSearch, Plus, Save, Trash2 } from "lucide-react";
+import { FileSearch, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { PageHeader } from "@/components/admin/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,26 +72,14 @@ function SeoPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link
-            to="/admin/superadmin"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" /> Super Admin
-          </Link>
-        </div>
-      </header>
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        title="SEO manager"
+        description="Per-route titles, descriptions, OG images, robots, and canonical URLs."
+      />
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <h1 className="font-display text-3xl font-semibold text-foreground">SEO Manager</h1>
-        <p className="mt-2 text-muted-foreground">
-          Per-route titles, descriptions, OG images, robots, and canonical URLs.
-        </p>
-
-        <div className="mt-8 grid gap-6 lg:grid-cols-[320px_1fr]">
-          <aside className="rounded-2xl border border-border bg-surface p-4">
+      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+        <aside className="rounded-xl border border-border/70 bg-surface p-4">
             <div className="flex gap-2">
               <Input
                 placeholder="/about"
