@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { listAuditLogs } from "@/lib/superadmin.functions";
+import { PageHeader } from "@/components/admin/ui/page-header";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
@@ -22,32 +23,23 @@ function AuditPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin/superadmin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> Back to Super Admin
-          </Link>
-        </div>
-      </header>
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        title="Audit log"
+        description="Tamper-evident timeline of every privileged action. Filter by action prefix (e.g. role., flag.)."
+      />
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <h1 className="font-display text-3xl font-semibold text-foreground">Audit Log</h1>
-        <p className="mt-2 text-muted-foreground">
-          Tamper-evident timeline of every privileged action. Filter by action prefix (e.g. <code>role.</code>, <code>flag.</code>).
-        </p>
+      <div className="mb-4 relative max-w-md">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder="Filter by action…"
+          className="pl-9"
+        />
+      </div>
 
-        <div className="mt-6 relative max-w-md">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            placeholder="Filter by action…"
-            className="pl-9"
-          />
-        </div>
-
-        <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-surface">
+      <div className="overflow-hidden rounded-xl border border-border/70 bg-surface">
           {isLoading ? (
             <div className="p-10 text-center text-sm text-muted-foreground">Loading…</div>
           ) : (logs ?? []).length === 0 ? (
@@ -91,9 +83,8 @@ function AuditPage() {
                 ))}
               </tbody>
             </table>
-          )}
-        </div>
-      </main>
+        )}
+      </div>
     </div>
   );
 }

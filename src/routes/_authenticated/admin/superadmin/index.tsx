@@ -6,9 +6,10 @@ import {
 } from "lucide-react";
 
 import { getPlatformStats } from "@/lib/superadmin.functions";
+import { PageHeader } from "@/components/admin/ui/page-header";
 
 export const Route = createFileRoute("/_authenticated/admin/superadmin/")({
-  head: () => ({ meta: [{ title: "Super Admin · BCA Gurukul" }] }),
+  head: () => ({ meta: [{ title: "Platform · Super Admin · BCA Gurukul" }] }),
   component: SuperAdminHome,
 });
 
@@ -36,55 +37,42 @@ function SuperAdminHome() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin" className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-              <Shield className="h-5 w-5" />
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        title="Platform controls"
+        description="Identity, observability, configuration, and brand — the levers reserved for super admins."
+      />
+
+      <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {metrics.map((m) => (
+          <div key={m.label} className="rounded-xl border border-border/70 bg-surface p-4">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+              <m.icon className="h-3.5 w-3.5" /> {m.label}
             </div>
-            <div className="font-display text-base font-semibold text-foreground">Super Admin</div>
+            <div className="mt-2 font-serif text-2xl font-semibold text-foreground">{m.value}</div>
+          </div>
+        ))}
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {TILES.map((t) => (
+          <Link
+            key={t.to}
+            to={t.to}
+            className="group rounded-xl border border-border/70 bg-surface p-5 transition hover:border-primary/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <div className="flex items-center gap-3">
+              <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
+                <t.icon className="h-5 w-5" />
+              </div>
+              <h3 className="font-serif text-base font-semibold text-foreground group-hover:text-primary">
+                {t.title}
+              </h3>
+            </div>
+            <p className="mt-3 text-sm text-muted-foreground">{t.desc}</p>
           </Link>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-6xl px-6 py-12">
-        <h1 className="font-display text-3xl font-semibold text-foreground">Platform controls</h1>
-        <p className="mt-2 max-w-2xl text-muted-foreground">
-          Identity, observability, configuration, and brand — the levers reserved for super admins.
-        </p>
-
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {metrics.map((m) => (
-            <div key={m.label} className="rounded-xl border border-border bg-surface p-4">
-              <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-                <m.icon className="h-3.5 w-3.5" /> {m.label}
-              </div>
-              <div className="mt-2 font-display text-2xl font-semibold text-foreground">{m.value}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {TILES.map((t) => (
-            <Link
-              key={t.to}
-              to={t.to}
-              className="group rounded-2xl border border-border bg-surface p-5 transition hover:border-primary/40 hover:shadow-sm"
-            >
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
-                  <t.icon className="h-5 w-5" />
-                </div>
-                <h3 className="font-display text-base font-semibold text-foreground group-hover:text-primary">
-                  {t.title}
-                </h3>
-              </div>
-              <p className="mt-3 text-sm text-muted-foreground">{t.desc}</p>
-            </Link>
-          ))}
-        </div>
-      </main>
+        ))}
+      </section>
     </div>
   );
 }
