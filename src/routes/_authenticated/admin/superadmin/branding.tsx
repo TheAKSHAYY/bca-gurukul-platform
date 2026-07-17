@@ -1,12 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { PageHeader } from "@/components/admin/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -139,20 +140,12 @@ function BrandingPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/60">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-5">
-          <Link to="/admin/superadmin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> Super Admin
-          </Link>
-        </div>
-      </header>
+    <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        title="Branding & site settings"
+        description="The identity students see across the platform, emails, and shareable links."
+      />
 
-      <main className="mx-auto max-w-4xl px-6 py-10">
-        <h1 className="font-display text-3xl font-semibold text-foreground">Branding & Site Settings</h1>
-        <p className="mt-2 text-muted-foreground">
-          The identity students see across the platform, emails, and shareable links.
-        </p>
 
         <section className="mt-8 rounded-2xl border border-border bg-surface p-6">
           <h2 className="font-display text-lg font-semibold">Maintenance mode</h2>
