@@ -148,8 +148,7 @@ function UsersPage() {
               </tbody>
             </table>
           )}
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
