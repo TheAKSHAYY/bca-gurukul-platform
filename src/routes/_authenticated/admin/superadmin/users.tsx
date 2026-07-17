@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Search, Shield, ShieldCheck, GraduationCap, UserCog } from "lucide-react";
+import { Search, Shield, ShieldCheck, GraduationCap, UserCog } from "lucide-react";
 import { toast } from "sonner";
 
 import { listUsers, grantRole, revokeRole, type AppRole } from "@/lib/superadmin.functions";
+import { PageHeader } from "@/components/admin/ui/page-header";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,35 +63,26 @@ function UsersPage() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link to="/admin/superadmin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> Back to Super Admin
-          </Link>
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        title="Users & roles"
+        description="Grant or revoke admin, instructor, and super admin access. Every change is recorded in the audit log."
+      />
+
+      <div className="mb-4 flex items-center gap-3">
+        <div className="relative w-full max-w-md">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name or email"
+            className="pl-9"
+          />
         </div>
-      </header>
+        <div className="text-sm text-muted-foreground">{filtered.length} of {users?.length ?? 0}</div>
+      </div>
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <h1 className="font-display text-3xl font-semibold text-foreground">Users &amp; Roles</h1>
-        <p className="mt-2 text-muted-foreground">
-          Grant or revoke admin, instructor, and super admin access. Every change is recorded in the audit log.
-        </p>
-
-        <div className="mt-6 flex items-center gap-3">
-          <div className="relative w-full max-w-md">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name or email"
-              className="pl-9"
-            />
-          </div>
-          <div className="text-sm text-muted-foreground">{filtered.length} of {users?.length ?? 0}</div>
-        </div>
-
-        <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-surface">
+      <div className="overflow-hidden rounded-xl border border-border/70 bg-surface">
           {isLoading ? (
             <div className="p-10 text-center text-sm text-muted-foreground">Loading…</div>
           ) : filtered.length === 0 ? (
