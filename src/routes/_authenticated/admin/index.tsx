@@ -7,8 +7,7 @@ import {
 } from "lucide-react";
 
 import { getDashboardStats, getRecentUploads, getRecentActivity } from "@/lib/admin.functions";
-import { PageHeader } from "@/components/admin/ui/page-header";
-import { StatCard } from "@/components/admin/ui/stat-card";
+import { PageContainer, PageHeader, SectionCard, StatCard } from "@/components/admin/ui";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
