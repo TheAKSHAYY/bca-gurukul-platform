@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer, PageHeader } from "@/components/admin/ui";
 import { useRoles } from "@/hooks/use-roles";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
