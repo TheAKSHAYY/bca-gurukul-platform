@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer, PageHeader } from "@/components/admin/ui";
 import { useRoles } from "@/hooks/use-roles";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
@@ -53,7 +53,7 @@ function SettingsPage() {
   const { isSuperAdmin } = useRoles();
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer width="narrow">
       <PageHeader
         title="Settings"
         description="Configure your site, taxonomy, appearance, and access."
@@ -92,6 +92,6 @@ function SettingsPage() {
           );
         })}
       </div>
-    </div>
+    </PageContainer>
   );
 }

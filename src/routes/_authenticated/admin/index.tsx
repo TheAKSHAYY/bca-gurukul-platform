@@ -7,8 +7,7 @@ import {
 } from "lucide-react";
 
 import { getDashboardStats, getRecentUploads, getRecentActivity } from "@/lib/admin.functions";
-import { PageHeader } from "@/components/admin/ui/page-header";
-import { StatCard } from "@/components/admin/ui/stat-card";
+import { PageContainer, PageHeader, SectionCard, StatCard } from "@/components/admin/ui";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
@@ -60,7 +59,7 @@ function AdminDashboard() {
     : false;
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer>
       <PageHeader
         title="Dashboard"
         description="Overview of the BCA Gurukul library, activity, and workflow."
@@ -99,16 +98,18 @@ function AdminDashboard() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-border/70 bg-surface">
-          <div className="flex items-center justify-between border-b border-border/70 px-4 py-3">
-            <h2 className="font-serif text-base font-semibold">Recent uploads</h2>
+        <SectionCard
+          padded={false}
+          title="Recent uploads"
+          actions={
             <Link to="/admin/content" className="text-xs text-primary hover:underline">
               View all <ArrowUpRight className="ml-0.5 inline h-3 w-3" />
             </Link>
-          </div>
+          }
+        >
           <div className="divide-y divide-border/60">
             {(uploads ?? []).slice(0, 8).map((u) => (
-              <div key={`${u.kind}-${u.id}`} className="flex items-center justify-between gap-3 px-4 py-2.5">
+              <div key={`${u.kind}-${u.id}`} className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium text-foreground">{u.title}</div>
                   <div className="text-xs capitalize text-muted-foreground">{u.kind}</div>
@@ -122,15 +123,12 @@ function AdminDashboard() {
               <div className="px-4 py-8 text-center text-sm text-muted-foreground">No uploads yet.</div>
             )}
           </div>
-        </div>
+        </SectionCard>
 
-        <div className="rounded-xl border border-border/70 bg-surface">
-          <div className="flex items-center justify-between border-b border-border/70 px-4 py-3">
-            <h2 className="font-serif text-base font-semibold">Recent activity</h2>
-          </div>
+        <SectionCard padded={false} title="Recent activity">
           <div className="divide-y divide-border/60">
             {(activity ?? []).slice(0, 8).map((a, i) => (
-              <div key={i} className="flex items-center justify-between gap-3 px-4 py-2.5">
+              <div key={i} className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
                 <div className="min-w-0">
                   <div className="truncate text-sm text-foreground">{a.title ?? "—"}</div>
                   <div className="text-xs capitalize text-muted-foreground">{a.kind.replace("_", " ")}</div>
@@ -144,8 +142,8 @@ function AdminDashboard() {
               <div className="px-4 py-8 text-center text-sm text-muted-foreground">No activity yet.</div>
             )}
           </div>
-        </div>
+        </SectionCard>
       </section>
-    </div>
+    </PageContainer>
   );
 }
