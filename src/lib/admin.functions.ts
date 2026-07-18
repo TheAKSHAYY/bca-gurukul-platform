@@ -55,6 +55,74 @@ export const getRecentActivity = createServerFn({ method: "GET" })
     return (data ?? []) as RecentActivity[];
   });
 
+export type WorkflowSummary = {
+  drafts_count: number;
+  drafts: Array<{ id: string; title: string; updated_at: string; type: string }>;
+  unread_messages: number;
+  latest_messages: Array<{ id: string; name: string; subject: string | null; created_at: string }>;
+  published_7d: number;
+  attempts_7d: number;
+  new_students_7d: number;
+  gap_subjects: Array<{ id: string; title: string }>;
+};
+
+export const getWorkflowSummary = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<WorkflowSummary> => {
+    const sb = context.supabase;
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    const [
+      draftsCountRes,
+      draftsListRes,
+      unreadCountRes,
+      latestMsgsRes,
+      publishedRes,
+      attemptsRes,
+      newStudentsRes,
+      subjectsRes,
+      publishedItemsRes,
+    ] = await Promise.all([
+      sb.from("content_items").select("id", { count: "exact", head: true })
+        .eq("status", "draft").is("deleted_at", null),
+      sb.from("content_items").select("id,title,updated_at,type")
+        .eq("status", "draft").is("deleted_at", null)
+        .order("updated_at", { ascending: false }).limit(5),
+      sb.from("contact_messages").select("id", { count: "exact", head: true })
+        .eq("status", "new"),
+      sb.from("contact_messages").select("id,name,subject,created_at")
+        .eq("status", "new").order("created_at", { ascending: false }).limit(4),
+      sb.from("content_items").select("id", { count: "exact", head: true })
+        .eq("status", "published").gte("updated_at", weekAgo).is("deleted_at", null),
+      sb.from("quiz_attempts").select("id", { count: "exact", head: true })
+        .gte("created_at", weekAgo),
+      sb.from("profiles").select("id", { count: "exact", head: true })
+        .gte("created_at", weekAgo),
+      sb.from("subjects").select("id,title").is("deleted_at", null).limit(500),
+      sb.from("content_items").select("subject_id")
+        .eq("status", "published").is("deleted_at", null).not("subject_id", "is", null).limit(2000),
+    ]);
+
+    const withContent = new Set(
+      (publishedItemsRes.data ?? []).map((r) => r.subject_id).filter(Boolean) as string[],
+    );
+    const gap_subjects = (subjectsRes.data ?? [])
+      .filter((s) => !withContent.has(s.id))
+      .slice(0, 5)
+      .map((s) => ({ id: s.id, title: s.title }));
+
+    return {
+      drafts_count: draftsCountRes.count ?? 0,
+      drafts: (draftsListRes.data ?? []) as WorkflowSummary["drafts"],
+      unread_messages: unreadCountRes.count ?? 0,
+      latest_messages: (latestMsgsRes.data ?? []) as WorkflowSummary["latest_messages"],
+      published_7d: publishedRes.count ?? 0,
+      attempts_7d: attemptsRes.count ?? 0,
+      new_students_7d: newStudentsRes.count ?? 0,
+      gap_subjects,
+    };
+  });
+
 export type TreeNode = {
   id: string;
   name: string;
