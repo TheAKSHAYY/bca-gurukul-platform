@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { listFeatureFlags, updateFeatureFlag } from "@/lib/superadmin.functions";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
@@ -40,7 +41,7 @@ function FlagsPage() {
   }, {});
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer>
       <PageHeader
         title="Feature flags"
         description="Enable, disable, or kill-switch entire modules without a redeploy."
@@ -99,6 +100,6 @@ function FlagsPage() {
           ))}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

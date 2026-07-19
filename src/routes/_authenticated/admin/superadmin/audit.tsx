@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 
 import { listAuditLogs } from "@/lib/superadmin.functions";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
@@ -23,7 +24,7 @@ function AuditPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer>
       <PageHeader
         title="Audit log"
         description="Tamper-evident timeline of every privileged action. Filter by action prefix (e.g. role., flag.)."
@@ -85,6 +86,6 @@ function AuditPage() {
             </table>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

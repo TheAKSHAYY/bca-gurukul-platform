@@ -18,6 +18,7 @@ import {
   type ContentType,
 } from "@/lib/content.functions";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { StatusBadge } from "@/components/admin/ui/status-badge";
 import { TableSkeleton } from "@/components/admin/ui/table-skeleton";
 import { ConfirmDialog } from "@/components/admin/ui/confirm-dialog";
@@ -121,7 +122,7 @@ function ContentPage() {
   const selectedIds = useMemo(() => Array.from(selected), [selected]);
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer>
       <PageHeader
         title="Content"
         description="All learning content in one place — notes, slides, videos, assignments, links."
@@ -304,6 +305,6 @@ function ContentPage() {
         destructive
         onConfirm={() => deleteMutation.mutate({ data: { ids: selectedIds } })}
       />
-    </div>
+    </PageContainer>
   );
 }

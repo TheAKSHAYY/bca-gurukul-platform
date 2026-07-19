@@ -10,6 +10,7 @@ import { formatDistanceToNow } from "date-fns";
 
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { StatusBadge } from "@/components/admin/ui/status-badge";
 import { TableSkeleton } from "@/components/admin/ui/table-skeleton";
 import { ConfirmDialog } from "@/components/admin/ui/confirm-dialog";
@@ -155,7 +156,7 @@ function AdminQuizzesList() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer>
       <PageHeader
         title="Question Bank"
         description="Author MCQ quizzes and manage them across every unit and subject."
@@ -326,7 +327,7 @@ function AdminQuizzesList() {
         destructive
         onConfirm={() => confirmDelete && del.mutate(confirmDelete.id)}
       />
-    </div>
+    </PageContainer>
   );
 }
 

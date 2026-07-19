@@ -10,6 +10,7 @@ import { formatDistanceToNow } from "date-fns";
 
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { StatusBadge } from "@/components/admin/ui/status-badge";
 import { TableSkeleton } from "@/components/admin/ui/table-skeleton";
 import { ConfirmDialog } from "@/components/admin/ui/confirm-dialog";
@@ -140,7 +141,7 @@ function AdminPapersPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer>
       <PageHeader
         title="Previous Papers"
         description="Curate past exam papers per subject — searchable across every course."
@@ -299,7 +300,7 @@ function AdminPapersPage() {
         destructive
         onConfirm={() => confirmDelete && deleteMutation.mutate(confirmDelete)}
       />
-    </div>
+    </PageContainer>
   );
 }
 

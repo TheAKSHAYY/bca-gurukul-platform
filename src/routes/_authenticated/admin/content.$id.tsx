@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { getContent } from "@/lib/content.functions";
 import { ContentEditor } from "@/components/admin/content-editor";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/admin/content/$id")({
   head: () => ({ meta: [{ title: "Edit content · Admin · BCA Gurukul" }] }),
   component: EditContentPage,
   errorComponent: ({ error }) => (
-    <div className="mx-auto w-full max-w-4xl px-4 py-10">
+    <PageContainer width="narrow">
       <p className="text-sm text-destructive">{error.message}</p>
       <Button asChild size="sm" className="mt-4">
         <Link to="/admin/content">Back to content</Link>
@@ -55,6 +56,6 @@ function EditContentPage() {
       ) : (
         <ContentEditor initialType={data.type} initial={data} contentId={id} />
       )}
-    </div>
+    </PageContainer>
   );
 }

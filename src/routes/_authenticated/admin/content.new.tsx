@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-r
 import { z } from "zod";
 import { ContentEditor } from "@/components/admin/content-editor";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
@@ -20,7 +21,7 @@ function NewContentPage() {
   const search = useSearch({ from: "/_authenticated/admin/content/new" });
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer width="narrow">
       <PageHeader
         title="New content"
         description="Pick a type and fill in the details. Save as draft or publish."
@@ -34,6 +35,6 @@ function NewContentPage() {
         initialType={search.type ?? "note"}
         onSaved={(id) => navigate({ to: "/admin/content/$id", params: { id } })}
       />
-    </div>
+    </PageContainer>
   );
 }

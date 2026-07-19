@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,7 +73,7 @@ function SeoPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer>
       <PageHeader
         title="SEO manager"
         description="Per-route titles, descriptions, OG images, robots, and canonical URLs."
@@ -144,7 +145,7 @@ function SeoPage() {
           )}
         </section>
       </div>
-    </div>
+    </PageContainer>
   );
 }
 
