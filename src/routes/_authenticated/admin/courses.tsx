@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { ArrowLeft, BookOpen, Plus, Pencil, Trash2 } from "lucide-react";
+import { PageContainer } from "@/components/admin/ui/page-container";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -109,7 +110,7 @@ function CoursesAdmin() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
+      <PageContainer>
         <div className="flex items-center gap-3">
           <BookOpen className="h-6 w-6 text-primary" />
           <h1 className="font-display text-3xl font-semibold text-foreground">Courses</h1>
@@ -175,7 +176,7 @@ function CoursesAdmin() {
             </article>
           ))}
         </section>
-      </main>
+      </PageContainer>
 
       <CourseDialog
         open={open}
