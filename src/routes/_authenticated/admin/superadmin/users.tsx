@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { listUsers, grantRole, revokeRole, type AppRole } from "@/lib/superadmin.functions";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -63,7 +64,7 @@ function UsersPage() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer>
       <PageHeader
         title="Users & roles"
         description="Grant or revoke admin, instructor, and super admin access. Every change is recorded in the audit log."
@@ -149,6 +150,6 @@ function UsersPage() {
             </table>
           )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

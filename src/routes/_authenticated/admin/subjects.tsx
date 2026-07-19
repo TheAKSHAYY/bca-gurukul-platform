@@ -6,6 +6,7 @@ import { Library, Search, Plus } from "lucide-react";
 
 import { listSubjectsFlat } from "@/lib/content.functions";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { StatusBadge } from "@/components/admin/ui/status-badge";
 import { TableSkeleton } from "@/components/admin/ui/table-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -37,7 +38,7 @@ function SubjectsPage() {
   }, [data, q]);
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer>
       <PageHeader
         title="Subjects"
         description="Every subject across every course and semester."
@@ -107,6 +108,6 @@ function SubjectsPage() {
           </table>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

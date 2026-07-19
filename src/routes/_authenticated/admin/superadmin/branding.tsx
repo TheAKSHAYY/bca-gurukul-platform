@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/admin/ui/page-header";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -140,7 +141,7 @@ function BrandingPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+    <PageContainer width="narrow">
       <PageHeader
         title="Branding & site settings"
         description="The identity students see across the platform, emails, and shareable links."
@@ -245,7 +246,7 @@ function BrandingPage() {
             </Button>
           </div>
         </form>
-    </div>
+    </PageContainer>
   );
 }
 

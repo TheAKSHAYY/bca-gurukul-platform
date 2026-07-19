@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ArrowLeft, Download, FileText, ImageIcon, Loader2, Trash2, Upload, Video } from "lucide-react";
+import { PageContainer } from "@/components/admin/ui/page-container";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -171,7 +172,7 @@ function MediaAdmin() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
+      <PageContainer>
         <h1 className="font-display text-3xl font-semibold text-foreground">Media library</h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
           Central registry of all uploaded files. Pick a target bucket above before uploading. Downloads use short-lived signed URLs.
@@ -237,7 +238,7 @@ function MediaAdmin() {
             </div>
           )}
         </section>
-      </main>
+      </PageContainer>
     </div>
   );
 }

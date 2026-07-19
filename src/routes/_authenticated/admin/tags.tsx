@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Tag as TagIcon, Trash2, Pencil } from "lucide-react";
+import { PageContainer } from "@/components/admin/ui/page-container";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -98,7 +99,7 @@ function TagsAdmin() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-6 py-10">
+      <PageContainer>
         <div className="flex items-center gap-3">
           <TagIcon className="h-6 w-6 text-primary" />
           <h1 className="font-display text-3xl font-semibold text-foreground">Tags</h1>
@@ -155,7 +156,7 @@ function TagsAdmin() {
             </ul>
           )}
         </section>
-      </main>
+      </PageContainer>
 
       <TagDialog
         open={open}

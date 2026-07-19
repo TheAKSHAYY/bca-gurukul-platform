@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Mail, Trash2, CheckCircle2, Circle, Inbox as InboxIcon, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { PageContainer } from "@/components/admin/ui/page-container";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -73,7 +74,7 @@ function InboxPage() {
   const unread = msgs.filter((m) => m.status === "new").length;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+    <PageContainer>
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold">Inbox</h1>
@@ -192,6 +193,6 @@ function InboxPage() {
           )}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

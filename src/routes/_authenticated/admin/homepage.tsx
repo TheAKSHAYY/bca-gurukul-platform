@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageContainer } from "@/components/admin/ui/page-container";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -232,7 +233,7 @@ function HomepageBuilder() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-6">
+    <PageContainer width="narrow" className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="space-y-1">
           <h1 className="font-display text-3xl font-semibold">Website Builder</h1>
@@ -292,7 +293,7 @@ function HomepageBuilder() {
           />
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }
 

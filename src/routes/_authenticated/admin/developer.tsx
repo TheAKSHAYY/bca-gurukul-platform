@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import { PageContainer } from "@/components/admin/ui/page-container";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/admin/developer")({
 
 function DeveloperAdmin() {
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-6">
+    <PageContainer width="narrow" className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold">Developer portfolio</h1>
         <p className="text-sm text-muted-foreground">
@@ -73,7 +74,7 @@ function DeveloperAdmin() {
           <AchievementsEditor />
         </TabsContent>
       </Tabs>
-    </div>
+    </PageContainer>
   );
 }
 

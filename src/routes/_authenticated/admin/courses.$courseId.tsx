@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2, Layers, BookText, ListTree, Pencil, FileText, FileQuestion, ClipboardList, ChevronDown, ChevronRight } from "lucide-react";
+import { PageContainer } from "@/components/admin/ui/page-container";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -86,7 +87,7 @@ function CourseTreePage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
+      <PageContainer>
         {courseQuery.data && (
           <div className="flex items-center gap-3">
             <Layers className="h-6 w-6 text-primary" />
@@ -115,7 +116,7 @@ function CourseTreePage() {
             ))}
           </Accordion>
         </section>
-      </main>
+      </PageContainer>
 
       <SemesterDialog
         open={semOpen}
