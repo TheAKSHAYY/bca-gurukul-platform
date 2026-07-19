@@ -19,12 +19,12 @@ export const Route = createFileRoute("/_authenticated/admin/content/$id")({
       <Button asChild size="sm" className="mt-4">
         <Link to="/admin/content">Back to content</Link>
       </Button>
-    </div>
+    </PageContainer>
   ),
   notFoundComponent: () => (
-    <div className="mx-auto w-full max-w-4xl px-4 py-10 text-center">
+    <PageContainer width="narrow" className="text-center">
       <p className="text-sm text-muted-foreground">Content not found.</p>
-    </div>
+    </PageContainer>
   ),
 });
 
