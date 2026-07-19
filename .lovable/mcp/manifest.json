@@ -4,12 +4,12 @@
   "path": "/mcp",
   "auth": {
     "type": "oauth",
-    "issuer": "https://cifnalemfmokembqxidh.supabase.co/auth/v1",
+    "issuer": "https://ylmiejeqpicjwqpwuzzr.supabase.co/auth/v1",
     "resource_name": "BCA Gurukul MCP",
     "accepted_audiences": [
       "authenticated"
     ],
-    "jwks_uri": "https://cifnalemfmokembqxidh.supabase.co/auth/v1/.well-known/jwks.json"
+    "jwks_uri": "https://ylmiejeqpicjwqpwuzzr.supabase.co/auth/v1/.well-known/jwks.json"
   },
   "mcp": {
     "server": {
