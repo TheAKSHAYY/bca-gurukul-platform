@@ -46,12 +46,12 @@ import { Route as AuthenticatedAdminInboxRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminExplorerRouteImport } from './routes/_authenticated/admin/explorer'
 import { Route as AuthenticatedAdminDeveloperRouteImport } from './routes/_authenticated/admin/developer'
-import { Route as AuthenticatedAdminCoursesRouteImport } from './routes/_authenticated/admin/courses'
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated/admin/content'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedAdminSuperadminRouteRouteImport } from './routes/_authenticated/admin/superadmin/route'
 import { Route as CoursesCourseSlugSemesterNumberIndexRouteImport } from './routes/courses.$courseSlug.$semesterNumber.index'
 import { Route as AuthenticatedAdminSuperadminIndexRouteImport } from './routes/_authenticated/admin/superadmin/index'
+import { Route as AuthenticatedAdminCoursesIndexRouteImport } from './routes/_authenticated/admin/courses.index'
 import { Route as CoursesCourseSlugSemesterNumberSubjectSlugRouteImport } from './routes/courses.$courseSlug.$semesterNumber.$subjectSlug'
 import { Route as AuthenticatedAdminSuperadminUsersRouteImport } from './routes/_authenticated/admin/superadmin/users'
 import { Route as AuthenticatedAdminSuperadminSeoRouteImport } from './routes/_authenticated/admin/superadmin/seo'
@@ -258,12 +258,6 @@ const AuthenticatedAdminDeveloperRoute =
     path: '/developer',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
-const AuthenticatedAdminCoursesRoute =
-  AuthenticatedAdminCoursesRouteImport.update({
-    id: '/courses',
-    path: '/courses',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
 const AuthenticatedAdminContentRoute =
   AuthenticatedAdminContentRouteImport.update({
     id: '/content',
@@ -293,6 +287,12 @@ const AuthenticatedAdminSuperadminIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedAdminSuperadminRouteRoute,
+  } as any)
+const AuthenticatedAdminCoursesIndexRoute =
+  AuthenticatedAdminCoursesIndexRouteImport.update({
+    id: '/courses/',
+    path: '/courses/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const CoursesCourseSlugSemesterNumberSubjectSlugRoute =
   CoursesCourseSlugSemesterNumberSubjectSlugRouteImport.update({
@@ -338,9 +338,9 @@ const AuthenticatedAdminQuizzesQuizIdRoute =
   } as any)
 const AuthenticatedAdminCoursesCourseIdRoute =
   AuthenticatedAdminCoursesCourseIdRouteImport.update({
-    id: '/$courseId',
-    path: '/$courseId',
-    getParentRoute: () => AuthenticatedAdminCoursesRoute,
+    id: '/courses/$courseId',
+    path: '/courses/$courseId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminContentNewRoute =
   AuthenticatedAdminContentNewRouteImport.update({
@@ -395,7 +395,6 @@ export interface FileRoutesByFullPath {
   '/admin/superadmin': typeof AuthenticatedAdminSuperadminRouteRouteWithChildren
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/content': typeof AuthenticatedAdminContentRouteWithChildren
-  '/admin/courses': typeof AuthenticatedAdminCoursesRouteWithChildren
   '/admin/developer': typeof AuthenticatedAdminDeveloperRoute
   '/admin/explorer': typeof AuthenticatedAdminExplorerRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
@@ -418,6 +417,7 @@ export interface FileRoutesByFullPath {
   '/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
   '/admin/superadmin/users': typeof AuthenticatedAdminSuperadminUsersRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
+  '/admin/courses/': typeof AuthenticatedAdminCoursesIndexRoute
   '/admin/superadmin/': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber/': typeof CoursesCourseSlugSemesterNumberIndexRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber': typeof CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute
@@ -449,7 +449,6 @@ export interface FileRoutesByTo {
   '/courses': typeof CoursesIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/content': typeof AuthenticatedAdminContentRouteWithChildren
-  '/admin/courses': typeof AuthenticatedAdminCoursesRouteWithChildren
   '/admin/developer': typeof AuthenticatedAdminDeveloperRoute
   '/admin/explorer': typeof AuthenticatedAdminExplorerRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
@@ -471,6 +470,7 @@ export interface FileRoutesByTo {
   '/admin/superadmin/flags': typeof AuthenticatedAdminSuperadminFlagsRoute
   '/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
   '/admin/superadmin/users': typeof AuthenticatedAdminSuperadminUsersRoute
+  '/admin/courses': typeof AuthenticatedAdminCoursesIndexRoute
   '/admin/superadmin': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber': typeof CoursesCourseSlugSemesterNumberIndexRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber': typeof CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute
@@ -506,7 +506,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/superadmin': typeof AuthenticatedAdminSuperadminRouteRouteWithChildren
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRouteWithChildren
-  '/_authenticated/admin/courses': typeof AuthenticatedAdminCoursesRouteWithChildren
   '/_authenticated/admin/developer': typeof AuthenticatedAdminDeveloperRoute
   '/_authenticated/admin/explorer': typeof AuthenticatedAdminExplorerRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
@@ -529,6 +528,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/superadmin/seo': typeof AuthenticatedAdminSuperadminSeoRoute
   '/_authenticated/admin/superadmin/users': typeof AuthenticatedAdminSuperadminUsersRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug': typeof CoursesCourseSlugSemesterNumberSubjectSlugRouteWithChildren
+  '/_authenticated/admin/courses/': typeof AuthenticatedAdminCoursesIndexRoute
   '/_authenticated/admin/superadmin/': typeof AuthenticatedAdminSuperadminIndexRoute
   '/courses/$courseSlug/$semesterNumber/': typeof CoursesCourseSlugSemesterNumberIndexRoute
   '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber': typeof CoursesCourseSlugSemesterNumberSubjectSlugUnitNumberRoute
@@ -564,7 +564,6 @@ export interface FileRouteTypes {
     | '/admin/superadmin'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/content'
-    | '/admin/courses'
     | '/admin/developer'
     | '/admin/explorer'
     | '/admin/homepage'
@@ -587,6 +586,7 @@ export interface FileRouteTypes {
     | '/admin/superadmin/seo'
     | '/admin/superadmin/users'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
+    | '/admin/courses/'
     | '/admin/superadmin/'
     | '/courses/$courseSlug/$semesterNumber/'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber'
@@ -618,7 +618,6 @@ export interface FileRouteTypes {
     | '/courses'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/content'
-    | '/admin/courses'
     | '/admin/developer'
     | '/admin/explorer'
     | '/admin/homepage'
@@ -640,6 +639,7 @@ export interface FileRouteTypes {
     | '/admin/superadmin/flags'
     | '/admin/superadmin/seo'
     | '/admin/superadmin/users'
+    | '/admin/courses'
     | '/admin/superadmin'
     | '/courses/$courseSlug/$semesterNumber'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber'
@@ -674,7 +674,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/superadmin'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/content'
-    | '/_authenticated/admin/courses'
     | '/_authenticated/admin/developer'
     | '/_authenticated/admin/explorer'
     | '/_authenticated/admin/homepage'
@@ -697,6 +696,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/superadmin/seo'
     | '/_authenticated/admin/superadmin/users'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug'
+    | '/_authenticated/admin/courses/'
     | '/_authenticated/admin/superadmin/'
     | '/courses/$courseSlug/$semesterNumber/'
     | '/courses/$courseSlug/$semesterNumber/$subjectSlug/$unitNumber'
@@ -988,13 +988,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDeveloperRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
-    '/_authenticated/admin/courses': {
-      id: '/_authenticated/admin/courses'
-      path: '/courses'
-      fullPath: '/admin/courses'
-      preLoaderRoute: typeof AuthenticatedAdminCoursesRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
     '/_authenticated/admin/content': {
       id: '/_authenticated/admin/content'
       path: '/content'
@@ -1029,6 +1022,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/superadmin/'
       preLoaderRoute: typeof AuthenticatedAdminSuperadminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminSuperadminRouteRoute
+    }
+    '/_authenticated/admin/courses/': {
+      id: '/_authenticated/admin/courses/'
+      path: '/courses'
+      fullPath: '/admin/courses/'
+      preLoaderRoute: typeof AuthenticatedAdminCoursesIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/courses/$courseSlug/$semesterNumber/$subjectSlug': {
       id: '/courses/$courseSlug/$semesterNumber/$subjectSlug'
@@ -1081,10 +1081,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/courses/$courseId': {
       id: '/_authenticated/admin/courses/$courseId'
-      path: '/$courseId'
+      path: '/courses/$courseId'
       fullPath: '/admin/courses/$courseId'
       preLoaderRoute: typeof AuthenticatedAdminCoursesCourseIdRouteImport
-      parentRoute: typeof AuthenticatedAdminCoursesRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/content/new': {
       id: '/_authenticated/admin/content/new'
@@ -1162,21 +1162,6 @@ const AuthenticatedAdminContentRouteWithChildren =
     AuthenticatedAdminContentRouteChildren,
   )
 
-interface AuthenticatedAdminCoursesRouteChildren {
-  AuthenticatedAdminCoursesCourseIdRoute: typeof AuthenticatedAdminCoursesCourseIdRoute
-}
-
-const AuthenticatedAdminCoursesRouteChildren: AuthenticatedAdminCoursesRouteChildren =
-  {
-    AuthenticatedAdminCoursesCourseIdRoute:
-      AuthenticatedAdminCoursesCourseIdRoute,
-  }
-
-const AuthenticatedAdminCoursesRouteWithChildren =
-  AuthenticatedAdminCoursesRoute._addFileChildren(
-    AuthenticatedAdminCoursesRouteChildren,
-  )
-
 interface AuthenticatedAdminQuizzesRouteChildren {
   AuthenticatedAdminQuizzesQuizIdRoute: typeof AuthenticatedAdminQuizzesQuizIdRoute
 }
@@ -1194,7 +1179,6 @@ const AuthenticatedAdminQuizzesRouteWithChildren =
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminSuperadminRouteRoute: typeof AuthenticatedAdminSuperadminRouteRouteWithChildren
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRouteWithChildren
-  AuthenticatedAdminCoursesRoute: typeof AuthenticatedAdminCoursesRouteWithChildren
   AuthenticatedAdminDeveloperRoute: typeof AuthenticatedAdminDeveloperRoute
   AuthenticatedAdminExplorerRoute: typeof AuthenticatedAdminExplorerRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
@@ -1206,6 +1190,8 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminSubjectsRoute: typeof AuthenticatedAdminSubjectsRoute
   AuthenticatedAdminTagsRoute: typeof AuthenticatedAdminTagsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminCoursesCourseIdRoute: typeof AuthenticatedAdminCoursesCourseIdRoute
+  AuthenticatedAdminCoursesIndexRoute: typeof AuthenticatedAdminCoursesIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
@@ -1213,7 +1199,6 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminSuperadminRouteRoute:
       AuthenticatedAdminSuperadminRouteRouteWithChildren,
     AuthenticatedAdminContentRoute: AuthenticatedAdminContentRouteWithChildren,
-    AuthenticatedAdminCoursesRoute: AuthenticatedAdminCoursesRouteWithChildren,
     AuthenticatedAdminDeveloperRoute: AuthenticatedAdminDeveloperRoute,
     AuthenticatedAdminExplorerRoute: AuthenticatedAdminExplorerRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
@@ -1225,6 +1210,9 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminSubjectsRoute: AuthenticatedAdminSubjectsRoute,
     AuthenticatedAdminTagsRoute: AuthenticatedAdminTagsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+    AuthenticatedAdminCoursesCourseIdRoute:
+      AuthenticatedAdminCoursesCourseIdRoute,
+    AuthenticatedAdminCoursesIndexRoute: AuthenticatedAdminCoursesIndexRoute,
   }
 
 const AuthenticatedAdminRouteRouteWithChildren =
