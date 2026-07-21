@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute("/_authenticated/admin/courses")({
+export const Route = createFileRoute("/_authenticated/admin/courses/")({
   head: () => ({ meta: [{ title: "Courses · Admin · BCA Gurukul" }] }),
   component: CoursesAdmin,
 });
